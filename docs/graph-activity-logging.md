@@ -125,7 +125,9 @@ and cap state during the POC. [Daily cap behavior](https://learn.microsoft.com/e
    and modifications of unrelated shared resources. A repeat setup preserves an
    existing DCR attachment and original enable timestamp.
 3. `python scripts/prepare-graph-activity.py` enrolls the source, preserves an active
-   watermark and retires the old unconfigured partition. `collect-audit-evidence.py`
+   watermark/lease/retry time and retires the old unconfigured partition. Legacy
+   worker receipts are fenced; first setup cannot reactivate the retired partition.
+   `collect-audit-evidence.py`
    no longer marks this configured source unavailable; legacy Office Activity remains off.
 4. Run `python scripts/collect-graph-activity.py` for one cycle, or add `--watch` for
    supervised local collection every five minutes. Stopping the local reader does

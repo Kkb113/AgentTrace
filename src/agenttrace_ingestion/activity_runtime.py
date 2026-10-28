@@ -10,11 +10,35 @@ from agenttrace_foundation.database import Database
 from agenttrace_foundation.settings import Settings
 from agenttrace_foundation.workload_identity import CertificateTokenProvider
 
-from .contracts import IngestionError
+from .contracts import Enrollment, IngestionError
 from .graph_activity import GraphActivityCollector
 from .protection import EvidenceCipher
 from .store import IngestionStore
 from .transport import MicrosoftTransport
+
+
+def enroll_activity_source(store: IngestionStore, enrollment: Enrollment, source_ref: UUID) -> None:
+    """Retire pre-enable state without resetting any active checkpoint or lease."""
+    store.enroll(
+        enrollment.model_copy(update={"source_ref": source_ref}),
+        kind="graph_activity",
+        alias="graph-activity",
+    )
+    active = store.cipher.reference(str(source_ref), "graph-activity")
+    retired = store.cipher.reference(str(source_ref), "graph_activity")
+    with store.database.connect() as connection:
+        connection.execute(
+            "INSERT INTO ingest_checkpoints(source_ref,partition_ref,reason_code) VALUES (%s,%s,'graph_activity_initial_sync_required') ON CONFLICT DO NOTHING",
+            (source_ref, active),
+        )
+        connection.execute(
+            "UPDATE ingest_checkpoints SET coverage='retired',reason_code='pre_enable_partition_retired',generation=generation+1,lease=NULL,lease_until=NULL WHERE source_ref=%s AND partition_ref=%s AND coverage<>'retired'",
+            (source_ref, retired),
+        )
+        connection.execute(
+            "UPDATE ingest_gaps SET disposition='unrecoverable',ended_at=now() WHERE source_ref=%s AND reason_code='graph_activity_destination_not_configured' AND disposition='open'",
+            (source_ref,),
+        )
 
 
 def load_activity(root: Path) -> tuple[GraphActivityCollector, dict[str, object]]:

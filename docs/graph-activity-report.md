@@ -24,12 +24,14 @@ earlier batches remain visible when fresh probes are generated. An empty non-tar
 table is distinguished from an explicit access denial. Source export remains
 tenant-wide before downstream minimization.
 
-Local validation passed all five gates: 216 unit/security tests, 52 subtests and 62
+Local validation passed all five gates: 216 unit/security tests, 52 subtests and 64
 integration/end-to-end tests. The added tests cover send-versus-draft/read/move
 semantics, failure statuses, URI redaction, delayed arrivals, deduplication, empty
 initial delivery, throttling, malformed/partial results and transaction rollback.
-The deployment guard preserves the DCR attachment on repeat setup and refuses changes
-to unrelated shared resources. The repeat plan changed only a provider-populated
+First enrollment retires and fences the legacy unconfigured checkpoint. Repeat
+enrollment preserves the active watermark, lease and retry time. The deployment
+guard preserves the DCR attachment on repeat setup and refuses changes to unrelated
+shared resources. The repeat plan changed only a provider-populated
 table schema default, with three NoChange resources and thirteen ignored resources.
 
 [Design, costs and runbook](graph-activity-logging.md),

@@ -1,9 +1,9 @@
 {
-  "executed_at": "2026-10-28T21:36:47.735855+00:00",
+  "executed_at": "2026-10-28T21:54:42.182495+00:00",
   "all_five_local_gates_pass": true,
   "primary_test_counts": {
     "unit": 216,
-    "integration": 62
+    "integration": 64
   },
   "required_regressions": {
     "test_transform_is_narrow_and_drops_sensitive_fields_before_storage": true,
@@ -15,7 +15,9 @@
     "test_delayed_arrivals_overlap_deduplicate_and_remove_uri_queries": true,
     "test_empty_initial_delivery_is_pending_and_not_negative_agent_evidence": true,
     "test_failed_windows_never_advance_checkpoints_or_partially_commit": true,
-    "test_only_noncollector_successful_send_api_operations_are_correlation_candidates": true
+    "test_only_noncollector_successful_send_api_operations_are_correlation_candidates": true,
+    "test_first_enrollment_retires_legacy_checkpoint_and_fences_its_worker": true,
+    "test_repeat_enrollment_preserves_active_watermark_lease_and_retry_time": true
   },
   "live_validation_passed": false,
   "files": [
@@ -25,7 +27,7 @@
     },
     {
       "path": "src/agenttrace_ingestion/activity_runtime.py",
-      "sha256": "b033112d11dfe917918cddec5052919a618119efca8dfe42cfbded1c79acdbb5"
+      "sha256": "5cb2a77e56d381203e0746fc53627fa3edc87d230ae2f4b97b68158f2e8cd9aa"
     },
     {
       "path": "src/agenttrace_ingestion/graph_activity.py",
@@ -57,7 +59,7 @@
     },
     {
       "path": "scripts/prepare-graph-activity.py",
-      "sha256": "f6d6c8e577e809949e25d5a177ac23453081db166334d480fceb02ef808f1c36"
+      "sha256": "6dc649bbce8458c40f276dfa495b4d2101ae6c4023a60807db04fa8bf490cf29"
     },
     {
       "path": "scripts/probe-graph-activity.py",
@@ -77,7 +79,7 @@
     },
     {
       "path": "tests/integration/test_graph_activity_collection.py",
-      "sha256": "c927eec66a5d997caee61559ce2f55d2d25dc363268b09a1f3831770dd37867a"
+      "sha256": "fd2cf426d7bd4ba23961bf568b3cb04c29399aa3ac71974ba770a2698d31f051"
     }
   ],
   "file_hash_normalization": "Git LF text bytes",

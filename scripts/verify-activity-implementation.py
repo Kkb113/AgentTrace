@@ -34,6 +34,8 @@ def main():
         "test_empty_initial_delivery_is_pending_and_not_negative_agent_evidence",
         "test_failed_windows_never_advance_checkpoints_or_partially_commit",
         "test_only_noncollector_successful_send_api_operations_are_correlation_candidates",
+        "test_first_enrollment_retires_legacy_checkpoint_and_fences_its_worker",
+        "test_repeat_enrollment_preserves_active_watermark_lease_and_retry_time",
     ]
     paths = [
         "src/agenttrace_ingestion/activity_policy.py",

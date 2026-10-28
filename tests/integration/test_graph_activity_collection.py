@@ -3,6 +3,7 @@ from uuid import uuid4
 
 import pytest
 
+from agenttrace_ingestion.activity_runtime import enroll_activity_source
 from agenttrace_ingestion.contracts import IngestionError, utc_now
 from agenttrace_ingestion.graph_activity import GraphActivityCollector
 from agenttrace_ingestion.store import IngestionStore
@@ -96,6 +97,51 @@ def test_empty_initial_delivery_is_pending_and_not_negative_agent_evidence(datab
     assert health["checkpoints"][0]["coverage"] == "catching_up"
     assert health["checkpoints"][0]["reason_code"] == "graph_activity_delivery_pending"
     assert health["agent_attribution"] == "not_established_by_ingestion"
+
+
+def test_first_enrollment_retires_legacy_checkpoint_and_fences_its_worker(database):
+    config = enrollment()
+    store = IngestionStore(database, cipher())
+    store.enroll(config, kind="graph_activity", alias="graph_activity")
+    old_partition = store.cipher.reference(str(config.source_ref), "graph_activity")
+    old_lease = store.claim_checkpoint(config.source_ref, old_partition)
+    store.gap(config.source_ref, "graph_activity_destination_not_configured")
+
+    enroll_activity_source(store, config, config.source_ref)
+
+    with database.connect() as connection:
+        rows = connection.execute("SELECT * FROM ingest_checkpoints").fetchall()
+        gap = connection.execute("SELECT * FROM ingest_gaps").fetchone()
+    assert len(rows) == 2
+    retired = next(r for r in rows if r["partition_ref"] == old_partition)
+    active = next(r for r in rows if r["partition_ref"] != old_partition)
+    assert retired["coverage"] == "retired" and retired["lease"] is None
+    assert retired["generation"] > old_lease.generation
+    assert active["coverage"] == "pending"
+    assert gap["disposition"] == "unrecoverable" and gap["known_lost_events"] is None
+    with database.connect() as connection, pytest.raises(IngestionError, match="checkpoint_lease"):
+        store._checkpoint_fence(connection, old_lease)
+
+
+def test_repeat_enrollment_preserves_active_watermark_lease_and_retry_time(database):
+    config = enrollment()
+    store = IngestionStore(database, cipher())
+    enroll_activity_source(store, config, config.source_ref)
+    partition = store.cipher.reference(str(config.source_ref), "graph-activity")
+    lease = store.claim_checkpoint(config.source_ref, partition)
+    with database.connect() as connection:
+        connection.execute(
+            "UPDATE ingest_checkpoints SET watermark=%s,coverage='catching_up',next_attempt=now()+interval '10 minutes' WHERE source_ref=%s AND partition_ref=%s",
+            (utc_now() - timedelta(minutes=15), config.source_ref, partition),
+        )
+        before = connection.execute("SELECT * FROM ingest_checkpoints").fetchone()
+
+    enroll_activity_source(store, config, config.source_ref)
+
+    with database.connect() as connection:
+        after = connection.execute("SELECT * FROM ingest_checkpoints").fetchone()
+        store._checkpoint_fence(connection, lease)
+    assert after == before
 
 
 @pytest.mark.parametrize(
