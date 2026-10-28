@@ -13,3 +13,13 @@ work/
 *.pfx
 *.key
 ~$*
+.mypy_cache/
+dist/
+build/
+node_modules/
+*.safetensors
+*.onnx
+*.pt
+*.bin
+*.parquet
+*.jsonl

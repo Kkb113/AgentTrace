@@ -1,0 +1,93 @@
+name: agenttrace-foundation
+services:
+  postgres:
+    image: postgres:17.11-bookworm@sha256:839fbb5a4942a7758dd93e18b42ea5649807491a0545b5eeeb8f0b8bb11857a5
+    environment:
+      POSTGRES_DB: agenttrace
+      POSTGRES_USER: agenttrace
+      POSTGRES_PASSWORD_FILE: /run/secrets/database_password
+    secrets: [database_password]
+    ports: ["127.0.0.1:55432:5432"]
+    volumes: ["database_data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U agenttrace -d agenttrace"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    networks: [private, local-access]
+  migrate:
+    build: .
+    image: agenttrace-foundation:local
+    command: [migrate]
+    environment: &runtime
+      AGENTTRACE_ENVIRONMENT: local_synthetic
+      AGENTTRACE_DATABASE_HOST: postgres
+      AGENTTRACE_DATABASE_PORT: "5432"
+      AGENTTRACE_DATABASE_PASSWORD_FILE: /run/secrets/database_password
+    secrets: [database_password]
+    depends_on:
+      postgres: {condition: service_healthy}
+    networks: [private]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+  api:
+    image: agenttrace-foundation:local
+    command: [api, --container]
+    environment: *runtime
+    secrets: [database_password]
+    ports: ["127.0.0.1:8080:8080"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health/ready',timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 30
+    networks: [private, local-access]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+  attribution-worker:
+    image: agenttrace-foundation:local
+    command: [worker, --role, attribution]
+    environment: *runtime
+    secrets: [database_password]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, agenttrace-foundation, health, --role, attribution]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+    networks: [private]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+  content-worker:
+    image: agenttrace-foundation:local
+    command: [worker, --role, content]
+    environment: *runtime
+    secrets: [database_password]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, agenttrace-foundation, health, --role, content]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+    networks: [private]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+networks:
+  private: {internal: true}
+  local-access:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+volumes:
+  database_data:
+secrets:
+  database_password:
+    file: ./work/local/postgres-password

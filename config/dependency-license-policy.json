@@ -1,0 +1,10 @@
+{
+  "own_project": "agenttrace-feasibility",
+  "own_project_license": "No distribution license granted by this repository; owner decision required before distribution",
+  "allowed_metadata": ["Apache Software License","Apache-2.0","Apache-2.0 OR BSD-2-Clause","Apache-2.0 OR BSD-3-Clause","BSD-2-Clause","BSD-3-Clause","MIT","MIT License","MIT-0","Mozilla Public License 2.0 (MPL 2.0)","MPL-2.0","PSF-2.0","Python Software Foundation License","LGPL-3.0-only"],
+  "reviewed_legacy_metadata": {
+    "colorama": {"version":"0.4.6","metadata":"BSD License","spdx":"BSD-3-Clause","source":"https://github.com/tartley/colorama/blob/0.4.6/LICENSE.txt"},
+    "httpx": {"version":"0.28.1","metadata":"BSD License","spdx":"BSD-3-Clause","source":"https://github.com/encode/httpx/blob/0.28.1/LICENSE.md"}
+  },
+  "obligations": "Preserve shipped notices. LGPL dependencies require their redistribution/source and replacement obligations to be reviewed before distribution. This inventory is not regulatory or legal certification."
+}

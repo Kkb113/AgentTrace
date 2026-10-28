@@ -1,0 +1,13 @@
+{
+  "review_version": "1.0.0",
+  "status": "implementation_and_local_validation_in_progress",
+  "active_ci": "github_actions_owner_selected_after_azure_project_permission_denial",
+  "exits": [
+    {"id":"reviewed_repository_and_architecture","met":false,"state":"implementation_ready_for_review_then_commit","evidence":["docs/adr/detection-contracts.md","docs/adr/local-storage-and-queues.md","docs/adr/identity-and-retention.md"]},
+    {"id":"clean_checkout_and_ci_reproducible","met":false,"state":"local_stack_validated_clean_checkout_and_remote_ci_pending","evidence":["docs/runbooks/local-development.md","uv.lock","compose.yaml"]},
+    {"id":"required_pull_request_checks","met":false,"state":"pipeline_definition_implemented_live_pr_run_pending","evidence":[".github/workflows/validation.yml","ci/azure-pipelines.yml"]},
+    {"id":"no_sensitive_tracked_material","met":true,"state":"secret_privacy_and_license_gates_passed_local_test_credential_rotated","evidence":["scripts/check-privacy.py","scripts/ci-checks.py","tests/security/test_credential_redaction.py"]},
+    {"id":"external_artifact_reproducibility","met":true,"state":"separate_component_hash_and_rights_contracts_enforced_no_model_or_dataset_acquired","evidence":["config/artifact-catalog.json","docs/runbooks/artifact-review.md","tests/unit/test_artifact_policy.py"]},
+    {"id":"detection_only_product_and_manifests","met":true,"state":"two_finding_contract_read_only_routes_and_package_boundary_gates_passed","evidence":["scripts/check-boundaries.py","packages/contracts/schemas/detection-decision.schema.json","infra/bicep/main.bicep"]}
+  ]
+}

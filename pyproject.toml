@@ -1,22 +1,65 @@
 [build-system]
-requires = ["setuptools>=75"]
+requires = ["setuptools==84.2.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "agenttrace-feasibility"
-version = "0.1.0"
-description = "Read-only evidence feasibility checks for AgentTrace"
+version = "0.2.0"
+description = "Detection-only AgentTrace foundation and evidence feasibility tools"
 requires-python = ">=3.12"
-dependencies = ["cryptography==50.0.2", "msal==1.39.0"]
+dependencies = [
+  "cryptography==50.0.2", "msal==1.39.0", "fastapi==0.162.0",
+  "pydantic==2.14.1", "uvicorn==0.54.0", "psycopg[binary]==3.3.6"
+]
 
 [project.scripts]
 agenttrace-feasibility = "agenttrace_feasibility.cli:main"
+agenttrace-foundation = "agenttrace_foundation.cli:main"
 
 [dependency-groups]
-dev = ["ruff==0.14.2"]
+build = ["setuptools==84.2.1"]
+dev = [
+  "ruff==0.14.2", "pytest==9.2.0", "mypy==2.4.0", "httpx2==2.16.0",
+  "pip-audit==2.10.1", "pip-licenses==5.5.5", "build==1.6.1",
+  "setuptools==84.2.1", "pyyaml==6.0.3", "jsonschema==4.26.0"
+]
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.setuptools]
+packages = [
+  "agenttrace_feasibility", "agenttrace_foundation", "agenttrace_contracts",
+  "agenttrace_attribution", "agenttrace_evidence_adapters", "agenttrace_content_detection",
+  "agenttrace_content_provenance", "agenttrace_text_normalization"
+]
+
+[tool.setuptools.package-dir]
+agenttrace_feasibility = "src/agenttrace_feasibility"
+agenttrace_foundation = "src/agenttrace_foundation"
+agenttrace_contracts = "packages/contracts/src/agenttrace_contracts"
+agenttrace_attribution = "packages/attribution/src/agenttrace_attribution"
+agenttrace_evidence_adapters = "packages/evidence-adapters/src/agenttrace_evidence_adapters"
+agenttrace_content_detection = "packages/content-detection/src/agenttrace_content_detection"
+agenttrace_content_provenance = "packages/content-provenance/src/agenttrace_content_provenance"
+agenttrace_text_normalization = "packages/text-normalization/src/agenttrace_text_normalization"
+
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
+agenttrace_foundation = ["migrations/*.sql", "py.typed"]
+agenttrace_contracts = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = ["integration: requires the isolated local PostgreSQL service"]
+
+[tool.mypy]
+files = ["src/agenttrace_foundation", "packages"]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["agenttrace_feasibility.*"]
+follow_imports = "skip"
 
 [tool.ruff]
 target-version = "py312"

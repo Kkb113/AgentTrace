@@ -2,23 +2,29 @@
 
 AgentTrace detects two independent things in Outlook/Exchange Online email: whether an AI agent executed the send, and whether the body contains AI-generated content. Accurate agent attribution with low false positives is the priority. Content scoring is a separate best-effort capability.
 
-This checkout currently contains bounded feasibility tooling and the initial evidence/policy documents. It does not contain the full hosted application, Outlook add-in or statistical content model. Read [the implementation plan](implementation.md) and [the current feasibility report](docs/feasibility-report.md) before interpreting results as completed release qualification.
+This checkout contains the typed product foundation, a local synthetic PostgreSQL/API/worker stack, reproducible CI/security/infrastructure gates and the earlier feasibility tooling. The dashboard and Outlook add-in have documented application boundaries; their UI and production authorization are later work. Statistical content models are not installed. Read [the implementation plan](implementation.md), [foundation decisions](docs/adr/detection-contracts.md) and [the feasibility report](docs/feasibility-report.md) before interpreting authored fixture results as release qualification.
 
 ## Run locally
 
-Requires Python 3.12+, `cryptography==50.0.2` and `msal==1.39.0`. Create an isolated environment and install the pinned requirements using your normal Python/package manager. From the repository root in PowerShell:
+Requires Python 3.12.14, uv 0.12.12 and Docker with Compose. From the repository root:
 
-With `uv`, prefer `uv sync --frozen`, which installs the project and the transitive dependency versions/hashes from `uv.lock`. It also installs the pinned development linter; run `uv run ruff check src tests scripts` and `uv run ruff format --check src tests scripts`. The standard-library test suite needs no separate test-runner dependency.
+`uv.lock` pins runtime and development dependencies with hashes. Generated requirements also support hash-enforced container builds. Use the same gate commands locally and in CI:
 
 ```powershell
-python -m venv .venv
-.venv\Scripts\python.exe -m pip install -r requirements-feasibility.txt
-$env:PYTHONPATH = (Join-Path (Get-Location) 'src')
-.venv\Scripts\python.exe -m unittest discover -s tests -v
-.venv\Scripts\python.exe scripts/verify-feasibility.py
+uv sync --frozen --all-groups
+uv run python scripts/bootstrap-tools.py all
+uv run python scripts/ci-checks.py quality
+uv run python scripts/ci-checks.py security
+uv run python scripts/ci-checks.py infrastructure
+uv run python scripts/ci-checks.py guard-controls
+uv run python scripts/ci-checks.py integration
 ```
 
-The tests create only offline synthetic files in an ignored workspace and never send email. Their keys are generated in memory. Authored signed examples test contract semantics and are not independent tenant labels or vendor attestations.
+The integration gate starts only the named local synthetic stack and exercises a real PostgreSQL queue, separate worker, persisted decision and GET API over loopback. Stop with `uv run python scripts/dev-services.py stop`. See the [local runbook](docs/runbooks/local-development.md) for health, clean-checkout testing and credential handling. Unit tests use offline fictional inputs; integration tests use disposable local schemas. No test sends email. Authored signed examples test semantics and are not independent tenant labels or vendor attestations.
+
+Active pull-request checks use GitHub Actions per the owner's selection after Azure project creation was denied. Equivalent [Azure Pipelines YAML](ci/azure-pipelines.yml) calls the same gates. Compile-only CI needs no Azure identity or secret. The optional WIF what-if template is reserved for a separately authorized protected connection. [CI decision](docs/adr/ci-and-release.md).
+
+The current API serves health and synthetic decision queries only on loopback. The model-absent content worker remains in standby and does not acknowledge content jobs. Production identities, mailbox collection, statistical scoring and UI implementation remain later milestones.
 
 To replay the reviewed public example:
 

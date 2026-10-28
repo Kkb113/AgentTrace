@@ -1,0 +1,36 @@
+trigger:
+  branches:
+    include: [main, codex/*]
+pr:
+  branches:
+    include: [main]
+pool:
+  vmImage: ubuntu-24.04
+variables:
+  UV_CACHE_DIR: $(Pipeline.Workspace)/uv-cache
+steps:
+  - checkout: self
+    persistCredentials: false
+    fetchDepth: 0
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.12.14'
+  - script: python -m pip install uv==0.12.12
+    displayName: Install pinned uv
+  - script: uv sync --frozen --all-groups
+    displayName: Install locked dependencies
+  - script: uv run python scripts/bootstrap-tools.py all
+    displayName: Verify official tool hashes
+  - script: uv run python scripts/ci-checks.py quality
+    displayName: Format, type, unit, contract and boundary checks
+  - script: uv run python scripts/ci-checks.py security
+    displayName: Secret, privacy, license and dependency checks
+  - script: uv run python scripts/ci-checks.py infrastructure
+    displayName: Bicep validation without provisioning
+  - script: uv run python scripts/ci-checks.py integration
+    displayName: PostgreSQL and separate worker end-to-end checks
+  - script: uv run python scripts/ci-checks.py guard-controls
+    displayName: Prove invalid contract, failing test and synthetic secret are rejected
+  - script: uv run python scripts/dev-services.py stop
+    condition: always()
+    displayName: Stop only the AgentTrace local stack
