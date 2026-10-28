@@ -1,6 +1,6 @@
 # Repository foundation review
 
-Status: implemented and locally validated; fresh installation passed; hosted PR checks are being completed. The machine-readable exit record is config/foundation-exits.json.
+Status: Phase 1 complete. All six exits have recorded evidence; the final PR head must continue to pass the enforced checks before merge. The machine-readable exit record is config/foundation-exits.json.
 
 ## Delivered boundaries
 
@@ -18,16 +18,22 @@ The negative controls invoke the real validation commands: an invalid contract, 
 
 Testing found and fixed Docker image ordering, Docker Desktop internal-network port forwarding, the test-client dependency migration and a credential-bearing database error trace. The affected generated local database password was rotated, driver exceptions were sanitized, and a regression test verifies that credentials cannot appear through that error path. Worker networks remain internal; only API/database get a loopback-published access bridge.
 
-A pre-commit Git-index export was independently installed into a fresh repository/virtual environment without private state. All gates and the eight-test real database/TCP suite passed with a new database and generated credential. See docs/evidence/foundation-clean-install.json. Hosted CI will additionally verify a genuine Git checkout.
+A pre-commit Git-index export was independently installed into a fresh repository/virtual environment without private state. All gates and the eight-test real database/TCP suite passed with a new database and generated credential. See docs/evidence/foundation-clean-install.json. Hosted CI also passed from a genuine Git checkout, as recorded in docs/evidence/foundation-ci-validation.json.
 
 ## CI and access
 
 Azure project creation returned TF50309 for missing Create new projects permission. The owner explicitly selected GitHub Actions for active PR checks and equivalent Azure Pipelines YAML. Both definitions invoke the same gate scripts. Actions are pinned by commit and validator binaries by release SHA-256. Jobs have contents:read, no Azure token or secret, and no persisted checkout credentials. Azure YAML is retained but an Azure run is not claimed. The optional future WIF what-if template is main-only and requires a separately approved protected connection.
 
-Native secret scanning and push protection are enabled. Required-check enforcement and the hosted PR results will be recorded after the actual runs. No Microsoft mailbox permission, Entra application or Azure role was created. The old feasibility reader stays retired. Existing client workbook changes remain excluded from this implementation.
+Native secret scanning and push protection are enabled. All five hosted pull-request checks passed on implementation commit 68b2c25. Main requires those exact GitHub Actions contexts with strict freshness, administrator enforcement, PR-only changes, linear history and no force pushes/deletion. Required external review count is zero for this solo-owner repository; no independent peer or regulatory review is invented. Feature pushes do not duplicate PR runs. See docs/evidence/foundation-ci-validation.json; final metadata/trigger changes must pass the same checks before merge. No Microsoft mailbox permission, Entra application or Azure role was created. The old feasibility reader stays retired. Existing client workbook changes remain excluded from this implementation.
 
 ## Artifact handling
 
 The catalog records research code, weights, tokenizer, dataset and calibration separately. No model/data artifact has been acquired; no revision, hash or license is invented. Verified components require immutable revision, byte hash and separate rights-evidence hash; local loading verifies containment/hash and safetensors format. Raw assets remain outside Git and runtime model downloads are absent. The artifact review runbook records acquisition, rights, calibration, disclosure and reproduction obligations.
 
 Decision expiry is checked at thirty days; physical purge, backups and retained raw-evidence lifecycle are later milestones. Compile-only infrastructure validation does not authorize provisioning or production use. Release false-positive/recall/content criteria remain unmeasured.
+
+## Exit review
+
+All six foundation exits are met: architecture and repository foundation reviewed/committed; fresh dependency installation and real checkout CI reproduced; required checks executed on the PR and enforced on main; source/privacy/secret checks passed; model/data reproducibility and rights procedure enforced with no unacquired asset falsely promoted; detection-only packages/manifests verified.
+
+The earlier local validation snapshot records the three exits that were met before remote CI existed. The current exit record contains six. The tracked baseline client workbook was separately read-only checked for known tenant/operator/mailbox/reader values and email patterns, with none found; the user's locally modified workbook was neither changed nor staged.

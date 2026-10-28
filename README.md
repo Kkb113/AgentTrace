@@ -22,7 +22,7 @@ uv run python scripts/ci-checks.py integration
 
 The integration gate starts only the named local synthetic stack and exercises a real PostgreSQL queue, separate worker, persisted decision and GET API over loopback. Stop with `uv run python scripts/dev-services.py stop`. See the [local runbook](docs/runbooks/local-development.md) for health, clean-checkout testing and credential handling. Unit tests use offline fictional inputs; integration tests use disposable local schemas. No test sends email. Authored signed examples test semantics and are not independent tenant labels or vendor attestations.
 
-Active pull-request checks use GitHub Actions per the owner's selection after Azure project creation was denied. Equivalent [Azure Pipelines YAML](ci/azure-pipelines.yml) calls the same gates. Compile-only CI needs no Azure identity or secret. The optional WIF what-if template is reserved for a separately authorized protected connection. [CI decision](docs/adr/ci-and-release.md).
+Phase 1 exit evidence is recorded in [the foundation review](docs/repository-foundation.md). Active pull-request checks use GitHub Actions per the owner's selection after Azure project creation was denied. Equivalent [Azure Pipelines YAML](ci/azure-pipelines.yml) calls the same gates. Compile-only CI needs no Azure identity or secret. The optional WIF what-if template is reserved for a separately authorized protected connection. [CI decision](docs/adr/ci-and-release.md).
 
 The current API serves health and synthetic decision queries only on loopback. The model-absent content worker remains in standby and does not acknowledge content jobs. Production identities, mailbox collection, statistical scoring and UI implementation remain later milestones.
 
