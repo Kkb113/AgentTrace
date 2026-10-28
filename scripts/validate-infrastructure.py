@@ -55,9 +55,18 @@ def main() -> int:
     assert parameters["expectedResourceGroup"]["allowedValues"] == ["kb-agentdemo"]
     assert parameters["location"]["allowedValues"] == ["eastus"]
     assert all("condition" in resource for resource in template["resources"])
+    access = json.loads((output / "access-sandbox.json").read_text(encoding="utf-8-sig"))
+    assert access["parameters"]["enableProvisioning"]["defaultValue"] is False
+    assert access["parameters"]["expectedResourceGroup"]["allowedValues"] == ["kb-agentdemo"]
+    assert access["parameters"]["location"]["allowedValues"] == ["eastus"]
+    assert all("condition" in resource for resource in access["resources"])
     print(
         json.dumps(
-            {"bicep_modules_compiled": 6, "parameters_compiled": True, "resources_provisioned": 0}
+            {
+                "bicep_modules_compiled": len(list((ROOT / "infra/bicep").rglob("*.bicep"))),
+                "parameters_compiled": True,
+                "resources_provisioned": 0,
+            }
         )
     )
     return 0

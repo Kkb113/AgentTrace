@@ -82,14 +82,17 @@ def test_concurrent_receivers_do_not_share_a_live_lease(database):
 
 def test_queue_worker_store_read_only_api_round_trip(database):
     queue = DevelopmentQueue(database, "agent-evidence")
-    queue.enqueue(job(), "round-trip")
+    queue.enqueue(job("synthetic-example"), "round-trip")
     decision = process_one(database, ROOT)
     assert decision is not None
     assert process_one(database, ROOT) is None
     store = DecisionStore(database)
     store.heartbeat("attribution")
     store.heartbeat("content")
-    client = TestClient(create_app(database))
+    from tests.development_identity import development_policy, development_token
+
+    client = TestClient(create_app(database, policy=development_policy()))
+    client.headers.update({"Authorization": "Bearer " + development_token()})
     assert client.get("/health/ready").status_code == 200
     response = client.get(f"/v1/decisions/{decision.decision_id}")
     assert response.status_code == 200

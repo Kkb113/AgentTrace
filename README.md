@@ -2,7 +2,7 @@
 
 AgentTrace detects two independent things in Outlook/Exchange Online email: whether an AI agent executed the send, and whether the body contains AI-generated content. Accurate agent attribution with low false positives is the priority. Content scoring is a separate best-effort capability.
 
-This checkout contains the typed product foundation, a local synthetic PostgreSQL/API/worker stack, reproducible CI/security/infrastructure gates and the earlier feasibility tooling. The dashboard and Outlook add-in have documented application boundaries; their UI and production authorization are later work. Statistical content models are not installed. Read [the implementation plan](implementation.md), [foundation decisions](docs/adr/detection-contracts.md) and [the feasibility report](docs/feasibility-report.md) before interpreting authored fixture results as release qualification.
+This checkout contains the typed product foundation, a secured local synthetic PostgreSQL/API/worker stack, scoped Microsoft 365 access, a minimal Azure access sandbox, reproducible CI/security/infrastructure gates and the earlier feasibility tooling. The dashboard/add-in UI, reliable mailbox ingestion and production rollout remain later work. Statistical content models are not installed. Read [the implementation plan](implementation.md), [the secure-access review](docs/secure-access-report.md) and [the feasibility report](docs/feasibility-report.md) before interpreting access tests or authored fixtures as detector qualification.
 
 ## Run locally
 
@@ -20,11 +20,11 @@ uv run python scripts/ci-checks.py guard-controls
 uv run python scripts/ci-checks.py integration
 ```
 
-The integration gate starts only the named local synthetic stack and exercises a real PostgreSQL queue, separate worker, persisted decision and GET API over loopback. Stop with `uv run python scripts/dev-services.py stop`. See the [local runbook](docs/runbooks/local-development.md) for health, clean-checkout testing and credential handling. Unit tests use offline fictional inputs; integration tests use disposable local schemas. No test sends email. Authored signed examples test semantics and are not independent tenant labels or vendor attestations.
+The integration gate generates local development keys, starts only the named synthetic stack and exercises PostgreSQL workload roles, queues, separate workers and an authenticated GET API over loopback. It also checks expired/untrusted tokens, decision retention and content-network isolation. Stop with `uv run python scripts/dev-services.py stop`. See the [local runbook](docs/runbooks/local-development.md) for health, clean-checkout testing and credential handling. Unit tests use offline fictional inputs; integration tests use disposable local schemas and explicit synthetic public-schema rows. No test sends email. Authored signed examples test semantics and are not independent tenant labels or vendor attestations.
 
 Phase 1 exit evidence is recorded in [the foundation review](docs/repository-foundation.md). Active pull-request checks use GitHub Actions per the owner's selection after Azure project creation was denied. Equivalent [Azure Pipelines YAML](ci/azure-pipelines.yml) calls the same gates. Compile-only CI needs no Azure identity or secret. The optional WIF what-if template is reserved for a separately authorized protected connection. [CI decision](docs/adr/ci-and-release.md).
 
-The current API serves health and synthetic decision queries only on loopback. The model-absent content worker remains in standby and does not acknowledge content jobs. Production identities, mailbox collection, statistical scoring and UI implementation remain later milestones.
+The API validates tenant, issuer, audience, signature, lifetime, client, role and server-owned message entitlements. The local stack uses fictional signing keys; a separate live probe verifies actual Entra-issued API tokens. The [access runbook](docs/runbooks/secure-access.md) covers the accepted certificate identities, exact-mailbox Exchange RBAC, isolated audit reader, Azure data roles and operator-only setup. Cloud/live probes never run in untrusted PR CI. The model-absent content worker remains in standby and does not acknowledge content jobs. Continuous collection, hosted managed identities, statistical scoring and UI implementation remain later milestones.
 
 To replay the reviewed public example:
 

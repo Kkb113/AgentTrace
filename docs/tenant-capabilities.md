@@ -1,5 +1,7 @@
 # Tenant capability matrix
 
+This is the historical feasibility probe. Current scoped application access and effective tests are recorded in [the secure-access report](secure-access-report.md); the temporary feasibility reader remains retired.
+
 Read-only probe run: 28 October 2026, 13:28 UTC. Raw output is ignored at `work/private/tenant-preflight/tenant-capabilities.private.json`; no tenant, subscription, mailbox, app or resource IDs are committed here.
 
 | Capability | Evidence | State and implication |

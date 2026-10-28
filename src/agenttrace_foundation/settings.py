@@ -12,12 +12,21 @@ class Settings:
     database_host: str
     database_port: int
     password_file: Path
+    database_user: str = "agenttrace"
 
     def __post_init__(self) -> None:
         if self.database_host not in {"127.0.0.1", "localhost", "postgres"}:
             raise ValueError("foundation_database_must_be_local")
         if self.database_port not in {5432, 55432}:
             raise ValueError("unexpected_local_database_port")
+        if self.database_user not in {
+            "agenttrace",
+            "agenttrace_api",
+            "agenttrace_attribution",
+            "agenttrace_content",
+            "agenttrace_collector",
+        }:
+            raise ValueError("unexpected_local_database_identity")
 
     @classmethod
     def from_environment(cls) -> Settings:
@@ -29,6 +38,7 @@ class Settings:
             Path(
                 os.environ.get("AGENTTRACE_DATABASE_PASSWORD_FILE", "work/local/postgres-password")
             ),
+            os.environ.get("AGENTTRACE_DATABASE_USER", "agenttrace"),
         )
 
     def password(self) -> str:

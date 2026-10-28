@@ -35,3 +35,27 @@ CREATE TABLE IF NOT EXISTS component_health (
     component text PRIMARY KEY CHECK(component IN ('attribution', 'content')),
     observed_at timestamptz NOT NULL
 );
+
+-- These checks also upgrade the existing local foundation volume. They prevent a
+-- direct producer SQL connection from storing bodies or extending decision retention.
+DO $migration$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid='detection_jobs'::regclass AND conname='reference_only_job_payload') THEN
+        ALTER TABLE detection_jobs ADD CONSTRAINT reference_only_job_payload CHECK (
+            jsonb_typeof(payload)='object'
+            AND (payload-'schema_version'-'fixture_ref'-'message_ref')='{}'::jsonb
+            AND payload ?& ARRAY['schema_version','fixture_ref','message_ref']
+            AND jsonb_typeof(payload->'schema_version')='string'
+            AND jsonb_typeof(payload->'fixture_ref')='string'
+            AND jsonb_typeof(payload->'message_ref')='string'
+            AND payload->>'schema_version'='1.0'
+            AND payload->>'fixture_ref'='authored_contract_example'
+            AND length(payload->>'message_ref') BETWEEN 1 AND 256
+        );
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid='detection_decisions'::regclass AND conname='bounded_decision_retention') THEN
+        ALTER TABLE detection_decisions ADD CONSTRAINT bounded_decision_retention
+            CHECK (expires_at<=created_at+interval '30 days');
+    END IF;
+END
+$migration$;

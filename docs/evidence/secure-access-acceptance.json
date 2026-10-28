@@ -1,0 +1,17 @@
+{
+  "accepted_on": "2026-10-28",
+  "recorded_review_date": "2026-10-29",
+  "source": "Explicit human reply in this chat to the concrete permission-matrix/data-flow acceptance request",
+  "accepted_roles": [
+    "project owner",
+    "Microsoft 365 administrator",
+    "security owner"
+  ],
+  "exact_reply": "Accept as project owner, Microsoft 365 administrator and security owner",
+  "documents": [
+    "docs/permissions-matrix.md",
+    "docs/data-flow.md"
+  ],
+  "baseline": "config/secure-access-baseline.json",
+  "technical_validation_is_separate": true
+}

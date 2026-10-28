@@ -1,5 +1,7 @@
 # Azure cost and deployment baseline
 
+This is the historical Phase 0 snapshot. The later secure-access milestone provisions minimal Storage/Key Vault resources and resource diagnostics; its incremental usage boundary is in [secure-access cost](secure-access-cost.md). The zero-resource statements below describe the original feasibility run.
+
 Date: 28 October 2026. Region: East US, accepted for synthetic tests only. Currency: USD retail, excluding tax, negotiated subscription discounts and unverified grants. Sources are Microsoft's [Retail Prices API](https://learn.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices) and [Container Apps billing guidance](https://learn.microsoft.com/en-us/azure/container-apps/billing). Public price snapshots were retrieved from `prices.azure.com`; a selected, reproducible meter snapshot accompanies this document.
 
 **Current incremental provisioned compute cost: $0.** No Azure resource, diagnostic setting or role assignment was created. The project owner separately authorized a temporary tenant-scoped Entra application, its service principal and operator-only delegated consent, which were created for the read-only exercise; these do not provision billable Azure compute. See `access-remediation.md`. Existing-resource charges are not attributed to this project. Local CPU work and existing licensing are used for this stage; internet egress, subscription-specific billing and operator labor are not measured by that $0 compute-creation statement.

@@ -46,6 +46,7 @@ def main() -> int:
             ".bicep",
             ".eml",
             ".bicepparam",
+            ".ps1",
         }:
             continue
         content = path.read_text(encoding="utf-8-sig")

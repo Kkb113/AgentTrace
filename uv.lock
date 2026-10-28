@@ -8,7 +8,7 @@ resolution-markers = [
 
 [[package]]
 name = "agenttrace-feasibility"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "cryptography" },
@@ -16,6 +16,7 @@ dependencies = [
     { name = "msal" },
     { name = "psycopg", extra = ["binary"] },
     { name = "pydantic" },
+    { name = "pyjwt" },
     { name = "uvicorn" },
 ]
 
@@ -43,6 +44,7 @@ requires-dist = [
     { name = "msal", specifier = "==1.39.0" },
     { name = "psycopg", extras = ["binary"], specifier = "==3.3.6" },
     { name = "pydantic", specifier = "==2.14.1" },
+    { name = "pyjwt", specifier = "==2.15.1" },
     { name = "uvicorn", specifier = "==0.54.0" },
 ]
 

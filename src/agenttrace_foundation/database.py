@@ -34,7 +34,7 @@ class Database:
                 host=self.settings.database_host,
                 port=self.settings.database_port,
                 dbname="agenttrace",
-                user="agenttrace",
+                user=self.settings.database_user,
                 password=self.settings.password(),
                 connect_timeout=5,
                 row_factory=dict_row,
