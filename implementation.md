@@ -7,8 +7,15 @@
 - **Status:** Revised delivery plan; product implementation and performance validation have not started.
 - **Delivery scope:** 15 phases, numbered Phase 0 through Phase 14.
 - **Product boundary:** Detection only. Two independent findings: email sent by an AI agent; email contains AI-generated content. English first for content; distinguish basic spelling/grammar assistance from generated drafts and substantial rewrites/translations.
+- **Priority:** Agent-sent detection is the primary release objective. Content detection is a required, measured best-effort capability; its accuracy does not determine whether the agent detector qualifies.
+- **Azure constraint:** Use Azure CLI with an explicit subscription and the existing `kb-agentdemo` resource group. Start with local development and the smallest suitable consumption/basic/burstable resources; no standing GPU or premium infrastructure by default.
+- **Research refresh:** Microsoft documentation, upstream repositories, model cards, and research papers reviewed on 28 October 2026. Recommendations below are implementation choices to validate, not achieved results.
 
 AgentTrace is a **read-only email detection platform**. For an existing Outlook/Exchange Online email it produces exactly two independent detection results: **(1) email sent by an AI agent; (2) email contains AI-generated content.** Each result includes its flag, evidence basis, reasons, and uncertainty. A person manually pasting AI-written text into Outlook and sending it is a content-positive test case, not an agent-sent test case. Low false positives, explicit coverage limits, reproducible decisions, and protection of sensitive email data remain the priorities.
+
+**Build and qualify agent-sent detection first.** Allocate the initial engineering effort to trustworthy send evidence, exact-message correlation, false-positive controls, and a working Outlook result. Run content experiments separately with bounded time and compute. A strong content score cannot create, strengthen, or resolve an agent-sent finding. An agent may send entirely human-written wording; a human may send entirely AI-written wording.
+
+The POC must actually attempt statistical content detection on eligible English emails, including untracked copy/paste, and report scores, errors, and coverage. It need not achieve perfect authorship detection or a fixed content-recall figure to release the independently qualified agent detector. A failed content benchmark must remain visible as a measured limitation, with experimental scores restricted to the evaluation/investigator view and unsupported inputs marked unknown. Do not substitute an all-unknown stub or provenance-only demonstration for this required attempt.
 
 AgentTrace does not create agents, generate or insert email drafts, send/reply/forward/schedule email, select recipients, request or manage approvals, orchestrate workflows, or block/quarantine mail. It reads authorized messages and available evidence, analyzes them, and stores/displays detection flags in its own API, dashboard, and read-only Outlook add-in. Background collection, scoring, and reassessment are internal detection operations. Records from existing third-party agents or generation tools are optional evidence inputs, not execution features of AgentTrace. Test emails are prepared outside the product with existing tools; the detection test harness only imports, reads, and replays them.
 
@@ -79,30 +86,30 @@ Draft creation, editing, mailbox reads, and other workflow activity may supply c
 | API and contracts | Python, FastAPI, Pydantic | Authenticated ingestion, queries, schema validation, and decision APIs |
 | Attribution workers | Python; versioned deterministic rules initially | Correlate evidence and produce auditable results |
 | Content normalization | Python MIME/HTML parsing with bounded, offline extraction | Separate authored text, quotes, signatures, language, and eligibility while retaining source offsets |
-| Content detectors | PyTorch, Hugging Face Transformers, scikit-learn; candidate encoder classifier plus Fast-DetectGPT and Binoculars benchmarks | Private inference, calibration, abstention, and evaluation of generated/revised text |
+| Content detectors | Transformers/PyTorch and scikit-learn; pretrained RoBERTa/DeBERTa candidates first, optional ONNX Runtime after parity testing | Independent, private statistical scoring; fine-tuning and larger research scorers only when measured improvement justifies them |
 | Content model artifacts | Versioned manifests and private Blob Storage; experiment tracking without message text | Pin code, weights, tokenizer, normalization, calibration, thresholds, and evaluation lineage |
 | Provenance ingestion | Read-only evidence adapters; optional authorized enterprise history connectors | Consume existing send/generation records and validate message links; never execute those workflows |
 | Mail integration | Microsoft Graph v1.0 | Scoped message reads, subscriptions, and delta reconciliation; no draft/write/send permissions |
 | Audit integration | Office 365 Management Activity API; Graph activity logs where licensed | Independent Microsoft evidence and application activity |
 | Identity | Entra ID, MSAL, managed identities | User sign-in, workload authentication, and least-privilege access |
 | Agent inventory | Entra Agent ID where available, plus a controlled local registry | Resolve agents, owners, applications, and trusted workflow integrations |
-| Queue | Azure Service Bus | Durable asynchronous work, retries, and dead-letter handling |
-| Operational database | Azure Database for PostgreSQL | Message references, source evidence, correlations, the two findings, and decision versions |
+| Queue | Azure Storage Queues by default; Service Bus Basic only if justified | Separate durable detection queues; explicit visibility renewal, retry/poison handling, and database-backed idempotency |
+| Operational database | Local PostgreSQL first; Azure PostgreSQL Flexible Server Burstable for the cloud pilot | Message references, source evidence, correlations, the two findings, and decision versions; smallest adequate SKU, no HA replica by default |
 | Evidence objects | Azure Blob Storage | Encrypted, access-controlled evidence; retention and optional immutability policies |
 | Keys and secrets | Azure Key Vault | Signing keys and required credentials; rotation and access auditing |
-| Hosting | Azure Container Apps and Azure Container Registry; isolated Azure GPU compute only if benchmarks justify it | API/workers and private detector inference with independently sized queues |
+| Hosting | Azure Container Apps Consumption; existing suitable registry or ACR Basic | Small CPU API/workers, separately bounded content inference, scale-to-zero where latency permits; no GPU prerequisite |
 | Observability | OpenTelemetry, Azure Monitor, Log Analytics | Sanitized traces, connector health, latency, and operational alerts |
 | Infrastructure and CI | Bicep and Azure DevOps pipelines, connected to GitHub | Repeatable deployment, secret-free CI, rollback, and artifact versioning |
 | Test tooling | pytest, Playwright, integration and scenario harnesses | Unit, contract, UI, adversarial, and end-to-end validation |
 
-Pin supported dependency versions during Phase 1. Keep one backend codebase, with separate attribution and content-worker processes and queues so slow model inference cannot delay agent evidence. Deterministic attribution requires no GPU. The content classifier may require supervised training and GPU inference; benchmark a small encoder on CPU first and measure larger candidates before selecting Azure capacity. No vector database is required. Model-based detection is itself AI processing and must satisfy the customer's data policy, even when self-hosted. AgentTrace has no email-generation endpoint or mail-sending credentials. Synthetic examples may be prepared separately using permitted existing tools; do not send real email to public detector demos or consumer AI services.
+Pin supported dependency versions during Phase 1. Keep one backend codebase, with separate attribution and content-worker processes and queues so slow model inference cannot delay agent evidence. Deterministic attribution requires no GPU. Start content scoring with pretrained CPU encoders; larger scoring models, supervised adaptation, and bounded GPU experiments are optional improvements after measuring their benefit and cost. No vector database is required. Model-based detection is itself AI processing and must satisfy the customer's data policy, even when self-hosted. AgentTrace has no email-generation endpoint or mail-sending credentials. Synthetic examples may be prepared separately using permitted existing tools; do not send real email to public detector demos or consumer AI services.
 
 ```mermaid
 flowchart TD
     A[Exchange Online test mailboxes] --> B[Graph collector and reconciliation]
     C[Existing external agent and generation systems] --> D[Read-only evidence ingestion]
     E[Microsoft audit and identity sources] --> F[Audit collector]
-    B --> G[Service Bus]
+    B --> G[Separate durable detection queues]
     D --> G
     F --> G
     G --> H[Correlation and agent attribution]
@@ -129,7 +136,45 @@ flowchart TD
 - The add-in is not a universal interception layer. Supported client events do not cover arbitrary server-side sends, and a send-button interaction does not prove human operation. [Smart Alerts](https://learn.microsoft.com/en-us/office/dev/add-ins/outlook/onmessagesend-onappointmentsend-events).
 - Use current MSAL/nested app authentication on supported clients. Legacy Exchange Online identity and callback tokens are unsupported. The backend must validate access tokens for its own audience and enforce mailbox-level authorization. [Outlook authentication](https://learn.microsoft.com/en-us/office/dev/add-ins/outlook/faq-nested-app-auth-outlook-legacy-tokens).
 - Entra Agent ID can supply useful registered identity metadata. Availability, licensing, and integration behavior must be checked in the actual tenant; absence of that identity type is not evidence of human origin. [Agent identities](https://learn.microsoft.com/en-us/entra/agent-id/agent-identities).
-- Copilot interaction export can expose supported enterprise prompts/responses, subject to licensing, permissions, and the particular experiences recorded. The reviewed API documentation marks the endpoint as beta; it is an optional POC adapter, not a production dependency. It excludes personal-account interactions and experiences that do not write to that history. A recorded response must still be linked to actual included email text. [Interaction history coverage](https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/api/ai-services/interaction-export/resources/aiinteractionhistory) and [export endpoint](https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/api/ai-services/interaction-export/aiinteractionhistory-getallenterpriseinteractions).
+- Copilot interaction export can expose supported enterprise prompts/responses subject to licensing and application permissions. The reviewed endpoint page lists both `v1.0` and `beta` routes while retaining a beta warning; validate the selected route's status and actual tenant behavior rather than assuming availability. The page requires a qualifying Copilot license, excludes Copilot Studio agent interactions, and provides no delta function. Personal histories and unrecorded experiences remain uncovered. This optional source cannot prove email inclusion without a trustworthy link. [Interaction history coverage](https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/api/ai-services/interaction-export/resources/aiinteractionhistory) and [export endpoint](https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/api/ai-services/interaction-export/aiinteractionhistory-getallenterpriseinteractions).
+
+### Primary detector: concrete evidence and correlation design
+
+The research supports combining existing evidence sources, rather than installing a text detector and treating its score as sender identity. The reviewed projects provide collection, tracing, or text-scoring components; none of the reviewed components supplies a validated, universal Outlook agent-send verdict. AgentTrace's principal custom work is the trust model, message correlation, conservative rules, and evaluation.
+
+| Evidence input | What to extract and validate | Boundary on the agent-sent claim |
+| --- | --- | --- |
+| Graph message observation | Mailbox-local immutable ID, `internetMessageId`, observed sender/recipients, draft/sent state, timestamps, and permitted headers/MIME | Establishes the message being assessed. From-address, Sent Items presence, and text style alone do not identify the executor |
+| Exchange/Purview audit | Actual `Send`, `SendAs`, or `SendOnBehalf` events; inspect optional app, request, session, item, and Internet-message identifiers | Can support a message/action link when present and validated in this tenant. These operations also occur for humans and ordinary applications. Never assume every schema field is populated. [Mailbox auditing](https://learn.microsoft.com/en-us/purview/audit-mailboxes), [audit schema](https://learn.microsoft.com/en-us/office/office-365-management-api/office-365-management-activity-api-schema) |
+| Microsoft Graph activity logs | `AppId`, `ServicePrincipalId`, `UserId`, `RequestId`, optional `ClientRequestId`, request URI, method, status, and time | Request metadata can corroborate an execution. A generic `/sendMail` request has no guaranteed message ID; an accepted request is not proof of a completed send. Request IDs and email IDs are different namespaces. [Activity-log schema](https://learn.microsoft.com/en-us/graph/microsoft-graph-activity-logs-overview) |
+| Entra agent identity and source registry | Validated identity type, ownership, source-system purpose, and whether the same identity is shared with non-agent work | `agentType` can help identify registered agent identities in supported logs, but neither registration nor sign-in proves that this email was agent-sent. Capability and field availability need tenant checks. [Agent ID logs](https://learn.microsoft.com/en-us/entra/agent-id/identity-professional/sign-in-audit-logs-agents) |
+| Existing agent execution traces | Authenticated source, trace/run ID, explicit send-tool execution/result, request IDs, exact message links, and execution type | A model call, planned tool call, or nearby trace is insufficient. Validate that the agent actually executed this send; exclude failed/cancelled attempts and draft-only activity |
+| Cooperating external source | Trusted issuer, message-bound send record, source execution identity, integrity and replay checks | Supports only the enrolled source and stated trust scope; unsigned email declarations and valid DKIM alone do not attest to AI use |
+
+Implement the following evidence path before adding any optional agent scoring:
+
+1. **Normalize without inventing identifiers.** Preserve original identifier type, source, tenant/mailbox, event time, ingestion time, and schema version. Decode or translate IDs only through documented mappings. Deduplicate events using source-scoped IDs and persist decisions transactionally.
+2. **Prove an agent executed the send.** Establish the execution type from trusted source records or a tenant-validated dedicated agent identity plus send evidence. Shared applications require execution-specific discrimination. A deterministic email API underneath an agent still counts when the trusted execution chain shows the agent invoked the send; a conventional scheduler without such a chain does not become an agent merely because its template contains AI text.
+3. **Bind that execution to this message.** Prefer an explicit source send-result/message mapping corroborated by the observed mailbox item; alternatively use a validated audit/request/item mapping with matching scope. Treat subject, time, recipients, body similarity, and transport headers as corroboration, not a substitute for the missing causal link. Ambiguous many-to-many joins stay unknown.
+4. **Confirm the observed state.** Separate planned, attempted, accepted, sent, and delivered. Do not require delivery to identify a completed send, and do not call an accepted API request a completed send. Missing Sent Items copies, transformed MIME, delayed audit, and shared-mailbox copies require explicit coverage handling.
+5. **Apply a conservative rule.** `verified_agent` requires trusted agent execution, validated exact-message linkage, and an observed completed send with no unresolved material contradiction. Store each predicate and its evidence references. Default agent suspicion is disabled; unverified candidates remain investigator context with `flagged: null`, not a positive agent accusation.
+6. **Publish promptly and reassess safely.** Return the agent result independently of content inference. Append later corroboration/conflicts as new decision versions; revoked sources trigger review. Freeze rule versions and replay identical evidence to reproduce the result.
+
+An enabled `suspected_agent` rule is a later, separately validated option using action/identity evidence only. It must pass the same user-visible agent false-positive budget; a low verified-error rate cannot excuse noisy suspicion flags. Never use the AI-content score, politeness, writing fluency, generic automation headers, or lack of approval logs as a shortcut.
+
+Phase 0 must produce a **source-to-field matrix** containing actual redacted examples, licensing, missing-field rates, source delay, retention, identifier mappings, and the strongest defensible result per path. Test at least one complete internal route, one shared/non-AI counterexample, and an external route with no source visibility. If no trustworthy agent-to-message route exists, report the primary feasibility gap before building an impressive UI around weak guesses.
+
+### Open-source components for the primary detector
+
+| Component and reviewed source | Integration decision | Adaptation and limits |
+| --- | --- | --- |
+| [Microsoft Graph Python SDK](https://github.com/microsoftgraph/msgraph-sdk-python), MIT | Adopt for read-only Graph collection; direct documented REST is acceptable where simpler | Pin versions; wrap pagination, throttling, retries, immutable-ID preferences, scoped authorization, and replayable request fixtures. SDK availability does not establish attribution |
+| [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector), Apache-2.0 | Optional existing-source transport; start with small authenticated JSON/file adapters if sufficient | Receive permitted existing metadata, validate source identity, strip sensitive payloads, and map to the evidence schema. OTLP is a transport format, not signed proof of truth |
+| [OpenTelemetry GenAI conventions](https://opentelemetry.io/docs/specs/semconv/registry/attributes/gen-ai/) and [Microsoft Agent Framework telemetry](https://github.com/microsoft/agent-framework/blob/main/python/samples/02-agents/observability/README.md) | Read compatible existing spans; do not install an agent runtime into AgentTrace | Map agent/tool/run relationships and pin convention versions. Some conventions are still developing. Do not enable broad prompt/tool-argument capture to obtain a message ID; require permitted minimal source records or return unknown |
+| [Langfuse](https://github.com/langfuse/langfuse), MIT core with separately licensed `ee` areas | Optional read-only export/API adapter if a customer already uses it | Existing traces may supply useful links; they still require source trust and message validation. Do not deploy its full observability stack, prompt tools, or agent features just to build this POC |
+| [AgentSight](https://github.com/eunomia-bpf/agentsight), MIT | Research reference; exclude endpoint capture from the Outlook MVP | Its Linux/eBPF capture requires host privileges and can capture sensitive traffic. It is not a drop-in Windows/Exchange or external-sender detector. Existing authorized exports may be evaluated separately; no covert endpoint instrumentation |
+
+Keep all these as evidence components. The product does not execute source agents, administer their approvals, or send test messages. Source-system owners prepare authorized synthetic examples outside AgentTrace; the detection harness imports and checks them.
 
 ### Content-detection strategy and open-source adaptations
 
@@ -138,13 +183,24 @@ Use two complementary paths. **Provenance** establishes what a trusted generatio
 | Approach | Planned adaptation | Release boundary |
 | --- | --- | --- |
 | Existing generation receipts | Read authenticated output records and any externally recorded inclusion history; validate tenant, source, time, integrity, and message linkage | Can support verified content only for material actually linked; AgentTrace neither generates the output nor inserts it into email |
-| Supervised encoder baseline | Fine-tune an appropriately licensed RoBERTa-class encoder on independently labeled business email; calibrate on separate data | First candidate for private, economical inference; must pass unseen-generator and domain tests |
-| [Fast-DetectGPT](https://github.com/baoguangsheng/fast-detect-gpt) | Benchmark its probability-curvature method on email; wrap inference, modernize dependencies, recalibrate, and pin scoring models | MIT code; model licenses are separate. Research scores and published benchmark results are not Outlook accuracy guarantees |
-| [Binoculars](https://github.com/ahans30/Binoculars) | Benchmark its paired-model scoring; replace the supplied threshold only through calibration and held-out validation | BSD-3-Clause code; model licenses are separate. Its documented fixed threshold depends on the chosen scoring models; do not reuse it as an email guarantee |
+| [Fakespot RoBERTa-base detector](https://huggingface.co/fakespot-ai/roberta-base-ai-text-detection-v1) | First pretrained CPU benchmark; inspect its cleaning/label mapping, pin weights, and calibrate on business email | Model card lists Apache-2.0, English, and approximately 0.1B parameters. Its score is not the percentage of AI-written words; email performance is unmeasured |
+| [Desklib detector](https://github.com/desklib/ai-text-detector) and [v1.01 model card](https://huggingface.co/desklib/ai-text-detector-v1.01) | Second pretrained encoder benchmark; compare its DeBERTa-v3-large classifier against the smaller baseline | Model card lists MIT. Review the custom model implementation and underlying weights' terms. A RAID leaderboard result is not an email guarantee; check training/evaluation overlap |
+| Email-adapted encoder | Fine-tune a suitably licensed small encoder only if pretrained baselines show a useful signal and labeled data justify the cost | Separate training, calibration, and locked evaluation. Prefer a simple calibrated model to an unvalidated ensemble |
+| [Fast-DetectGPT](https://github.com/baoguangsheng/fast-detect-gpt) | Offline comparator when CPU time or a bounded GPU experiment is justified; adapt probability-curvature scoring and recalibrate | MIT code; scoring-model terms are separate. The upstream January 2026 update discusses Llama3-8B scoring pairs; benchmark the actual pinned pair, not old published numbers. No use of the public demo/API with customer mail |
+| [Binoculars](https://github.com/ahans30/Binoculars) | Optional offline paired-model comparator; retain only if added value warrants runtime and memory | BSD-3-Clause code; default scoring uses Falcon-7B and Falcon-7B-Instruct. The supplied threshold depends on the pair. It is not the cheapest default for a small Azure POC |
+| [RAID](https://github.com/liamdugan/raid) and [DetectRL](https://github.com/NLP2CT/DetectRL) | Reuse evaluation methods and permitted datasets for generator/domain shift, edits, mixed text, and attacks | Evaluation assets, not sender detectors. RAID code is MIT; review dataset and DetectRL licenses separately. Use fresh business-email holdouts and avoid benchmark leakage. Import evaluation code/data only, not their generation workflows |
 
 Select the simplest candidate that meets the gates. An ensemble is optional and must improve held-out performance at the same false-positive budget; agreement between correlated detectors is not independent proof. A prompted LLM saying that text looks AI-written is not ground truth or the default classifier.
 
+Implement a common content adapter returning raw score, score direction, model/revision, preprocessing version, eligibility, token/word counts, elapsed time, and any error. Normalize the score direction before comparison, but do not pretend different raw scores share a probability scale. Store the selected threshold and evidence grade separately. A classifier's failure, timeout, or poor benchmark cannot delay or change the primary agent result.
+
+Start with pretrained CPU inference and a two-week bounded comparison after the agent evidence spike is viable. Use a development corpus with at least 300 independently documented content-policy negatives and 300 positives spanning copied drafts, rewrites, English translations, and mixed passages, separate from final calibration/evaluation. Include formal human writing, non-native English, templates, grammar-only changes, and short replies. These are starting experiment sizes, not evidence of production accuracy. Expand samples for the statistical claim actually proposed. Larger models, fine-tuning, or paid APIs are not prerequisites to making this attempt.
+
+For every shortlisted dependency, record repository/model revision, license and weight terms, maintenance status at selection, known vulnerabilities, required custom code, expected memory, and a reproducible installation. Inspect rather than automatically execute repository setup scripts or remote model code. Prefer pinned safetensors where available, private artifact caching, and no runtime downloads selected by email input. No paid/public detector API is a default dependency.
+
 The research supports testing robustness rather than importing headline accuracy. RAID found substantial weaknesses under unseen generators and text transformations. A July 2026 preprint found a strong supervised baseline competitive in-domain but vulnerable to confident errors after domain/generator changes. These findings motivate the evaluation design; they do not establish AgentTrace's performance. [RAID, ACL 2024](https://aclanthology.org/2024.acl-long.674/) and [Rethinking AI-Generated Text Detection, 2026 preprint](https://arxiv.org/abs/2607.03680).
+
+Paraphrasing and spoofing also undermine reliable text-only origin claims. Use these as stress tests and report misses, rather than promising a universal detector. [Can AI-Generated Text be Reliably Detected?, TMLR](https://arxiv.org/abs/2303.11156). These research limitations concern the content track; they are not a reason to replace evidence-based send attribution with prose analysis.
 
 For content provenance, record both the generation event and evidence of inclusion. A signed hash proves integrity of a particular record, not authorship or causality. A model echoing a human prompt, a common greeting, or a shared legal template cannot become verified generated content merely through a string match. Require an authenticated transfer/edit lineage for a verified claim; a distinctive output match without that lineage is corroborating evidence with its ambiguity disclosed. Material changes without a trustworthy transformation record break verified inclusion for the changed region. Do not search other users' private generation histories to resolve a message.
 
@@ -164,6 +220,7 @@ Each message assessment should include:
 - Evidence source, issuer, trust status, signature/key reference if applicable, schema version, canonicalization version, and evidence digest.
 - Agent-sent finding, observed sending mechanism as supporting evidence, evidence completeness, applicable policy, reason codes, decision version, and superseded decision references.
 - Independent content assessment for authored and inherited regions: language, extraction/normalization version, eligible length, evaluated scope, provenance references, inference model/weights/tokenizer, calibration and threshold versions, result, and abstention reason.
+- Content qualification context: raw score and direction, whether a threshold is qualified for advisory flags, experimental/unavailable reason, runtime, and evaluated scope. These support `content_assessment`; they are not a third detection output. An experimental score never silently becomes a positive flag or a negative human-origin finding.
 - Assistance category where evidenced (`draft_generation`, `substantial_rewrite`, `translation`, `basic_correction`, `none_observed`, or `unknown`), generation provider only when established, and any mapped inclusion spans. A statistical score cannot establish these operation/provider fields.
 - Content-processing authorization, retention class, restricted source references, and flags identifying omitted attachments, protected text, or incomplete extraction. Do not persist raw text, prompts, or model inputs in ordinary logs.
 
@@ -210,7 +267,7 @@ These are proposed acceptance targets, not achieved performance or contractual s
 
 | Gate | Required target |
 | --- | --- |
-| G1 Agent-sent false positives | One-sided 95% upper confidence bound on the verified agent-sent false-positive rate no greater than 0.1%; zero errors in at least 3,000 independent representative non-agent-send negatives is one sufficient binomial case |
+| G1 Agent-sent false positives — primary release gate | One-sided 95% upper confidence bound no greater than 0.1% for the union of all user-visible positive agent-sent flags, including any enabled suspicion rules. Report verified-only errors separately. Zero errors in at least 3,000 independent representative non-agent-send negatives is one sufficient binomial case; pooled results do not establish this bound for every subgroup |
 | G2 Supported-path agent-send recall | At least 99% observed recall on at least 1,000 independently labeled agent-sent emails with available trusted evidence, spanning externally approved and autonomous sends, multiple source systems, and varied content; publish the confidence interval and scenario counts |
 | G3 Send-executor correctness | No agent-send verdict for the mandatory agent-draft/human-send, copy-and-paste, or non-AI-automation counterexamples |
 | G4 Evidence integrity | No verified verdict from forged, replayed, expired-for-use, wrong-tenant, wrong-message, or mismatched-content evidence in the mandatory attack suite |
@@ -220,39 +277,39 @@ These are proposed acceptance targets, not achieved performance or contractual s
 | G8 Access isolation and detection-only boundary | Zero successful unauthorized reads, decisions, or exports; no AgentTrace identity has mail-send/write permission, and no product API/UI can draft, send, approve, schedule, or otherwise operate email workflows |
 | G9 Pilot operation | At least ten consecutive business days after the last material fix, with no unresolved critical/high release-blocking issue or unexplained data loss |
 
-For the agent-sent finding, a false positive is a message not sent by an agent receiving a verified agent-sent verdict. An AI-created draft manually sent by a person is negative for this finding and may be positive for the independent content finding. Use separate confusion matrices and negative denominators for agent-sent and AI-content detection. Include recipient-side agent reads and draft-only actions among sender-attribution counterexamples. Report `suspected_agent` false alerts and reviewer burden separately; do not hide a noisy suspicion channel behind a low verified-verdict error rate. Report precision at observed deployment prevalence and any explicitly labeled prevalence scenarios.
+For the primary finding, a false positive is a non-agent-sent email receiving any positive agent-sent flag. An AI-created draft manually sent by a person is negative for this finding and may be positive for content. Maintain separate confusion matrices and negative denominators. Test recipient-side reads, draft-only actions, non-AI automation, shared identities, spoofed headers, and failed sends explicitly. Report verified and suspected errors separately as well as their union; default suspicion remains off. Report precision at observed deployment prevalence and any explicitly labeled prevalence scenarios.
 
 For supported-path recall, unknown and pending results after the declared observation window count as misses. Also report recall across all labeled agent scenarios, including uninstrumented paths, so high registered-path recall cannot be marketed as universal recall. Report attribution coverage, unknown rate, and source availability with all headline metrics.
 
 Repeated templates, multiple copies of one email, and correlated executions are not automatically independent observations. Split evaluation by sender, workflow, thread, and time; use grouped or cluster-aware uncertainty estimates when necessary. Do not claim the same bound for a subgroup that lacks adequate evidence. Review samples of unflagged messages as well as alerts.
 
-### Content quality gates and feasibility decision
+### Secondary content evaluation and release decision
 
-These are **proposed engineering acceptance targets, not measured results or claims supported by a public benchmark**. The stricter false-positive budget deliberately trades recall for caution. Phase 0 fixes the workload, length eligibility, negative population, and business-usefulness targets before model selection; Phase 8 establishes development feasibility; Phase 12 qualifies a frozen pipeline on untouched data. If the targets cannot be met, report the expanded content requirement as unmet and keep inference in research mode. Do not call a provenance-only or all-unknown result completion of the requested untracked copy/paste detector.
+Agent-sent qualification is the main release decision. The content track must deliver a real, reproducible scoring attempt and honest evaluation, not guaranteed detection. The criteria below distinguish required engineering/evaluation work from permission to expose positive statistical flags. All numerical targets are **proposed, unmeasured targets**. Phase 0 freezes populations and thresholds before final evaluation; failure to attain a content recall goal does not block an otherwise qualified agent detector.
 
-| Gate | Required target |
+| Criterion | Required work or conditional promotion target |
 | --- | --- |
-| C1 Read-only content provenance | At least 99% observed recall on at least 1,000 independent, in-scope emails with existing trusted generation-and-inclusion records prepared outside AgentTrace; publish its interval. Zero false verified claims in the mandatory forged/echoed/common-template/wrong-message/cross-user attack suite. Untracked copy/paste is evaluated separately in C3/C4 |
-| C2 Content false positives | One-sided 95% upper confidence bound at most 0.1% for the union of user-visible positive content flags on representative content-policy negatives. Evaluate all-assessed and statistically eligible populations separately; zero errors among at least 3,000 independent negatives per claimed population is one sufficient case. Include genuine human writing, basic-correction-only text, and human-written automation templates |
-| C3 Useful untracked-content recall | At least 60% observed recall separately for copied original drafts, substantial rewrites, translations into English, and mixed human/AI passages, using at least 500 independent eligible positives per family and publishing 95% intervals. Disable generation provenance for this evaluation. Initial proposed eligibility is at least 100 authored English words, with the mixed family containing a material AI contribution labeled from its creation history. Freeze that definition before the holdout |
-| C4 Coverage and all-length usefulness | Complete statistical assessment on at least 50% of readable English authored-body messages in a frozen representative workload, and flag at least 30% of at least 1,000 independent untracked in-scope AI-content positives across all lengths using its predeclared mix/weights. Short/edited/ineligible positives count as misses in this all-length recall. Also report coverage across all mail, including protected and unsupported-language messages. These are minimum usefulness floors, not aspirational marketing accuracy |
-| C5 Content latency and failure behavior | P95 at most 30 seconds from readable body availability at ingestion to persisted content result at the agreed load, including queue and inference time. Publish cold-start/burst performance and subsequent provenance-enrichment lag. Timeout/error produces a visible unknown or pending result, never a silent negative |
+| C1 Optional provenance path | Evaluate available trusted generation/inclusion records and mandatory wrong-message, replay, echo, and common-template counterexamples. No unsupported verified-content claims. Publish sample size and recall; an unavailable provenance source is a coverage gap, not a reason to skip statistical scoring |
+| C2 Positive-flag promotion | Proposed initial budget: one-sided 95% upper bound at most 1% for the union of positive content flags on representative policy negatives, with 0.1% as a stretch target. Evaluate all-assessed and statistically eligible populations separately. Zero errors among 300 independent negatives is one sufficient case for 1%; 3,000 supports 0.1%. Freeze the accepted budget before the holdout. If unmet or underpowered, retain experimental scores in evaluation/investigator views and show unqualified content findings as unknown, not asserted AI |
+| C3 Actual untracked-content attempt | Required: run and compare at least two available, appropriately licensed classifiers/scorers, with generation provenance disabled. Report precision/recall and intervals separately for copied drafts, rewrites, English translations, and mixed content. Seek useful recall, with 60% on eligible positives as an initial research goal, not a release-blocking promise. A scored experiment with reported poor results satisfies the attempt; an unimplemented/all-unknown stub does not |
+| C4 Coverage and difficult inputs | Required: publish readable/eligible/scored/unknown counts, all-length recall, length bins, and protected/unsupported-language exclusions. Investigate the initial 100-authored-English-word eligibility hypothesis; report short/edited misses rather than silently excluding them. Initial goals of 50% readable-English statistical coverage and 30% all-length recall guide improvement but do not gate primary release |
+| C5 Isolation and runtime | Required: content outages and queue backlog cannot delay agent decisions. Measure end-to-end content latency, cold starts, memory, and cost. Aim for P95 at most 30 seconds at the agreed load; report a slower bounded budget if that is the economical feasible configuration. Timeout/error yields unknown or pending, never a silent negative |
 | C6 Semantic separation | Mandatory cases preserve both axes, grammar-only policy, inherited-content attribution, unsupported-language unknowns, and no provider/word-percentage claims from inference. No content score can produce a verified agent or verified content result |
 | C7 Release reproducibility and review | Pin and reproduce extraction, model, weights, tokenizer, thresholds, scope, and decisions. Freeze drift/rollback rules and reviewer workload limits before the pilot. No auto-blocking, disciplinary conclusion, or automatic retraining from detector flags |
 
-The C3/C4 figures are provisional product-usefulness hypotheses to test early, not predictions that current open-source models will achieve them at C2. Report short-message bins (1–49, 50–99, 100–199, and 200+ authored words), source families, editing levels, English writing varieties, domains, and internal/external paths separately. English is a language scope, not a claim to cover every writing style. Treat a materially failing subgroup as a release issue; restrict its supported inference scope or obtain more evidence before making a performance claim. Do not claim a per-subgroup 0.1% bound from a pooled sample that cannot establish it.
+Report short-message bins (1–49, 50–99, 100–199, and 200+ authored words), source families, editing levels, English writing varieties, domains, and internal/external paths separately. English is a language scope, not a claim to cover every writing style. Restrict statistically flagged subgroups when their evidence does not support the agreed budget. Insufficient samples mean an unproven claim, not a passing result. State independently whether content is qualified for advisory flags or remains an experimental scoring capability.
 
-False-positive rate is not the probability that a flag is correct. As an illustration, 60% recall and 0.1% false positives imply about 85.8% positive predictive value when 1% of eligible messages contain in-scope AI text, but only about 37.5% when prevalence is 0.1%. These are arithmetic scenarios, not AgentTrace measurements. Publish observed prevalence, precision with uncertainty, false alerts per 1,000 messages, and review time alongside recall. Use probability wording only if calibration is validated for the relevant population; the default UI uses evidence labels rather than an apparent “AI certainty” percentage.
+False-positive rate is not the probability that a flag is correct. As an illustration, 60% recall and 0.1% false positives imply about 85.8% positive predictive value when prevalence is 1%, but only about 37.5% when prevalence is 0.1%. With a 1% false-positive rate and 1% prevalence, the same recall implies about 37.7% precision. These are arithmetic scenarios, not AgentTrace measurements. This is why content suspicion is advisory and cannot identify an agent sender. Publish observed precision, uncertainty, false alerts per 1,000 messages, and review time. Raw scores are not calibrated probabilities or percentages of AI-written words.
 
 Evaluate the final message-level union of provenance and statistical flags, not merely each detector separately. Include grammar-only examples in the policy-negative evaluation and report their error rate separately from strictly human originals. Repeated windows, templates, forwarded copies, and variants of one prompt are correlated; they cannot inflate the independent sample count. Sample unflagged mail with known sampling probabilities, obtain independent labels, and account for sampling when estimating pilot precision and missed positives. Unresolved real-world labels remain unknown ground truth, not assumed human negatives.
 
 ## 4. Phase overview
 
-All phases start as **Not started**. A phase is complete only when its exit criteria have recorded evidence. A plan, implementation, and test result are distinct artifacts.
+All phases start as **Not started**. Research and read-only Azure inventory are preparation, not completed implementation phases. A phase is complete only when its exit criteria have recorded evidence. Prioritize the agent path through Phases 0–7, then agent decisions/UI/qualification in Phases 9–14. Phase 8 runs as a bounded secondary track; a poor content-accuracy result does not hold the agent path open. Its actual experiment, safety/isolation checks, and limitation report remain required for POC handover.
 
 | Phase | Focus | Primary dependency | Principal exit artifact |
 | --- | --- | --- | --- |
-| 0 | Both detection scopes, tenant/content feasibility, acceptance contract | None | Approved baseline, capability matrix, and content feasibility decision |
+| 0 | Primary agent evidence feasibility, scope, cost baseline, content experiment protocol | None | Exact-message evidence path and agent-first acceptance contract |
 | 1 | Repository, architecture, contracts, local environment, CI | 0 | Reproducible project foundation |
 | 2 | Tenant identity, permissions, secure connectivity | 0–1 | Tested access and telemetry configuration |
 | 3 | Graph/audit ingestion and private text extraction | 2 | Reliable collection and measured extraction coverage |
@@ -260,28 +317,30 @@ All phases start as **Not started**. A phase is complete only when its exit crit
 | 5 | Independent action/content labels and scenario harness | 0–4 | Versioned corpus with leakage-controlled splits |
 | 6 | Read-only send-evidence and content-provenance adapters | 2–5 | Validated ingestion and message linkage for existing evidence sources |
 | 7 | Passive and external evidence adapters | 3–6 | Measured coverage beyond instrumented sends |
-| 8 | Content detector benchmarking, adaptation, calibration | 3–7 | Versioned candidate passing development feasibility gates |
-| 9 | Independent attribution/content outcomes and review policy | 4–8 | Versioned decision engine with abstention |
+| 8 | Bounded secondary content benchmark and scoring implementation | 3–5; scheduled after viable agent evidence | Reproducible scores, measured errors/coverage, and qualified-or-experimental disposition |
+| 9 | Primary attribution engine and independent content result contract | 4–7; 8 integrated independently | Versioned agent decision engine and isolated content assessment |
 | 10 | Outlook and investigator experiences | 9 | Authorized UI showing both results and their basis |
 | 11 | Adversarial, privacy, model, and reliability hardening | 2–10 | Closed release-blocking findings |
-| 12 | Locked evaluation of both detection tracks | 5, 8–11 | Reproducible evaluation report against G and C gates |
+| 12 | Primary agent qualification and separate content evaluation | 5, 7, 9–11; 8 for content report | G-gate decision, actual content results, and conditional flag-promotion decision |
 | 13 | Azure shadow pilot, drift monitoring, operations | 12 | Completed pilot and operational evidence |
 | 14 | Stakeholder demonstration and release handover | 13 | Tagged POC release and acceptance pack |
 
 ## Phase 0 — Establish scope, risk boundaries, and feasibility
 
-**Objective:** Fix both detection definitions, demonstrate usable Microsoft evidence, and assess content-detection feasibility before committing to a full implementation.
+**Objective:** Establish a viable, low-false-positive agent-send evidence path first; define a separate bounded content experiment and economical Azure deployment constraints.
 
 **Implementation work**
 
 - Confirm industry, jurisdiction, data classifications, permitted Azure region, retention requirements, and project decision owners. Treat these as requirements to resolve, not assumed compliance claims.
 - Record target clients, test mailboxes, external evidence sources, pilot volume, and intended use of the two detection findings. Define agent-sent emails, generated/revised content, inherited material, and basic-correction exceptions. Draft-only and read-only AI activity are counterexamples for the agent-sent target, not additional product flags.
 - Inventory Microsoft 365, Entra, Purview, and Azure capabilities and licenses. Verify audit enablement, Graph activity-log eligibility, Entra Agent ID availability, and supported add-in authentication.
+- Use Azure CLI to resolve the subscription containing `kb-agentdemo`, rather than trusting the CLI default. Inventory existing resources read-only; record a local environment configuration, proposed SKU/region/replica settings, and estimated incremental cost. Existing resources may belong to unrelated work and must not be reconfigured or deleted for AgentTrace.
 - Run a read-only feasibility spike over independently prepared synthetic emails: human sends, non-AI application sends, and agent sends. Inspect available source-event schemas, identifiers, field availability, and lag. Establish message/action links without subject/time guessing and without implementing a sender in AgentTrace.
-- Time-box an initial content feasibility study to two weeks: use a legally usable, independently labeled development sample, compare an encoder baseline and at least one open-source scorer, measure writing-length distribution and runtime, and test copied drafts, rewrites, English translations, and grammar-only controls. A small spike cannot establish a 0.1% false-positive bound; record learning curves and the corpus still required.
+- Produce the source-to-field matrix and complete the three-part proof: trusted agent execution, exact-message link, and observed completed send. Record every fallback as lower-confidence or unknown; do not equate an app registration with a send verdict.
+- Define a content study of at most two engineer-weeks, starting after a viable primary evidence path. Compare at least two licensed pretrained candidates on independently labeled data before paying for model training or larger scorers. Record the time/compute ceiling, evaluation protocol, and untracked copy/paste cases. No successful content-recall result is required to exit Phase 0.
 - Check whether existing enterprise generation history or externally supplied provenance records are available for authorized read-only access. Document coverage, licensing, API maturity, content permissions, and inclusion evidence. An unavailable Copilot connector cannot remove unmanaged copy/paste from the statistical requirements.
 - Define threats including forged evidence, shared/stolen credentials, compromised issuers, browser automation, delayed logs, detector evasion, model supply-chain changes, poisoned labels, prompt echoes, and misleading self-declarations.
-- Freeze metric definitions G1–G9 and C1–C7, minimum-length eligibility, labeling rubrics, supported domains, pilot workload, observation windows, and review capacity. Budget for independent negatives and a held-out generator/version. Confirm the detection-only boundary across permissions, APIs, UI, deployment, and tests.
+- Freeze G1–G9 as primary release gates, C1–C7 as the separate experiment/promotion criteria, and the combined review budget. Document that agent flags include all enabled suspicion rules in G1. Fix eligibility, labeling, observation windows, data independence, held-out sources, and the detection-only boundary before evaluation.
 - Confirm permitted body processing, model hosting/training, retention, and whether production email may ever become evaluation data. Default to transient inference in the customer's boundary, no training on pilot mail, and no public detector/API uploads.
 
 **Expected outcomes**
@@ -289,7 +348,7 @@ All phases start as **Not started**. A phase is complete only when its exit crit
 - `docs/scope.md`, `docs/threat-model.md`, `docs/acceptance.md`, and a tenant capability matrix using sanitized identifiers.
 - A concrete list of supported sources, known blind spots, and unavailable prerequisites.
 - A small evidence sample showing a viable exact-message attribution path.
-- `docs/content-policy.md`, `docs/content-feasibility.md`, and a costed data/model experiment plan with explicit go/no-go conditions.
+- `docs/content-policy.md`, an experiment protocol for `docs/content-feasibility.md`, and a costed, bounded comparison plan with explicit advisory-flag versus experimental-score conditions.
 
 **Validation criteria**
 
@@ -309,7 +368,8 @@ All phases start as **Not started**. A phase is complete only when its exit crit
 - [ ] The agreed product has exactly two detection findings and no email execution, approval management, or automation features.
 - [ ] No unresolved dependency prevents the minimum end-to-end path; unavailable optional feeds have explicit fallback/coverage behavior.
 - [ ] Content-policy rubric, English boundary, proposed numeric gates, private-processing permissions, and data acquisition plan are recorded.
-- [ ] The content feasibility review authorizes a bounded implementation experiment or records a no-go; it does not claim accuracy from the small spike. Any changed usefulness target is documented before model selection and locked evaluation.
+- [ ] The secondary content experiment is defined and resourced without blocking the primary agent evidence work or claiming accuracy from a small sample.
+- [ ] `kb-agentdemo`, explicit subscription selection, resource reuse boundaries, basic/consumption sizing, and incremental-cost estimates are recorded before provisioning.
 
 ## Phase 1 — Create the repository and reproducible foundation
 
@@ -320,7 +380,7 @@ All phases start as **Not started**. A phase is complete only when its exit crit
 - Continue the existing working checkout and supplied GitHub repository without overwriting unrelated work. Keep this plan at the repository root.
 - Establish the directory structure below, dependency lockfiles, formatting, type checks, unit-test runners, and documented developer commands.
 - Define contracts and architecture decisions for exactly two detection findings, separate collector/model identities, read-only source adapters, and minimum-retention content processing. No product sender or approval-service identity is created.
-- Configure local PostgreSQL and a documented development queue adapter. Integration CI must also exercise actual Azure Service Bus semantics before release.
+- Configure local PostgreSQL and a documented development queue adapter. Start locally without new Azure resources; integration CI must later exercise the actual chosen Azure queue's delivery, retry, visibility, poison-message, and idempotency behavior.
 - Add Bicep modules and Azure DevOps CI with workload identity federation where supported. Never commit cloud credentials or real message fixtures.
 - Configure secret scanning, dependency and license checks, protected main-branch workflow where available, and pull-request validation. Add a documented alternative if repository-plan features are unavailable.
 - Record licenses and hashes separately for research code, model weights, tokenizers, and datasets. Package inference behind a stable adapter and keep model downloads/build steps outside runtime processing of email.
@@ -381,7 +441,7 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 - Create identities only for read-only mailbox/audit collection, detection workloads, and authorized users as needed. External source systems retain their own identities and operation outside AgentTrace.
 - Scope reads to approved mailboxes. Do not grant AgentTrace `Mail.Send`, `Mail.ReadWrite`, SMTP sending access, or equivalent mailbox write/execute rights. Creating/renewing a monitoring subscription does not authorize message changes.
 - Validate effective Exchange Application RBAC and Entra permissions together. Remove redundant unscoped grants that defeat the intended restriction.
-- Configure Graph notification ingress, Service Bus, PostgreSQL, Blob Storage, Key Vault, managed identities, and controlled network access.
+- Configure only the Azure components needed for the current milestone: notification ingress, Storage Queues, PostgreSQL, Blob Storage, Key Vault, identities, and network access under Section 6's cost controls. Prefer suitable existing resources with isolated permissions; do not create an entire future stack up front.
 - Enable required audit feeds through approved administrator configuration. Document that audit feeds can expose broader tenant information and restrict collection, processing, and investigator access accordingly.
 - Configure Entra application roles for viewer, investigator, and administrator. Plan selected-message authorization for the add-in independently of the collector's broader service permissions.
 - Document the additional body-content access needed for detection; metadata-only reads cannot supply it. The content worker receives only authorized scoped text and has no send/delete permission. Separate inference access from access to retained prompts and generation histories.
@@ -510,7 +570,7 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 **Expected outcomes**
 
 - Versioned scenario matrix, safe fixture manifests, label definitions, and a reproducible detection-replay harness.
-- A dataset expansion plan sufficient for G1/G2 and C1–C4, with licensing, independence, subgroup coverage, and acquisition effort recorded. Some independently valid scenarios can serve multiple metrics, but denominators remain separate.
+- A dataset expansion plan that funds G1/G2 first, then the bounded C1–C4 evaluation, with licensing, independence, subgroup coverage, and effort recorded. Separate content targets cannot consume the primary agent qualification budget; some independently valid scenarios may serve both axes with separate denominators.
 
 **Validation criteria**
 
@@ -540,6 +600,7 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 - Implement source-specific readers/importers for authorized existing agent execution logs, message observations, and generation provenance. Support authenticated evidence submission where a source already produces records; the endpoint accepts data, not commands to execute a workflow.
 - Validate source identity, schema, trust configuration, timestamps, integrity, tenant/mailbox scope, and event uniqueness. An app registration or model-generated `is_agent` assertion alone is insufficient.
 - Link an externally recorded send execution to the correct observed message using reliable identifiers. Distinguish an accepted API request, a failed attempt, an observed sent message, and delivery evidence. AgentTrace never retries or completes the source system's send.
+- Implement the first complete adapter for the best evidenced existing tenant source, using the Section 2 source-to-field matrix. Keep provider-specific extraction separate from shared rules. Prefer minimal authenticated records; ingest OTel/Langfuse exports only when they add the required execution/message links.
 - Treat agent sends with and without external human approval as positive examples for the same detection target. Do not implement approval requests, approval binding logic, approver interfaces, or approval queues.
 - Read existing generation/output records and any trustworthy insertion/edit lineage. Determine which regions of the email are actually supported by that evidence. Exclude echoed human input and common boilerplate from generated-origin claims based only on matching.
 - Keep exact trusted linkage, corroborating output similarity, and unsupported links distinct. Untracked manual copy/paste must still be evaluated through the independent statistical content path where eligible.
@@ -609,15 +670,15 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 
 ## Phase 8 — Build, adapt, and calibrate the content detector
 
-**Objective:** Determine whether private statistical detection can usefully flag untracked AI content at the required false-positive rate, and produce a reproducible candidate if it can.
+**Objective:** Implement and evaluate a real best-effort statistical content detector, while keeping primary agent attribution independent of content accuracy, runtime, and cost.
 
 **Implementation work**
 
-- Benchmark a small supervised encoder against Fast-DetectGPT and Binoculars using identical development splits and production text extraction. Include a no-inference/provenance-only baseline to show what statistical detection adds. Record licenses, model sizes, hardware, memory, throughput, and cost per 1,000 messages.
+- Compare the pretrained Fakespot RoBERTa and Desklib DeBERTa candidates, or documented licensed substitutes, on the same development splits and production extraction. Include a provenance-only baseline. Evaluate Fast-DetectGPT/Binoculars only if the bounded budget supports their compute; do not require all research models to deploy. Record revision/license, hardware, memory, throughput, errors, and cost per 1,000 messages.
 - Fine-tune only on approved training data. Keep generator families, prompt/template families, writers, and time partitions separated as specified in Phase 5. Do not use the locked evaluation set to select a model, minimum length, threshold, or ensemble.
 - Implement language/length/domain eligibility and explicit abstention. Evaluate the proposed 100-word minimum against shorter bins, but retain every short in-scope positive in C4 reporting. A longer threshold requires an explicit revised coverage claim before the final holdout, not a hidden filter.
 - Test substantive rewriting, human editing, AI rewriting of human prose, English translation, small AI insertions, formal human templates, and grammar-only controls. A high score cannot by itself distinguish a rewrite from a grammar operation or identify the source assistant.
-- Calibrate on held-out calibration data and choose a high-precision threshold subject to C2, then evaluate C3/C4 usefulness on separate development validation data. If using multiple windows/models, calibrate their final message-level combination; do not multiply supposed confidences or reuse research defaults.
+- Calibrate a candidate threshold against C2, then report C3/C4 usefulness on separate data. Keep best-effort scores and thresholded positive flags distinct. If no useful threshold fits the accepted budget, preserve the measured experimental result rather than lower the threshold silently. Calibrate final message-level window/model aggregation; do not multiply supposed confidences or reuse research defaults.
 - Assess reliability and base-rate sensitivity. Retain raw scores for authorized analysis, with model/threshold versions; expose a probability only if independently calibrated for the claimed population. Measure source/domain/language-style subgroups and held-out generator performance.
 - Package the selected model as an isolated, bounded inference worker with private model artifacts, token/size/time limits, batching, timeouts, and explicit unavailable states. Keep weights cached under approved controls and prevent runtime downloads driven by message content.
 - Test numerical effects of quantization, ONNX conversion, tokenizer changes, and HTML/redaction preprocessing before adopting them. Any change that affects predictions requires recalibration and fresh validation.
@@ -626,22 +687,22 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 **Expected outcomes**
 
 - `docs/content-benchmark.md`, `docs/content-model-card.md`, pinned candidate artifacts, inference contracts, and a calibration report showing recall versus false positives and coverage.
-- A documented selection or no-go decision, including cases where no tested candidate meets the requested low-false-positive usefulness tradeoff.
+- A documented choice between qualified advisory content flags and experimental scoring with limitations. The agent detector's release decision remains separate.
 
 **Validation criteria**
 
 - Reproduce development predictions and runtime measurements from pinned artifacts using permitted retained test inputs.
-- Meet the development targets corresponding to C2–C5 on independent development validation data, with confidence/sample-size limits visible; this does not replace Phase 12 qualification.
+- Execute C2–C5 evaluation on independent development data, exposing confidence/sample-size limits. Passing C2 is required to promote ordinary positive content flags, not to report an actual scoring experiment or to qualify the primary agent detector.
 - Demonstrate statistical assessment of manual copy/paste with all generation provenance disabled. Show basic-correction-only controls and unknown behavior for unsupported/too-short inputs.
 - Verify that neither model failures nor malformed inputs produce a negative default or block the agent-attribution worker.
 
 **Exit criteria**
 
-- [ ] A selected candidate meets the recorded development feasibility gates, including useful recall and coverage at the low false-positive threshold.
+- [ ] At least two candidates have produced real scores on documented copied-text and negative examples, with recall, false positives, coverage, and runtime reported. A no-op/all-unknown implementation cannot pass.
 - [ ] Code, weights, tokenizer, calibration, preprocessing, aggregation, eligibility, and runtime configuration are pinned and licensed for the proposed use.
 - [ ] Known subgroup, length, editing, and generator limitations are recorded with matching abstention and release-claim boundaries.
 - [ ] Private inference, timeout handling, and independent worker operation pass integration checks.
-- [ ] If no candidate qualifies, this phase stays incomplete for the expanded MVP. Findings and any revised proposal are recorded; provenance-only delivery is not presented as solving untracked copy/paste.
+- [ ] The experiment has a recorded qualified-or-experimental disposition. Unmet accuracy goals remain explicitly unmet, but a completed scoring experiment with disclosed limitations does not block primary agent release. Provenance-only evaluation is insufficient.
 
 ## Phase 9 — Implement independent outcomes and review policy
 
@@ -650,7 +711,7 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 **Implementation work**
 
 - Implement the status model, trust rules, and versioned reason codes defined in Section 3.
-- Use deterministic rules for verified action/content provenance. Use the selected calibrated content detector for eligible untracked text; keep optional agent-anomaly scoring separate and unable to create verified status. Content detection is now a required MVP track, not an optional scoring experiment.
+- Implement the conservative agent rules first. Integrate content scoring through its independent contract; an unqualified model remains experimental and cannot affect agent findings. Optional agent-suspicion rules are off by default, use no content scores, and require their own validation within G1 before positive flags are enabled.
 - Implement exactly two findings: agent-sent and AI-generated content. Keep observed sending mechanism, authored/inherited regions, assistance category, evidence completeness, and analyst review state as supporting fields, not additional product detection flags.
 - Define pending-evidence windows using measured source behavior. Missing evidence after a window becomes incomplete/unknown, not a human verdict.
 - Add conflict resolution and append-only reassessment. Preserve the original decision, evidence set, and rule version.
@@ -689,6 +750,7 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 **Implementation work**
 
 - Build a read-only Outlook pane with exactly two result cards labeled **Email sent by an AI agent** and **Email contains AI-generated content**. Each shows flag/status, evidence basis, reasons, and limits. Findings stay in AgentTrace; no draft/send/approval controls or mailbox modifications are included.
+- Put the agent-sent result first and make it available while content is pending or experimental. Label content scoring as advisory; an unqualified score must not look like a confirmed flag. Use separate filters and explanations, never a combined overall "AI email" verdict that obscures the distinction.
 - Use MSAL with supported nested app authentication and a tested fallback where required by the selected client. Authorize backend access with an access token for the backend audience.
 - Map the selected item to the correct mailbox/message context. Validate access server-side; never trust a mailbox or message ID supplied by the browser as authorization.
 - Build dashboard views for detected-message search, evidence timeline, review/correction of findings, connected evidence sources, and detection coverage. Analyst review is about the classification, not permission to send an email.
@@ -748,7 +810,7 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 - No content injection or malformed evidence can escalate trust or execute operations.
 - Restore a representative environment and reproduce selected decisions from retained evidence.
 - Meet G5 at the agreed workload and publish any performance bottlenecks.
-- Meet C5 independently, including queue wait; verify inference outages leave agent processing responsive and content state explicit. C6/C7 semantic and artifact controls must survive attack and recovery cases.
+- Measure C5 independently, including queue wait and cost; verify inference outages leave agent processing responsive and content state explicit. C6/C7 semantic and artifact controls must survive attack and recovery cases regardless of content accuracy.
 
 **Exit criteria**
 
@@ -759,22 +821,22 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 - [ ] Model artifact, content egress, retention/deletion, and inference-isolation tests pass.
 - [ ] A deployment/API/permission audit confirms the product can analyze and flag email but cannot execute mail or agent workflows.
 
-## Phase 12 — Qualify both detection tracks on locked evaluation data
+## Phase 12 — Qualify agent detection and independently evaluate content
 
-**Objective:** Establish credible, reproducible performance evidence for the supported deployment scope.
+**Objective:** Qualify the primary agent detector against its strict gates and report the secondary content detector's actual performance and promotion eligibility separately.
 
 **Implementation work**
 
 - Freeze rules, correlation configuration, observation windows, content policy, normalization, language/length eligibility, model/weights/tokenizer, calibration, aggregation, thresholds, and dataset manifests before evaluation. Commit a signed-off evaluation protocol before accessing held-out labels.
 - Evaluate at least 3,000 representative independently labeled non-agent-send negatives and 1,000 independently labeled agent-sent emails, subject to Section 3's independence and source-coverage requirements. Evaluate AI-content negatives/positives separately under C1–C4.
 - Include human text, copied AI text, non-AI automation, shared applications, externally approved agent sends, autonomous agent sends, draft-only AI activity, and uninstrumented positives.
-- Evaluate C1's controlled inclusion cases and C2's human/grammar-only negatives separately from untracked content. Evaluate at least 500 independent eligible positives per C3 family, and at least 1,000 independently labeled all-length content positives for C4 using the predeclared workload mix/weights. Do not substitute long generated essays for short business emails.
+- Evaluate available C1 inclusion evidence separately from untracked content. Use a locked, independently labeled English corpus covering every C3 family and C4 length group; publish sample sizes and uncertainty. Size C2 negatives for the actual promotion claim and expand positives where intervals are too wide. Do not substitute long essays for short emails or require an unbounded content-data effort before primary agent release.
 - Run an explicit provenance-disabled copy/paste test so managed generation receipts cannot mask weak statistical detection. Publish new-generator/domain results, internal versus external results, length bins, edited/mixed text, and grammar-only errors.
 - Measure agent-sent false positives, suspicion false alerts, supported-evidence-path and overall agent-sent recall, precision, unknowns, and source coverage. Draft-only and recipient-side AI activity must not inflate sender-side recall. AI-content metrics remain independent.
 - Publish independent action/content confusion matrices and the final combined review-policy false-alert rate. Measure content-policy errors at message level after region/window aggregation, conditional recall on eligible content, all-length recall, abstention, all-mail coverage, latency, memory, cost, and reviewer workload. A missed supported positive remains a miss even if the pipeline abstains.
 - Publish one-sided confidence bounds for false positives and confidence intervals for recall/precision using justified binomial or cluster-aware methods.
 - Evaluate key subgroups and out-of-scope paths separately. Do not average away a failure in a required counterexample class.
-- Investigate all verified false positives and a representative sample of false negatives, unknowns, and unflagged messages. A fix after examining the holdout requires a new held-out evaluation or a clearly labeled exploratory result.
+- Investigate every positive agent-flag false positive, including suspicion if enabled, and a representative sample of misses, unknowns, and unflagged messages. A fix after examining the holdout requires a new held-out evaluation or a clearly labeled exploratory result.
 - Publish ablations for provenance-only, statistical-only, and combined content assessment. Verify that receipt/header availability, provider identifiers, template families, or sender metadata did not leak statistical labels.
 
 **Expected outcomes**
@@ -786,19 +848,19 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 
 - G1 and G2 pass with their required denominators and uncertainty reporting.
 - G3 and G4 remain satisfied on the locked suite.
-- C1–C7 pass for the declared English content scope, including useful untracked copy/paste recall and coverage at the accepted false-positive budget.
+- C1–C7 have actual evaluation evidence: scoring attempts, errors, coverage, isolation, and reproducibility are mandatory. C2 must pass before ordinary positive statistical content flags are exposed; unmet content-recall goals are reported and do not invalidate passing G gates.
 - Unknown/pending supported positives after the fixed window are counted as misses.
 - Results can be recomputed from the stored predictions and independent labels.
 
 **Exit criteria**
 
 - [ ] G1–G8 are supported by recorded evidence for the declared scope.
-- [ ] C1–C7 and the combined review-policy budget have supporting evidence, with all-length copy/paste results presented alongside eligible-only results.
+- [ ] The C1–C7 report includes actual provenance-disabled scoring, all-length and eligible-only results, limits, and a qualified-or-experimental decision; the enabled combined review policy has a measured workload/error budget.
 - [ ] No holdout leakage, hidden exclusions, or unsupported independence assumptions remain.
 - [ ] Required scenario failures are resolved and re-evaluated on uncontaminated data.
-- [ ] If a numerical gate is unmet, qualification remains incomplete; results are not relabeled as a pass.
+- [ ] Unmet G gates keep primary qualification incomplete. Unmet C2 keeps ordinary statistical content flags unqualified. Content recall/runtime research goals retain their actual outcomes rather than being relabeled as passes.
 - [ ] Project owner accepts the measured scope and the exact wording of performance claims.
-- [ ] Agent qualification and content qualification are reported separately; success in one cannot turn a failure in the other into full MVP acceptance.
+- [ ] The release disposition explicitly states primary agent qualification and secondary content capability. A qualified agent detector with a completed, disclosed experimental content scorer is an acceptable POC outcome under the revised priority.
 
 ## Phase 13 — Run the Azure shadow pilot and establish operations
 
@@ -806,7 +868,7 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 
 **Implementation work**
 
-- Deploy the pinned release candidate through Bicep and CI to the agreed Azure region and pilot resource group.
+- Deploy the pinned release candidate through Azure CLI/Bicep and CI using the explicit verified subscription and `kb-agentdemo`. Apply the smallest validated settings from Section 6 and inspect the deployment diff before changing existing resources.
 - Enable only the approved mailbox and investigator groups. Verify that the deployed system has no mail-execution, blocking, quarantine, or approval-management features or credentials.
 - Run the shadow pilot for at least ten consecutive business days after the last material correction. Collect representative alerts, unflagged samples, unknowns, and source-health observations.
 - Monitor source lag, both queues, subscription renewal, retries, agent/content coverage, length/language/score distributions, decision revisions, investigator workload, model runtime, and cloud cost.
@@ -824,7 +886,7 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 
 **Validation criteria**
 
-- G9 passes, and observed pilot behavior does not invalidate G1–G8, C1–C7, the combined alert budget, or the stated scope.
+- G9 passes and pilot behavior does not invalidate G1–G8, the two-output separation, or the enabled alert budget. Content follows its recorded advisory-qualified or experimental disposition; an unsupported content score cannot become a positive agent flag.
 - All pilot findings are reproducible or explicitly recorded as unresolved.
 - Reviewer workload and unknown coverage are visible; unflagged sampling supports detection-quality assessment.
 - Restore and rollback procedures remain valid in the deployed environment.
@@ -835,7 +897,7 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 - [ ] No unresolved critical/high issue, unexplained loss, or unauthorized access remains.
 - [ ] Pilot data handling, retention, cost, and operational ownership are accepted.
 - [ ] Any changes to supported scope or performance claims are reflected in the release documentation.
-- [ ] Model drift/reversion procedures, review capacity, unknown coverage, and content-specific costs are measured and accepted; a material content regression reopens qualification.
+- [ ] Model drift/reversion procedures, review capacity, unknown coverage, and content costs are measured; a content regression reopens content promotion and disables affected flags without undoing an unaffected agent qualification.
 
 ## Phase 14 — Deliver the demonstration and accepted POC release
 
@@ -843,7 +905,7 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 
 **Implementation work**
 
-- Prepare a short presentation covering the two independent product questions, private evidence/inference architecture, message inspection in Outlook, separate quality scorecards, unknown coverage, and deployment permissions.
+- Lead the demonstration with accurate agent-send attribution, negative counterexamples, exact-message evidence, and unknown external cases. Then show the independent best-effort content scores/flags, measured limitations, deployment permissions, and actual incremental cost.
 - Demonstrate detection of independently prepared emails across send mechanisms and content origins. Include manual AI copy/paste, existing generation provenance, substantial rewrite, English translation, grammar-only assistance, agent-sent human wording, externally approved agent sends, and autonomous agent sends. AgentTrace displays findings; it does not perform the scenario's send or generation actions.
 - Include a short copied message, mixed passage, inherited AI quote, unsupported language, forged external claim, uninstrumented agent, and detector/source outage. Show measured outcomes even when they are unknown or a statistical miss; do not cherry-pick only long detectable drafts.
 - Use real test-mailbox messages prepared outside AgentTrace for the live detection demonstration. Clearly label any replay and link it to original evidence. Show the product's read-only permissions and absence of execution controls.
@@ -871,7 +933,7 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 - [ ] Source, deployment assets, documentation, and sanitized validation reports are committed and released.
 - [ ] Customer technical owner accepts the POC against the agreed gates.
 - [ ] Remaining production work is explicit; POC acceptance is not represented as regulatory certification, universal external-agent detection, or guaranteed AI-text detection.
-- [ ] The content track meets the agreed gates; a provenance-only demonstration cannot substitute for required untracked copy/paste performance.
+- [ ] The content track demonstrates real statistical scoring of untracked copy/paste and measured errors/coverage. Its qualified-or-experimental status is disclosed; a provenance-only demo or an all-unknown stub is insufficient, but perfect content accuracy is not required.
 - [ ] The accepted product exposes exactly the two requested detection findings and passes the detection-only boundary audit.
 
 ## 5. Delivery ownership and working practices
@@ -895,14 +957,43 @@ AgentTrace tests consume independently prepared, authorized test emails and evid
 
 ## 6. Schedule, cost, and release boundaries
 
-The expanded scope has an initial planning allowance of twelve to sixteen weeks with two application/integration engineers, dedicated ML/evaluation capacity, and part-time Microsoft administration, security, and operations support. This is an estimate, not a delivery commitment. Refine it after the bounded Phase 0 feasibility study; obtaining independently labeled human email or failing the content gates can extend the work or produce a no-go. The ten-business-day shadow period and statistically meaningful evaluation must not be compressed into a scripted demo. Independent work may overlap, but a dependent exit cannot pass before its prerequisite evidence exists.
+Use milestone-based planning: first prove the agent-to-message evidence path, then deliver the primary detector and its low-false-positive qualification. The earlier twelve-to-sixteen-week allowance is provisional and must be re-estimated after Phase 0 using actual source access and labeling effort. Prioritize integration/evaluation engineers; use bounded ML support for the secondary experiment rather than assuming a dedicated training program. Content-recall failures do not extend the primary critical path indefinitely. The ten-business-day shadow period and meaningful agent evaluation must not be compressed into a scripted demo.
 
-Primary costs are Azure application/model compute, PostgreSQL, Service Bus, storage, logs, and any missing Microsoft licensing. The expanded scope adds human labeling/adjudication, model benchmarking/training, possible GPU capacity, private artifact storage, and independent test-data preparation outside AgentTrace. Record Phase 0 estimates using region, hardware/quota, message volume and lengths, retention, data acquisition, and licensing; compare candidate cost per 1,000 messages in Phase 8 and validate actual consumption in Phase 13. No fixed cloud-cost claim is made before those inputs are known.
+Primary costs are evidence access/licensing, data labeling, small application/database compute, storage/queues, and logs. Content adds a bounded CPU benchmark and only justified adaptation work. Estimate incremental cost from the selected region, subscription prices, operating hours, storage/retention, message volume, and existing entitlements. Record cost per 1,000 assessed emails for each track. No current Azure balance, free-tier entitlement, or fixed monthly-price guarantee is assumed.
+
+### Azure CLI and resource-group guardrails
+
+- **Required destination:** `kb-agentdemo` for all new AgentTrace Azure resources. Use an explicit `--subscription` for every Azure CLI command; resolve and validate the exact subscription locally, not by ambiguous display name. Do not change the user's global CLI default for convenience.
+- **Read-only observation, 28 October 2026:** the named group exists in an accessible non-default subscription, with resource-group metadata location `eastus`. It contains shared storage, Key Vault, Log Analytics, Event Hubs, Search, and AI resources in several regions. This is not evidence that their data-plane permissions, residency, spare capacity, or suitability for AgentTrace are approved. No resources were created or changed during this plan revision.
+- Store resolved environment identifiers in local/deployment configuration. Verify group existence, permissions, provider support, quotas, and required region before deployment. The group's metadata location does not choose the location of every resource or settle regulated-data residency.
+- Use group-scoped Bicep deployments through Azure CLI, preview with `az deployment group what-if`, and enforce the expected group in CI. Inspect service-managed ancillary resources/groups and their charges; do not silently provision outside the specified group.
+- Inventory/reuse only resources that meet isolation, region, and access requirements. Use separate containers, queues, keys, and database scopes as appropriate. Do not modify another workload's network, retention, access, or SKU to save money. A same-group resource is not automatically available for this project.
+- Never delete `kb-agentdemo` as cleanup: it is shared. Track newly created AgentTrace resource IDs and ownership tags, and remove only those explicitly selected for teardown after preserving required evidence.
+
+### Minimal-cost deployment baseline
+
+These are starting configurations to test, not guarantees of capacity or price. Choose the cheapest configuration that still satisfies the detection and data-handling requirements.
+
+| Area | Starting choice | Cost and validation boundary |
+| --- | --- | --- |
+| Development | Local containers, PostgreSQL, and a queue adapter; authorized synthetic fixtures | No new Azure resources until a viable evidence path needs live cloud integration |
+| API, webhook and UI | Container Apps Consumption; serve the small dashboard from the existing API deployment; start testing at 0.25 vCPU / 0.5 GiB | Demo-only API can scale to zero if measured cold starts are acceptable. For an active Graph subscription, keep one small ingress replica if necessary to meet webhook response deadlines; cap replicas initially at two and measure bursts. [Billing](https://learn.microsoft.com/en-us/azure/container-apps/billing), [webhook delivery](https://learn.microsoft.com/en-us/graph/change-notifications-delivery-webhooks) |
+| Attribution worker | Small CPU consumer, independently scaled from content | Start at 0.25–0.5 vCPU with measured memory; event-driven wake-up must be configured before using zero minimum replicas. No GPU. [Scaling](https://learn.microsoft.com/en-us/azure/container-apps/scale-app) |
+| Content worker | CPU-only small encoder; initially one worker, bounded batch/timeout and 1 vCPU / 2 GiB experiment | Adjust only from measured memory/runtime. Use scale-to-zero or bounded jobs with a real trigger, max one replica initially. Larger DeBERTa or paired 7B/8B scorers may not fit; benchmark offline or defer rather than provisioning a standing GPU |
+| Storage and work queues | Suitable existing storage or Standard_LRS GPv2; separate queues for the two tracks | Queue payloads contain references, not raw email bodies. Implement idempotency, visibility renewal, capped retries, and poison storage. Storage Queues do not provide native FIFO or duplicate detection. [Queue comparison](https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-azure-and-service-bus-queues-compared-contrasted) |
+| Alternative broker | Service Bus Basic only if its operational benefits justify a new resource | Do not assume Basic supports sessions or duplicate detection; no topics needed. Upgrade only for a demonstrated requirement and cost delta. [Duplicate-detection tiers](https://learn.microsoft.com/en-us/azure/service-bus-messaging/duplicate-detection), [sessions](https://learn.microsoft.com/en-us/azure/service-bus-messaging/message-sessions) |
+| Database | Suitable isolated existing PostgreSQL or the smallest region-supported Flexible Server Burstable SKU, initially evaluate B1ms | Minimal supported storage and retention consistent with evidence needs; no HA/read replica by default. Stop development compute outside use, accounting for automatic restart after seven days and continuing storage/backup charges. [Burstable and stop/start](https://learn.microsoft.com/en-us/azure/postgresql/overview), [stop behavior](https://learn.microsoft.com/en-us/azure/postgresql/configure-maintain/how-to-stop-server) |
+| Registry and secrets | Reuse an appropriate registry; otherwise ACR Basic. Key Vault Standard if a separate vault is needed | Managed identities, minimal image retention, no premium registry by default. ACR private endpoints require Premium; Basic does not satisfy that requirement. [ACR tiers](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-skus), [private endpoints](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-private-endpoints) |
+| Logs | Reuse a suitably isolated workspace or pay-as-you-go logging with bounded retention and low-volume metrics | No raw mail/prompts; avoid verbose payload logging and duplicate trace ingestion. Sampling cannot remove evidence needed to support a detection claim; retained evidence and optional diagnostic traces have different policies |
+| Networking | Minimum approved topology; public HTTPS notification ingress, protected data/inference boundaries | No premium network/appliance by default, but never weaken required isolation to meet a price target. Container Apps private endpoints incur additional charges even on Consumption; estimate before deployment. [Private-endpoint billing](https://learn.microsoft.com/en-us/azure/container-apps/private-endpoints-with-dns) |
+| Explicitly absent by default | GPU VM, AKS, dedicated Container Apps plan, Azure AI Search, vector database, managed LLM deployment, new Event Hubs, full Langfuse stack | These are not prerequisites for the proposed detection path, even if unrelated instances already exist in the resource group |
+
+Prepare an incremental-cost worksheet before provisioning: resource/SKU, region, hours/replicas, storage, requests, logs, network charges, license dependencies, existing-resource allocation, and monthly total. Record a project spending ceiling and alert thresholds at 50%, 80%, and 100%. Cost Management budgets notify; they do not stop consumption. Enforce practical bounds through replica caps, job timeouts, limited experimental compute, and a reviewed stop/teardown runbook that preserves evidence. [Azure budgets](https://learn.microsoft.com/en-us/azure/cost-management-billing/costs/tutorial-acm-create-budgets). Recheck current pricing and available SKUs immediately before creating resources rather than embedding stale dollar estimates in this plan.
 
 The release must answer all of the following with evidence:
 
-- Which supported email actions can be attributed to agents, and at what observed recall?
-- How often are non-agent workflows incorrectly assigned a verified-agent result?
+- Which observed sends can be attributed to agents, with what exact-message evidence, recall, and coverage?
+- How often are non-agent sends incorrectly assigned any positive agent flag, including suspicion if enabled?
 - What share of traffic is unknown, pending, or outside observed coverage?
 - Which identities and evidence sources support each verdict?
 - Are externally approved and autonomous agent sends both detected as agent-sent emails without introducing approval management?
@@ -915,4 +1006,4 @@ The release must answer all of the following with evidence:
 - How long do agent attribution and content analysis take separately, including queues and source delays?
 - Can the customer deploy, inspect, recover, and operate the POC without exposing sensitive mail unnecessarily?
 
-Completion means a measured, reproducible, read-only Outlook detection POC that qualifies **both** requested findings: **email sent by an AI agent** and **email contains AI-generated content**, including untracked manual copy/paste. If useful content recall cannot coexist with the false-positive budget, record the requirement as unmet and present the measured limitation. Do not weaken gates silently, add execution features to manufacture evidence, or claim universal authorship detection. Additional detection channels require their own scope and validation; this plan does not build an automation platform.
+Completion means a measured, reproducible, read-only Outlook POC with **qualified primary detection of emails sent by AI agents**, plus a **real, separately evaluated best-effort attempt to detect AI-generated email content**, including manual copy/paste. The content result may be qualified for advisory flags or explicitly experimental, depending on the evidence. Low agent false positives, independent findings, honest unknowns, and the absence of execution features are mandatory. Do not weaken the primary gates, manufacture evidence by sending email, or claim universal detection. Content-scoring limitations do not conceal a failed agent gate and do not block an otherwise qualified primary detector after the required secondary experiment is completed.
