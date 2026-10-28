@@ -75,13 +75,19 @@ def main():
         allowed_message_ids=message_ids,
     )
     count = audit.collect(window_end=utc_now())
-    for kind in ["office_activity", "graph_activity"]:
+    activity_file = ROOT / "work/private/graph-activity/logging-settings.private.json"
+    graph_enabled = activity_file.is_file() and json.loads(activity_file.read_text()).get(
+        "enabled", False
+    )
+    for kind in ["office_activity"] if graph_enabled else ["office_activity", "graph_activity"]:
         OptionalActivityCollector(collector, UUID(refs[kind]), kind).unavailable()
     health = collector.health(UUID(refs["exchange_audit"]))
     result = {
         "exchange_audit_records_added": count,
         "checkpoint": health["checkpoints"],
-        "optional_activity_sources": "explicitly_unavailable_no_new_grants",
+        "optional_activity_sources": "graph_activity_configured_separate_collector"
+        if graph_enabled
+        else "explicitly_unavailable_no_new_grants",
     }
     (directory / "audit-collection-status.private.json").write_text(json.dumps(result, indent=2))
     print(json.dumps(result))

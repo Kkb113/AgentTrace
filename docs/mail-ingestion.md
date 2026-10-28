@@ -89,8 +89,9 @@ The retained envelope excludes body fields and arbitrary audit payloads.
 
 The optional Graph activity adapter reads an explicitly configured Log Analytics
 workspace with bounded overlap and fixed projected fields. It does not enable
-logging or acquire permissions. The current tenant has no approved Graph activity
-destination; its live coverage is explicitly unavailable. The alternative legacy
+logging or acquire permissions. The later owner-authorized Graph activity setup adds a dedicated filtered destination;
+see [its configuration and validation](graph-activity-logging.md). The original
+Phase 3 live snapshot records the source as unavailable at that earlier time. The alternative legacy
 Office Management Activity feed is also disabled: no broader `ActivityFeed.Read`
 grant was introduced merely to duplicate the approved Exchange audit source.
 Fixtures exercise the eligible Graph adapter, including deduplication and source errors.

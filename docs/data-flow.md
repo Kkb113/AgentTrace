@@ -18,3 +18,8 @@ Role/credential revocation, certificate overlap rotation, signing-key version re
 ## Accepted notification transport addition
 
 Graph basic notifications now enter through a dedicated East US Event Grid/Standard LRS metadata zone, then the local encrypted durable inbox and separate analysis dispatch. The owner accepted a trusted-services exception and destination-account delivery roles only on this new notification account after live validation rejected narrower scopes. The existing raw-evidence store and Key Vault remain unchanged. No new mailbox send/write grant exists. See [the ingestion design](mail-ingestion.md) and [acceptance](evidence/notification-transport-acceptance.json).
+
+
+## Graph activity source addition
+
+The tenant diagnostic category now routes Graph API-request logs to a dedicated East US workspace in kb-agentdemo. A workspace transformation keeps only enrolled pilot/collector application contexts and drops query strings and unused fields before storage. The certificate-based audit identity reads only the conditioned Graph table, then persists minimized encrypted source records with independent event/ingestion times. This is API evidence for later correlation, not proof of an AI actor or of generated wording. See [the Graph source review](graph-activity-logging.md).

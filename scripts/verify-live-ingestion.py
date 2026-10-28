@@ -155,6 +155,10 @@ def main():
         "original_vault_firewall_unchanged": vault["properties"]["networkAcls"]["bypass"] == "None"
         and vault["properties"]["networkAcls"]["defaultAction"] == "Deny",
     }
+    activity_path = ROOT / "work/private/graph-activity/logging-settings.private.json"
+    activity_enabled = activity_path.is_file() and json.loads(activity_path.read_text()).get(
+        "enabled", False
+    )
     result = {
         "kind": "actual_live_calls",
         "checks": checks,
@@ -164,7 +168,9 @@ def main():
         "exchange_audit_records": audit["n"],
         "email_write_actions": 0,
         "raw_snapshots_enabled": False,
-        "graph_activity_source": "not_configured",
+        "graph_activity_source": "configured_filtered_workspace"
+        if activity_enabled
+        else "not_configured",
         "office_audit_source": "graph_exchange_audit_query",
         "content_scorer": "not_installed",
     }

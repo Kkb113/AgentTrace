@@ -1,0 +1,86 @@
+{
+  "executed_at": "2026-10-28T21:13:50.502406+00:00",
+  "all_five_local_gates_pass": true,
+  "primary_test_counts": {
+    "unit": 216,
+    "integration": 62
+  },
+  "required_regressions": {
+    "test_transform_is_narrow_and_drops_sensitive_fields_before_storage": true,
+    "test_unbounded_or_inconsistent_source_scopes_are_rejected": true,
+    "test_supported_send_api_calls_are_only_send_observations": true,
+    "test_drafts_edits_reads_failures_and_other_resources_are_not_send_events": true,
+    "test_uri_minimization_removes_queries_and_fragments_without_changing_object_path": true,
+    "test_untrusted_activity_uris_are_rejected": true,
+    "test_delayed_arrivals_overlap_deduplicate_and_remove_uri_queries": true,
+    "test_empty_initial_delivery_is_pending_and_not_negative_agent_evidence": true,
+    "test_failed_windows_never_advance_checkpoints_or_partially_commit": true,
+    "test_only_noncollector_successful_send_api_operations_are_correlation_candidates": true
+  },
+  "live_validation_passed": false,
+  "files": [
+    {
+      "path": "src/agenttrace_ingestion/activity_policy.py",
+      "sha256": "be91876337bb01fccda29e98588473dc9f2e302d88f2d90b90dc0a0488af119d"
+    },
+    {
+      "path": "src/agenttrace_ingestion/activity_runtime.py",
+      "sha256": "b033112d11dfe917918cddec5052919a618119efca8dfe42cfbded1c79acdbb5"
+    },
+    {
+      "path": "src/agenttrace_ingestion/graph_activity.py",
+      "sha256": "9b344685582d2d4f80efceea8d8f01768837f7d35be38cdc36fb0b3394ff047e"
+    },
+    {
+      "path": "src/agenttrace_foundation/workload_identity.py",
+      "sha256": "484b917eb2f1edab1fdc463e04850df5b37ec36810407b29348531a81f13d9d4"
+    },
+    {
+      "path": "infra/bicep/graph-activity-logging.bicep",
+      "sha256": "52860b1dba47307b8478c44dbca685a4351ee755c0c97e29d210107ce6837052"
+    },
+    {
+      "path": "scripts/collect-audit-evidence.py",
+      "sha256": "308529a25088e685725d1765d84a9b7ccaf5d243e50ccf11470eb3505e229703"
+    },
+    {
+      "path": "scripts/collect-graph-activity.py",
+      "sha256": "ba9fe5eb004be4ab1b49535f82d8a062a61b02e1054224fbf1ce7a4e898a6ddd"
+    },
+    {
+      "path": "scripts/configure-graph-activity.py",
+      "sha256": "d98f3c9042737cc35ca4f09dbf08df4f9c142b6e53cb8b6464bd95ae9b87365f"
+    },
+    {
+      "path": "scripts/inspect-graph-activity.py",
+      "sha256": "2473b7bd4c364b5882399a943a6a92bb2b2a16e5927440d17196ae44e2a6bb6d"
+    },
+    {
+      "path": "scripts/prepare-graph-activity.py",
+      "sha256": "f6d6c8e577e809949e25d5a177ac23453081db166334d480fceb02ef808f1c36"
+    },
+    {
+      "path": "scripts/probe-graph-activity.py",
+      "sha256": "daffd3541196ffaab8bf9f973d29b3c51f7e2d79410bfa9c390e763f0a1fa2d1"
+    },
+    {
+      "path": "scripts/verify-graph-activity.py",
+      "sha256": "07a146139c43c3dc0118534e390ff95bc6be1390a6ee4020c643263d3972422d"
+    },
+    {
+      "path": "scripts/validate-infrastructure.py",
+      "sha256": "d0da26bcb3186129430fd68e0a91d124a012d8fe97037e71fcfb3abe251d84c5"
+    },
+    {
+      "path": "tests/unit/test_graph_activity_policy.py",
+      "sha256": "fcb014fe488beeacf3017edf24d721866a144b814374c5a70ba28ea8f4ca0d2d"
+    },
+    {
+      "path": "tests/integration/test_graph_activity_collection.py",
+      "sha256": "c927eec66a5d997caee61559ce2f55d2d25dc363268b09a1f3831770dd37867a"
+    }
+  ],
+  "file_hash_normalization": "Git LF text bytes",
+  "scope": "Graph API-request evidence only; no API-only AI verdict, mailbox write or content scoring",
+  "all_passed": false
+}

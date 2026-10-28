@@ -67,6 +67,24 @@ def main() -> int:
     assert notifications["parameters"]["expectedResourceGroup"]["allowedValues"] == ["kb-agentdemo"]
     assert notifications["parameters"]["location"]["allowedValues"] == ["eastus"]
     assert all("condition" in resource for resource in notifications["resources"])
+    graph = json.loads((output / "graph-activity-logging.json").read_text(encoding="utf-8-sig"))
+    assert graph["parameters"]["enableProvisioning"]["defaultValue"] is False
+    assert graph["parameters"]["expectedResourceGroup"]["allowedValues"] == ["kb-agentdemo"]
+    assert graph["parameters"]["location"]["allowedValues"] == ["eastus"]
+    assert all("condition" in resource for resource in graph["resources"])
+    table = next(
+        r
+        for r in graph["resources"]
+        if r["type"] == "Microsoft.OperationalInsights/workspaces/tables"
+    )
+    assert (
+        table["properties"]["retentionInDays"] == table["properties"]["totalRetentionInDays"] == 7
+    )
+    rule = next(
+        r for r in graph["resources"] if r["type"] == "Microsoft.Insights/dataCollectionRules"
+    )
+    assert rule["kind"] == "WorkspaceTransforms"
+    assert "outputStream" not in rule["properties"]["dataFlows"][0]
     print(
         json.dumps(
             {

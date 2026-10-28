@@ -49,3 +49,7 @@ raw-evidence account and Key Vault retain their no-bypass firewalls. No tenant m
 write/send role or broader mailbox read role was added. See
 [the review and amendment](notification-transport-proposal.md) and
 [owner acceptance](evidence/notification-transport-acceptance.json).
+
+## Graph activity source addition
+
+The owner subsequently authorized enabling Microsoft Graph activity logging, checking licensing/permissions, minimizing cost, and testing the source end to end. A dedicated pay-as-you-go East US workspace/DCR in kb-agentdemo keeps a filtered seven-day Graph table. The existing audit collector receives only a workspace-scoped Log Analytics Data Reader assignment conditioned on that table. This adds no Microsoft 365 mailbox/send/write permissions. Tenant-wide source export is minimized downstream and remains broader than a mailbox authorization boundary. Shared workspaces and existing evidence firewalls stay unchanged. See [the design and cost controls](graph-activity-logging.md).

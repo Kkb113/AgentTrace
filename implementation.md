@@ -516,7 +516,7 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 - [x] Content access and retention follow the approved minimum-data policy.
 - [x] Authored/inherited regions, excluded content, version changes, and extraction failures are represented correctly; raw bodies do not leak into logs or queue diagnostics.
 
-Implementation evidence: [review](docs/mail-ingestion-report.md), [exit/test report](docs/evidence/mail-ingestion-validation.json), [actual live checks](docs/evidence/mail-ingestion-live-validation.json) and [runbook](docs/runbooks/mail-ingestion.md). The live optional Graph activity source remains explicitly unavailable; the eligible adapter is fixture-tested.
+Implementation evidence: [review](docs/mail-ingestion-report.md), [exit/test report](docs/evidence/mail-ingestion-validation.json), [actual live checks](docs/evidence/mail-ingestion-live-validation.json) and [runbook](docs/runbooks/mail-ingestion.md). Graph activity logging was subsequently authorized and configured in a dedicated filtered East US workspace; see [configuration and live validation](docs/graph-activity-logging.md). The original Phase 3 snapshot remains historical.
 
 ## Phase 4 — Build the evidence ledger and correlation model
 
