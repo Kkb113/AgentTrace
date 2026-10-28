@@ -6,6 +6,7 @@ import argparse
 import json
 import secrets
 import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,6 +30,15 @@ def main() -> int:
         # The host directory is private; the mounted file must be readable by
         # the non-root application UID on Linux. It holds only a local test secret.
         secret.chmod(0o644)
+    if args.command == "start":
+        prepared = subprocess.run(
+            [sys.executable, str(ROOT / "scripts/prepare-local-security.py")],
+            cwd=ROOT,
+            shell=False,
+            check=False,
+        )
+        if prepared.returncode:
+            return prepared.returncode
     command = [
         "docker",
         "compose",

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import signal
 import threading
 from pathlib import Path
@@ -14,6 +15,7 @@ from agenttrace_contracts import DetectionJob
 
 from .api import create_app
 from .database import Database, StorageUnavailable
+from .database_access import configure_local_roles
 from .queue import DevelopmentQueue
 from .service import process_one
 from .settings import Settings
@@ -40,6 +42,9 @@ def main() -> int:
         database = Database(Settings.from_environment())
         if arguments.command == "migrate":
             database.migrate()
+            role_directory = os.environ.get("AGENTTRACE_DATABASE_ROLE_SECRET_DIRECTORY")
+            if role_directory:
+                configure_local_roles(database, Path(role_directory))
             print(json.dumps({"status": "migrated", "schema_version": 1}))
         elif arguments.command == "api":
             uvicorn.run(

@@ -1,0 +1,637 @@
+{
+  "verified_at": "2026-10-28T18:33:15.261614+00:00",
+  "scope": "Synthetic effective-access tests; not detector accuracy or production qualification",
+  "sections": [
+    {
+      "verified_at": "2026-10-28T18:04:28.856597+00:00",
+      "section": "mailbox",
+      "cases": [
+        {
+          "name": "negative_control_exists_and_sign_in_is_disabled",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "collector_reads_approved_mailbox",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "name": "collector_reads_only_authorized_synthetic_body",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "collector_denied_out_of_scope_mailbox",
+          "expected": 403,
+          "actual": 403,
+          "passed": true
+        },
+        {
+          "name": "content_identity_denied_direct_mailbox",
+          "expected": 403,
+          "actual": 403,
+          "passed": true
+        },
+        {
+          "name": "attribution_identity_denied_direct_mailbox",
+          "expected": 403,
+          "actual": 403,
+          "passed": true
+        },
+        {
+          "name": "audit_identity_denied_mailbox_body_access",
+          "expected": 403,
+          "actual": 403,
+          "passed": true
+        },
+        {
+          "name": "effective_entra_grants_exact_mail-collector",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "no_hidden_delegated_grants_mail-collector",
+          "expected": 0,
+          "actual": 0,
+          "passed": true
+        },
+        {
+          "name": "effective_entra_grants_exact_audit-collector",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "no_hidden_delegated_grants_audit-collector",
+          "expected": 0,
+          "actual": 0,
+          "passed": true
+        },
+        {
+          "name": "effective_entra_grants_exact_attribution",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "no_hidden_delegated_grants_attribution",
+          "expected": 0,
+          "actual": 0,
+          "passed": true
+        },
+        {
+          "name": "effective_entra_grants_exact_content",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "no_hidden_delegated_grants_content",
+          "expected": 0,
+          "actual": 0,
+          "passed": true
+        },
+        {
+          "name": "effective_entra_grants_exact_api",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "no_hidden_delegated_grants_api",
+          "expected": 0,
+          "actual": 0,
+          "passed": true
+        },
+        {
+          "name": "effective_entra_grants_exact_access-test",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "no_hidden_delegated_grants_access-test",
+          "expected": 0,
+          "actual": 0,
+          "passed": true
+        }
+      ],
+      "all_pass": true,
+      "mail_mutations_attempted": 0,
+      "public_text_uploads": 0,
+      "scope": "effective synthetic access validation; no accuracy or production-readiness claim"
+    },
+    {
+      "verified_at": "2026-10-28T18:20:06.828474+00:00",
+      "section": "configuration",
+      "cases": [
+        {
+          "name": "storage_effective_sku_region_and_oauth_boundary",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "storage_effective_exact_operator_ip_firewall",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "vault_effective_standard_rbac_nonbypass_firewall",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "raw_evidence_has_effective_seven_day_lifecycle",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "raw_blob_versioning_and_soft_delete_are_disabled",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "resource_access_diagnostics_enabled_keys",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "resource_access_diagnostics_enabled_blobs",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "resource_access_diagnostics_enabled_queues",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "no_client_secret_and_one_bounded_certificate_mail-collector",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "workload_has_no_directory_administrator_role_mail-collector",
+          "expected": 0,
+          "actual": 0,
+          "passed": true
+        },
+        {
+          "name": "no_client_secret_and_one_bounded_certificate_audit-collector",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "workload_has_no_directory_administrator_role_audit-collector",
+          "expected": 0,
+          "actual": 0,
+          "passed": true
+        },
+        {
+          "name": "no_client_secret_and_one_bounded_certificate_attribution",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "workload_has_no_directory_administrator_role_attribution",
+          "expected": 0,
+          "actual": 0,
+          "passed": true
+        },
+        {
+          "name": "no_client_secret_and_one_bounded_certificate_content",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "workload_has_no_directory_administrator_role_content",
+          "expected": 0,
+          "actual": 0,
+          "passed": true
+        },
+        {
+          "name": "no_client_secret_and_one_bounded_certificate_api",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "workload_has_no_directory_administrator_role_api",
+          "expected": 0,
+          "actual": 0,
+          "passed": true
+        },
+        {
+          "name": "no_client_secret_and_one_bounded_certificate_access-test",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "workload_has_no_directory_administrator_role_access-test",
+          "expected": 0,
+          "actual": 0,
+          "passed": true
+        },
+        {
+          "name": "effective_azure_resource_roles_exact_mail-collector",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "effective_azure_resource_roles_exact_audit-collector",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "effective_azure_resource_roles_exact_attribution",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "custom_key_role_has_only_required_crypto_actions_attribution",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "effective_azure_resource_roles_exact_content",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "effective_azure_resource_roles_exact_api",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "custom_key_role_has_only_required_crypto_actions_api",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "effective_azure_resource_roles_exact_access-test",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        }
+      ],
+      "all_pass": true,
+      "mail_mutations_attempted": 0,
+      "public_text_uploads": 0,
+      "scope": "effective synthetic access validation; no accuracy or production-readiness claim"
+    },
+    {
+      "verified_at": "2026-10-28T18:02:00.458308+00:00",
+      "section": "azure",
+      "cases": [
+        {
+          "name": "collector_can_store_synthetic_raw_evidence",
+          "expected": 201,
+          "actual": 201,
+          "passed": true
+        },
+        {
+          "name": "raw_container_access_attribution",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "name": "raw_evidence_bytes_match",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "raw_container_access_content",
+          "expected": 403,
+          "actual": 403,
+          "passed": true
+        },
+        {
+          "name": "raw_container_access_api",
+          "expected": 403,
+          "actual": 403,
+          "passed": true
+        },
+        {
+          "name": "attribution_denied_other_container",
+          "expected": 403,
+          "actual": 403,
+          "passed": true
+        },
+        {
+          "name": "collector_enqueue_reference_agent-evidence",
+          "expected": 201,
+          "actual": 201,
+          "passed": true
+        },
+        {
+          "name": "collector_enqueue_reference_content-analysis",
+          "expected": 201,
+          "actual": 201,
+          "passed": true
+        },
+        {
+          "name": "queue_access_attribution_agent-evidence",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "name": "queue_access_attribution_content-analysis",
+          "expected": 403,
+          "actual": 403,
+          "passed": true
+        },
+        {
+          "name": "queue_access_content_content-analysis",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "name": "queue_access_content_agent-evidence",
+          "expected": 403,
+          "actual": 403,
+          "passed": true
+        },
+        {
+          "name": "queue_access_api_agent-evidence",
+          "expected": 403,
+          "actual": 403,
+          "passed": true
+        },
+        {
+          "name": "queue_access_mail-collector_agent-evidence",
+          "expected": 403,
+          "actual": 403,
+          "passed": true
+        },
+        {
+          "name": "attribution_can_read_public_signing_key",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "name": "signing_key_private_material_not_exported",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "attribution_can_sign_evidence_digest",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "name": "signing_denied_content",
+          "expected": 403,
+          "actual": 403,
+          "passed": true
+        },
+        {
+          "name": "signing_denied_api",
+          "expected": 403,
+          "actual": 403,
+          "passed": true
+        },
+        {
+          "name": "signing_denied_mail-collector",
+          "expected": 403,
+          "actual": 403,
+          "passed": true
+        },
+        {
+          "name": "api_can_verify_without_signing",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        }
+      ],
+      "all_pass": true,
+      "mail_mutations_attempted": 0,
+      "public_text_uploads": 0,
+      "scope": "effective synthetic access validation; no accuracy or production-readiness claim"
+    },
+    {
+      "verified_at": "2026-10-28T18:06:09.827770+00:00",
+      "section": "audit",
+      "cases": [
+        {
+          "name": "audit_identity_can_create_bounded_read_query",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "audit_read_query_completes",
+          "expected": "succeeded",
+          "actual": "succeeded",
+          "passed": true
+        },
+        {
+          "name": "audit_identity_can_read_query_records",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "name": "selected_synthetic_send_evidence_available",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        }
+      ],
+      "all_pass": true,
+      "mail_mutations_attempted": 0,
+      "public_text_uploads": 0,
+      "scope": "effective synthetic access validation; no accuracy or production-readiness claim"
+    },
+    {
+      "verified_at": "2026-10-28T18:17:25.050147+00:00",
+      "section": "api",
+      "cases": [
+        {
+          "name": "actual_entra_api_token_has_expected_viewer_identity",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "actual_entra_token_authorizes_live_http_decision",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "name": "actual_microsoft_wrong_audience_token_rejected_by_backend",
+          "expected": 401,
+          "actual": 401,
+          "passed": true
+        },
+        {
+          "name": "live_backend_denies_missing_token",
+          "expected": 401,
+          "actual": 401,
+          "passed": true
+        },
+        {
+          "name": "runtime_security_events_are_emitted_without_token_or_body",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        }
+      ],
+      "all_pass": true,
+      "mail_mutations_attempted": 0,
+      "public_text_uploads": 0,
+      "scope": "effective synthetic access validation; no accuracy or production-readiness claim"
+    },
+    {
+      "verified_at": "2026-10-28T18:22:47.176372+00:00",
+      "section": "logs",
+      "cases": [
+        {
+          "name": "resource_access_events_actually_ingested",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "denied_identity_access_events_actually_ingested",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        }
+      ],
+      "all_pass": true,
+      "mail_mutations_attempted": 0,
+      "public_text_uploads": 0,
+      "scope": "effective synthetic access validation; no accuracy or production-readiness claim"
+    }
+  ],
+  "total_live_checks": 79,
+  "all_live_checks_pass": true,
+  "mail_mutations_attempted": 0,
+  "public_inference_uploads": 0,
+  "certificate_verification": {
+    "count": 6,
+    "all_non_exportable": true,
+    "all_3072_bit": true,
+    "client_secrets": 0,
+    "token_persistence": "memory_only"
+  },
+  "azure_resources": {
+    "region": "eastus",
+    "resource_group": "kb-agentdemo",
+    "storage_accounts": 1,
+    "sku": "Standard_LRS",
+    "key_vaults": 1,
+    "key_vault_tier": "standard",
+    "compute_resources": 0,
+    "cloud_databases": 0,
+    "gpu_resources": 0,
+    "private_link_claimed": false
+  },
+  "source_files": [
+    {
+      "path": "compose.yaml",
+      "sha256": "b90b7463cd281af874bfb60a3e8e4e694d7bca04a51594074e9a972c6dc53a02"
+    },
+    {
+      "path": "infra/bicep/access-sandbox.bicep",
+      "sha256": "a249d51593aaaba0ebc6d200aa640e42962bfa9d2a316e0e1682bc6b9a6f81a4"
+    },
+    {
+      "path": "src/agenttrace_foundation/__init__.py",
+      "sha256": "e72c997b86fac1ef22e7ef16238777488c428fd3d5cbdd625c706fe295c41a80"
+    },
+    {
+      "path": "src/agenttrace_foundation/access_policy.py",
+      "sha256": "a274a24a3ce0b7369cf4034d3da496207c1d3f7f41628fd97957c960d78247fd"
+    },
+    {
+      "path": "src/agenttrace_foundation/api.py",
+      "sha256": "eb35dc9ef46a6eff7b7d3abd412e382af5da183da6bf71f45e8f075f2016910a"
+    },
+    {
+      "path": "src/agenttrace_foundation/artifacts.py",
+      "sha256": "6ab3edf919e0a12739de2c3f698a936305f36aea76eeac79f679ab3c1d81d685"
+    },
+    {
+      "path": "src/agenttrace_foundation/authorization.py",
+      "sha256": "39b53893b1cbbfaca58eb0f16380a204e9c4bb8409d9f0d03defe1ad2742b367"
+    },
+    {
+      "path": "src/agenttrace_foundation/cli.py",
+      "sha256": "ddf639c79184a8764ca54f5003fedd669ae912c502e676aba8cd55b5240e029b"
+    },
+    {
+      "path": "src/agenttrace_foundation/database.py",
+      "sha256": "7718287febdf3ee119331c97540b5c4599f5952fdc721e922ab772afa058973f"
+    },
+    {
+      "path": "src/agenttrace_foundation/database_access.py",
+      "sha256": "d56e86b4a5cb8c3d93134217f769fb94ff7e00954adfc6535008dbfc97a4a987"
+    },
+    {
+      "path": "src/agenttrace_foundation/mail_reader.py",
+      "sha256": "0f23fbf6a1479c1e28b5e304ad4456f9d0a9a58a2c61a9df319f6b3908cba17f"
+    },
+    {
+      "path": "src/agenttrace_foundation/migrations/schema.sql",
+      "sha256": "470cdaf95acceb5b60a4bf2cb6ce4c338b8dbf01c7e1307715fe227427ec6967"
+    },
+    {
+      "path": "src/agenttrace_foundation/queue.py",
+      "sha256": "249682a1b2eb924adb60c63282d642e993e9544fdcd689e150ffdd41ab3e4034"
+    },
+    {
+      "path": "src/agenttrace_foundation/raw_evidence.py",
+      "sha256": "1257bc2ce383d7ebb3ff4c9da3f0bb041b031d01c51f5cdc3858ae81cc1dd822"
+    },
+    {
+      "path": "src/agenttrace_foundation/service.py",
+      "sha256": "3bbac562e352f35627bcad2f7cb338ae3831d3dbfb14f3a98307f700deca19d0"
+    },
+    {
+      "path": "src/agenttrace_foundation/settings.py",
+      "sha256": "0c8c714b67ee1b318a89b2c774719217649372343ce97b4c209718e788b24471"
+    },
+    {
+      "path": "src/agenttrace_foundation/store.py",
+      "sha256": "a6eda455e652fb1449d26d053634ab58146cd6ef3d7c9a7090d0faf4366f8e2a"
+    },
+    {
+      "path": "src/agenttrace_foundation/workload_identity.py",
+      "sha256": "33b385d09f4bfe5ece2873da5bbffaeb611ab32982945d44d3104f669f3f2632"
+    }
+  ]
+}

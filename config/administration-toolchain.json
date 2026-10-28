@@ -1,0 +1,8 @@
+{
+  "exchange_online_management": {
+    "version": "3.9.2",
+    "url": "https://www.powershellgallery.com/api/v2/package/ExchangeOnlineManagement/3.9.2",
+    "sha256": "3c9d862971e7e620fb3b3b76dcc5bf8949e8e40cf860fa1c3099fbc78669ef93",
+    "usage": "Operator-only Exchange administration; not a product worker dependency"
+  }
+}

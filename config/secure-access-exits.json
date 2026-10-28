@@ -1,0 +1,61 @@
+{
+  "review_version": "1.0.0",
+  "status": "complete_with_effective_access_tests_and_explicit_owner_acceptance",
+  "review_date": "2026-10-29",
+  "exits": [
+    {
+      "id": "effective_positive_and_negative_permission_calls",
+      "met": true,
+      "evidence": [
+        "docs/evidence/secure-access-live-validation.json",
+        "docs/evidence/secure-access-local-validation.json"
+      ]
+    },
+    {
+      "id": "no_unscoped_mail_permission_bypass",
+      "met": true,
+      "evidence": [
+        "docs/permissions-matrix.md",
+        "scripts/configure-mailbox-access.ps1",
+        "docs/evidence/secure-access-live-validation.json"
+      ]
+    },
+    {
+      "id": "credentials_and_routine_logs_protected",
+      "met": true,
+      "evidence": [
+        "src/agenttrace_foundation/authorization.py",
+        "scripts/manage-workload-certificate.ps1",
+        "tests/security/test_credential_redaction.py",
+        "docs/evidence/secure-access-live-validation.json"
+      ]
+    },
+    {
+      "id": "administrator_and_security_owner_acceptance",
+      "met": true,
+      "evidence": [
+        "docs/evidence/secure-access-acceptance.json",
+        "docs/data-flow.md"
+      ]
+    },
+    {
+      "id": "body_history_inference_and_retention_boundaries",
+      "met": true,
+      "evidence": [
+        "tests/security/test_content_access.py",
+        "tests/e2e/test_content_isolation.py",
+        "tests/integration/test_workload_access.py",
+        "docs/evidence/secure-access-live-validation.json"
+      ]
+    },
+    {
+      "id": "G8_detection_only_permission_boundary",
+      "met": true,
+      "evidence": [
+        "scripts/check-boundaries.py",
+        "docs/evidence/secure-access-live-validation.json",
+        "docs/permissions-matrix.md"
+      ]
+    }
+  ]
+}

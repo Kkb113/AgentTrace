@@ -1,0 +1,7 @@
+# Secure-access sandbox cost boundary
+
+Approved design: synthetic data, East US, dedicated Standard LRS Storage and Standard Key Vault in kb-agentdemo, local compute/PostgreSQL, and resource-scoped access diagnostics to the existing East US workspace. Existing resources are not reconfigured. No hosted model, GPU, Container Apps runtime, registry, cloud database, premium/HSM tier or Private Endpoint is created at this milestone.
+
+The initial test allowance is under 10 MB raw synthetic fixtures, under 10 MB access diagnostics, under 10,000 storage operations and under 1,000 Standard software-key operations for the verification run. Storage, operations and diagnostic ingestion are metered; these are usage assumptions, not a free-service or hard spending-cap claim. Expected incremental usage is below USD 1 for this bounded exercise using the public meter snapshot in [the cost baseline](azure-cost-baseline.md). Entra registrations, Exchange RBAC and the disabled-sign-in shared test mailbox add no purchased license or Azure compute resource.
+
+Before applying, the operator script records a group-scoped what-if and refuses deletion or modification of an existing shared resource. It creates only the access resources declared in access-sandbox.bicep. Raw lifecycle deletion is configured at seven days, with application checks to deny expired reads independently of asynchronous storage cleanup. Do not repeat unbounded test loops or enable broader diagnostics. Budgets and the later cloud pilot spending ceiling remain separate deployment decisions.

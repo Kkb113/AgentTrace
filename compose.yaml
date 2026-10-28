@@ -2,6 +2,7 @@ name: agenttrace-foundation
 services:
   postgres:
     image: postgres:17.11-bookworm@sha256:839fbb5a4942a7758dd93e18b42ea5649807491a0545b5eeeb8f0b8bb11857a5
+    command: [postgres, -c, log_statement=none, -c, log_min_error_statement=panic, -c, log_error_verbosity=terse, -c, log_parameter_max_length=0, -c, log_parameter_max_length_on_error=0]
     environment:
       POSTGRES_DB: agenttrace
       POSTGRES_USER: agenttrace
@@ -24,7 +25,13 @@ services:
       AGENTTRACE_DATABASE_HOST: postgres
       AGENTTRACE_DATABASE_PORT: "5432"
       AGENTTRACE_DATABASE_PASSWORD_FILE: /run/secrets/database_password
-    secrets: [database_password]
+      AGENTTRACE_DATABASE_ROLE_SECRET_DIRECTORY: /run/secrets
+    secrets:
+      - database_password
+      - {source: api_password, target: api-password}
+      - {source: attribution_password, target: attribution-password}
+      - {source: content_password, target: content-password}
+      - {source: collector_password, target: collector-password}
     depends_on:
       postgres: {condition: service_healthy}
     networks: [private]
@@ -34,8 +41,12 @@ services:
   api:
     image: agenttrace-foundation:local
     command: [api, --container]
-    environment: *runtime
-    secrets: [database_password]
+    environment:
+      <<: *runtime
+      AGENTTRACE_DATABASE_USER: agenttrace_api
+      AGENTTRACE_DATABASE_PASSWORD_FILE: /run/secrets/api_password
+      AGENTTRACE_AUTHORIZATION_FILE: /run/secrets/development_authorization
+    secrets: [api_password, development_authorization, development_jwks]
     ports: ["127.0.0.1:8080:8080"]
     depends_on:
       migrate: {condition: service_completed_successfully}
@@ -51,8 +62,11 @@ services:
   attribution-worker:
     image: agenttrace-foundation:local
     command: [worker, --role, attribution]
-    environment: *runtime
-    secrets: [database_password]
+    environment:
+      <<: *runtime
+      AGENTTRACE_DATABASE_USER: agenttrace_attribution
+      AGENTTRACE_DATABASE_PASSWORD_FILE: /run/secrets/attribution_password
+    secrets: [attribution_password]
     depends_on:
       migrate: {condition: service_completed_successfully}
     healthcheck:
@@ -67,8 +81,11 @@ services:
   content-worker:
     image: agenttrace-foundation:local
     command: [worker, --role, content]
-    environment: *runtime
-    secrets: [database_password]
+    environment:
+      <<: *runtime
+      AGENTTRACE_DATABASE_USER: agenttrace_content
+      AGENTTRACE_DATABASE_PASSWORD_FILE: /run/secrets/content_password
+    secrets: [content_password]
     depends_on:
       migrate: {condition: service_completed_successfully}
     healthcheck:
@@ -76,6 +93,21 @@ services:
       interval: 5s
       timeout: 4s
       retries: 20
+    networks: [private]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+  collector-tools:
+    profiles: [tools]
+    image: agenttrace-foundation:local
+    command: [enqueue-example]
+    environment:
+      <<: *runtime
+      AGENTTRACE_DATABASE_USER: agenttrace_collector
+      AGENTTRACE_DATABASE_PASSWORD_FILE: /run/secrets/collector_password
+    secrets: [collector_password]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
     networks: [private]
     read_only: true
     cap_drop: [ALL]
@@ -91,3 +123,15 @@ volumes:
 secrets:
   database_password:
     file: ./work/local/postgres-password
+  api_password:
+    file: ./work/local/roles/api-password
+  attribution_password:
+    file: ./work/local/roles/attribution-password
+  content_password:
+    file: ./work/local/roles/content-password
+  collector_password:
+    file: ./work/local/roles/collector-password
+  development_authorization:
+    file: ./work/local/development-authorization.json
+  development_jwks:
+    file: ./work/local/development-jwks.json

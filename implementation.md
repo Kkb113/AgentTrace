@@ -4,7 +4,7 @@
 - **Primary workspace:** `C:\AgentDetection`
 - **Repository:** [Kkb113/AgentTrace](https://github.com/Kkb113/AgentTrace)
 - **Plan date:** 28 October 2026
-- **Status:** Phases 0 and 1 are complete with recorded exit evidence. The foundation has reproducible local services and enforced PR validation. Phase 2 and later product work, statistical content scoring and release accuracy qualification remain unimplemented. See [foundation review](docs/repository-foundation.md) and [feasibility report](docs/feasibility-report.md).
+- **Status:** Phases 0 through 2 are complete with recorded exit evidence. The foundation has reproducible secured local services, scoped Microsoft 365/Azure access and enforced PR validation. Phase 3 and later product work, statistical content scoring and release accuracy qualification remain unimplemented. See [foundation review](docs/repository-foundation.md) and [feasibility report](docs/feasibility-report.md).
 - **Delivery scope:** 15 phases, numbered Phase 0 through Phase 14.
 - **Product boundary:** Detection only. Two independent findings: email sent by an AI agent; email contains AI-generated content. English first for content; distinguish basic spelling/grammar assistance from generated drafts and substantial rewrites/translations.
 - **Priority:** Agent-sent detection is the primary release objective. Content detection is a required, measured best-effort capability; its accuracy does not determine whether the agent detector qualifies.
@@ -305,7 +305,7 @@ Evaluate the final message-level union of provenance and statistical flags, not 
 
 ## 4. Phase overview
 
-Phases 0 and 1 are **Complete**, with exit reviews in [the feasibility report](docs/feasibility-report.md) and [the foundation review](docs/repository-foundation.md). Phases 2–14 are **Not started**. A phase is complete only when its exit criteria have recorded evidence. Prioritize the agent path through Phases 0–7, then agent decisions/UI/qualification in Phases 9–14. Phase 8 runs as a bounded secondary track; a poor content-accuracy result does not hold the agent path open. Its actual experiment, safety/isolation checks, and limitation report remain required for POC handover.
+Phases 0 through 2 are **Complete**, with exit reviews in [the feasibility report](docs/feasibility-report.md), [the foundation review](docs/repository-foundation.md) and [the secure-access review](docs/secure-access-report.md). Phases 3–14 are **Not started**. A phase is complete only when its exit criteria have recorded evidence. Prioritize the agent path through Phases 0–7, then agent decisions/UI/qualification in Phases 9–14. Phase 8 runs as a bounded secondary track; a poor content-accuracy result does not hold the agent path open. Its actual experiment, safety/isolation checks, and limitation report remain required for POC handover.
 
 | Phase | Focus | Primary dependency | Principal exit artifact |
 | --- | --- | --- | --- |
@@ -440,6 +440,8 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 
 **Objective:** Connect to Microsoft 365 and Azure with explicitly scoped, testable permissions.
 
+**Implementation decision:** Completed for the owner-accepted synthetic hybrid sandbox. Compute/PostgreSQL stay local with separate SQL roles; dedicated East US Standard LRS Storage and Standard Key Vault provide the required cloud permission tests without provisioning the future stack. Six non-exportable certificate registrations separate mailbox/audit collection, detection, API and the access-test client. Exact-mailbox Exchange RBAC has no parallel Entra mail grant; broader audit exposure was explicitly accepted. All six exits have effective evidence in `config/secure-access-exits.json`, [the access review](docs/secure-access-report.md) and [live validation](docs/evidence/secure-access-live-validation.json). Hosted managed identities, reliable ingestion, statistical scoring, add-in sign-in and production rollout remain later work. The final PR must pass the existing protected checks before merge.
+
 **Implementation work**
 
 - Create identities only for read-only mailbox/audit collection, detection workloads, and authorized users as needed. External source systems retain their own identities and operation outside AgentTrace.
@@ -469,12 +471,12 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 
 **Exit criteria**
 
-- [ ] Positive and negative permission tests pass using effective API calls, not configuration screenshots alone.
-- [ ] No tenant-wide mail grant unintentionally bypasses the pilot scope.
-- [ ] Signing keys and credentials are absent from application code and routine logs.
-- [ ] Microsoft administrator and security owner accept the permission matrix and data flow.
-- [ ] Body processing, optional history access, private inference, and retention boundaries have effective negative-access tests.
-- [ ] G8's detection-only permission boundary is verified; no sender or approval-management permissions are provisioned.
+- [x] Positive and negative permission tests pass using effective API calls, not configuration screenshots alone.
+- [x] No tenant-wide mail grant unintentionally bypasses the pilot scope.
+- [x] Signing keys and credentials are absent from application code and routine logs.
+- [x] Microsoft administrator and security owner accept the permission matrix and data flow.
+- [x] Body processing, optional history access, private inference, and retention boundaries have effective negative-access tests.
+- [x] G8's detection-only permission boundary is verified; no sender or approval-management permissions are provisioned.
 
 ## Phase 3 — Implement reliable mailbox and audit ingestion
 

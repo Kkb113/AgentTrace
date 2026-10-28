@@ -1,0 +1,54 @@
+{
+  "verified_at": "2026-10-28T18:31:53.514436+00:00",
+  "python_version": "3.12.14",
+  "gates": {
+    "quality": {
+      "exit_code": 0,
+      "elapsed_seconds": 12.016
+    },
+    "security": {
+      "exit_code": 0,
+      "elapsed_seconds": 7.14
+    },
+    "infrastructure": {
+      "exit_code": 0,
+      "elapsed_seconds": 11.25
+    },
+    "integration": {
+      "exit_code": 0,
+      "elapsed_seconds": 29.719
+    },
+    "guard-controls": {
+      "exit_code": 0,
+      "elapsed_seconds": 2.063
+    }
+  },
+  "junit_counts": {
+    "unit": {
+      "tests": 187,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "integration": {
+      "tests": 24,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "pytest_test_counts": {
+    "unit_and_security": 135,
+    "integration_and_e2e": 24,
+    "subtests": 52
+  },
+  "all_five_gates_pass": true,
+  "validation_commands_provision_azure": false,
+  "live_azure_setup_recorded_separately": "secure-access-live-validation.json",
+  "negative_gate_exit_codes": {
+    "invalid_contract": 1,
+    "failing_test": 1,
+    "synthetic_secret": 1
+  },
+  "qualification": "Access and foundation validation only; no detector accuracy, actual Azure Queue delivery parity or production claim"
+}
