@@ -37,3 +37,15 @@ Optional Copilot/Claude/ChatGPT generation-history connectors are disabled and r
 Test allowed/denied mailbox reads with the actual collector token; inspect all effective Entra and Exchange grants; reject mail mutations through the product boundary without delivering email. Test API signature, issuer, audience, tenant, expiry, role, subject and message/mailbox authorization. Exercise queue/blob/signing denials with the wrong actual principal and database denials through separate SQL logins. Test content egress and expired/raw-data access. Failed, unavailable or configuration-only checks stay open and cannot satisfy a live exit.
 
 Acceptance covers this matrix and [the data flow](data-flow.md), including authorized synthetic body processing, broader Exchange audit exposure, disabled optional histories, firewall-restricted public Azure endpoints, local private processing and the 7/30-day retention boundary. It grants no sender/approval capability, real customer-data use, public text upload or tenant security-policy exception.
+
+## Notification transport addition
+
+The owner accepted a dedicated East US Standard LRS metadata account and Event Grid
+partner topic for live Graph delivery, plus the later destination-account role
+amendment after narrower grants failed Azure validation. Event Grid's system identity
+has Message Sender and Blob Data Contributor only on this new single-purpose account.
+The mail collector has Message Processor only on its notification queue. The original
+raw-evidence account and Key Vault retain their no-bypass firewalls. No tenant mail
+write/send role or broader mailbox read role was added. See
+[the review and amendment](notification-transport-proposal.md) and
+[owner acceptance](evidence/notification-transport-acceptance.json).

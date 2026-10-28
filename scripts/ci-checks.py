@@ -159,6 +159,7 @@ def main() -> int:
         [PYTHON, "scripts/export-locks.py", "--check"],
         [PYTHON, "scripts/export-contracts.py", "--check"],
         [PYTHON, "scripts/check-boundaries.py"],
+        [PYTHON, "scripts/verify-language-artifacts.py"],
         [
             PYTHON,
             "-m",

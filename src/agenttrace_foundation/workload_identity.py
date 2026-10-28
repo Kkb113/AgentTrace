@@ -51,7 +51,7 @@ class CertificateTokenProvider:
         except Exception:
             raise AccessDenied("workload_credential_unavailable") from None
 
-    def token(self, resource: str) -> str:
+    def token(self, resource: str, *, force_refresh: bool = False) -> str:
         allowed = {
             "https://graph.microsoft.com",
             "https://storage.azure.com",
@@ -61,7 +61,9 @@ class CertificateTokenProvider:
         if resource not in allowed and not re.fullmatch(r"api://[0-9a-fA-F-]{36}", resource):
             raise AccessDenied("workload_token_resource_denied")
         try:
-            result = self._application.acquire_token_for_client(scopes=[resource + "/.default"])
+            result = self._application.acquire_token_for_client(
+                scopes=[resource + "/.default"], force_refresh=force_refresh
+            )
             token = result.get("access_token")
             if not isinstance(token, str) or not token:
                 raise AccessDenied("workload_token_unavailable")

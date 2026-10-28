@@ -1,0 +1,16 @@
+{
+  "package": "langdetect",
+  "version": "1.0.9",
+  "profile_count": 55,
+  "profile_manifest_sha256": "617ec4ca9e2279d47113e73256e9efb194be9a916288bdf23480653557b7c61b",
+  "notices": [
+    {
+      "path": "LICENSE",
+      "sha256": "9c539fdc47fa4e195b88efaa6495f11463de271f59c8de96feb8bc9c8abab1ab"
+    },
+    {
+      "path": "NOTICE",
+      "sha256": "bc22bad5907339e12834d91f7809ec35c3c44fa4b812f274ebfefa38de080869"
+    }
+  ]
+}

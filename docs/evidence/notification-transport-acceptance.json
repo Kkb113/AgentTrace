@@ -1,0 +1,14 @@
+{
+  "baseline": "Synthetic-only, read-only Outlook detection collection in kb-agentdemo",
+  "owner_acceptance": "Accept the dedicated notification transport",
+  "scope_amendment_acceptance": "Accept the dedicated-account delivery roles",
+  "accepted_changes": [
+    "Separate East US Standard LRS metadata notification account and Graph Event Grid partner topic",
+    "Default-deny firewall with operator IPv4 and Azure trusted-services network exception on the new metadata account only",
+    "Event Grid system identity: Storage Queue Data Message Sender and Storage Blob Data Contributor on that dedicated metadata account",
+    "Mailbox collector remains message-processor scoped to the single notification queue"
+  ],
+  "original_raw_evidence_and_vault_firewalls_unchanged": true,
+  "new_mailbox_write_send_or_tenant_wide_mail_grants": false,
+  "approval_source": "Explicit project-owner replies in the implementation conversation; no passwords, tokens or identifiers retained here"
+}

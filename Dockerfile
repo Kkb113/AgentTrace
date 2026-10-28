@@ -2,7 +2,8 @@ FROM python:3.12.14-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc07
 WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 COPY requirements-runtime.txt requirements-build.txt ./
-RUN python -m pip install --no-cache-dir --require-hashes -r requirements-runtime.txt -r requirements-build.txt
+RUN python -m pip install --no-cache-dir --require-hashes -r requirements-build.txt \
+    && python -m pip install --no-cache-dir --no-build-isolation --require-hashes -r requirements-runtime.txt
 COPY pyproject.toml README.md ./
 COPY src ./src
 COPY packages ./packages

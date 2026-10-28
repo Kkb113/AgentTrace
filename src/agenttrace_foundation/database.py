@@ -47,9 +47,10 @@ class Database:
             raise StorageUnavailable("local_database_operation_failed") from None
 
     def migrate(self) -> None:
-        source = files("agenttrace_foundation").joinpath("migrations/schema.sql").read_text()
         with self.connect() as connection:
-            connection.execute(source, prepare=False)
+            for name in ("schema.sql", "ingestion.sql"):
+                source = files("agenttrace_foundation").joinpath("migrations/" + name).read_text()
+                connection.execute(source, prepare=False)
 
     def healthy(self) -> bool:
         try:

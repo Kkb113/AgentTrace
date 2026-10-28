@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from psycopg import sql
+from psycopg import Connection, sql
+from psycopg.rows import DictRow
 
 from .database import Database
 
@@ -143,3 +144,96 @@ def configure_local_roles(database: Database, secret_directory: Path) -> None:
         connection.execute(
             "GRANT INSERT,UPDATE ON component_health TO agenttrace_attribution,agenttrace_content"
         )
+        _configure_ingestion_access(connection)
+
+
+def _configure_ingestion_access(connection: Connection[DictRow]) -> None:
+    # Keep operator enrollment separate from the runtime collector's data writes.
+    cursor = connection
+    cursor.execute("ALTER TABLE ingest_source_acl ENABLE ROW LEVEL SECURITY")
+    cursor.execute("DROP POLICY IF EXISTS own_ingestion_acl ON ingest_source_acl")
+    cursor.execute(
+        "CREATE POLICY own_ingestion_acl ON ingest_source_acl FOR SELECT USING(db_role=current_user)"
+    )
+    cursor.execute(
+        "GRANT SELECT ON ingest_source_acl TO agenttrace_collector,agenttrace_api,agenttrace_attribution,agenttrace_content"
+    )
+    tables = (
+        "ingest_sources",
+        "ingest_checkpoints",
+        "ingest_subscriptions",
+        "ingest_events",
+        "ingest_copies",
+        "ingest_versions",
+        "ingest_dispatch",
+        "ingest_content_inputs",
+        "ingest_gaps",
+        "ingest_audit_events",
+        "ingest_transport_poison",
+    )
+    for table in tables:
+        cursor.execute(
+            sql.SQL("ALTER TABLE {} ENABLE ROW LEVEL SECURITY").format(sql.Identifier(table))
+        )
+        cursor.execute(
+            sql.SQL("DROP POLICY IF EXISTS scoped_ingestion_access ON {}").format(
+                sql.Identifier(table)
+            )
+        )
+        cursor.execute(
+            sql.SQL(
+                "CREATE POLICY scoped_ingestion_access ON {} USING(EXISTS(SELECT 1 FROM ingest_source_acl acl WHERE acl.source_ref={}.source_ref AND acl.db_role=current_user))"
+            ).format(sql.Identifier(table), sql.Identifier(table))
+        )
+    cursor.execute("GRANT SELECT ON ingest_sources TO agenttrace_collector")
+    for table in tables[1:]:
+        cursor.execute(
+            sql.SQL("GRANT SELECT,INSERT,UPDATE ON {} TO agenttrace_collector").format(
+                sql.Identifier(table)
+            )
+        )
+    cursor.execute("GRANT DELETE ON ingest_content_inputs TO agenttrace_collector")
+    cursor.execute(
+        "GRANT SELECT(source_ref,event_ref,reason_code,received_at,expires_at) ON ingest_transport_poison TO agenttrace_api"
+    )
+    cursor.execute(
+        "GRANT SELECT(source_ref,source_kind,source_alias,created_at) ON ingest_sources TO agenttrace_api,agenttrace_content,agenttrace_attribution"
+    )
+    cursor.execute(
+        "GRANT SELECT(event_ref,source_ref,kind,event_time,received_at,expires_at,state,attempts,visible_at,last_error_code) ON ingest_events TO agenttrace_api"
+    )
+    cursor.execute(
+        "GRANT SELECT(source_ref,partition_ref,coverage,reason_code,generation,last_success,next_attempt) ON ingest_checkpoints TO agenttrace_api"
+    )
+    cursor.execute(
+        "GRANT SELECT(source_ref,state,expires_at) ON ingest_subscriptions TO agenttrace_api"
+    )
+    cursor.execute(
+        "GRANT SELECT(source_ref,axis,state,version_ref) ON ingest_dispatch TO agenttrace_api"
+    )
+    cursor.execute(
+        "GRANT SELECT(source_ref,reason_code,disposition,known_lost_events) ON ingest_gaps TO agenttrace_api"
+    )
+    cursor.execute("GRANT SELECT(source_ref,visibility) ON ingest_copies TO agenttrace_api")
+    cursor.execute(
+        "GRANT SELECT(message_ref,current_version,copy_role,delivery_ref) ON ingest_copies TO agenttrace_api"
+    )
+    cursor.execute(
+        "GRANT SELECT(message_ref,source_ref,current_version) ON ingest_copies TO agenttrace_content,agenttrace_attribution"
+    )
+    cursor.execute("GRANT SELECT ON ingest_dispatch TO agenttrace_content,agenttrace_attribution")
+    cursor.execute(
+        "GRANT SELECT(source_ref,version_ref,message_ref,expires_at,obsolete,summary) ON ingest_versions TO agenttrace_content,agenttrace_attribution"
+    )
+    cursor.execute(
+        "GRANT UPDATE(state,receipt,lease_until) ON ingest_dispatch TO agenttrace_content,agenttrace_attribution"
+    )
+    cursor.execute("DROP POLICY IF EXISTS scoped_ingestion_access ON ingest_dispatch")
+    cursor.execute(
+        "CREATE POLICY scoped_ingestion_access ON ingest_dispatch USING(EXISTS(SELECT 1 FROM ingest_source_acl acl WHERE acl.source_ref=ingest_dispatch.source_ref AND acl.db_role=current_user) AND (current_user IN ('agenttrace_api','agenttrace_collector') OR (current_user='agenttrace_content' AND axis='content') OR (current_user='agenttrace_attribution' AND axis='agent')))"
+    )
+    cursor.execute("GRANT SELECT ON ingest_content_inputs TO agenttrace_content")
+    cursor.execute("DROP POLICY IF EXISTS scoped_ingestion_access ON ingest_content_inputs")
+    cursor.execute(
+        "CREATE POLICY scoped_ingestion_access ON ingest_content_inputs USING(EXISTS(SELECT 1 FROM ingest_source_acl acl WHERE acl.source_ref=ingest_content_inputs.source_ref AND acl.db_role=current_user) AND (current_user='agenttrace_collector' OR (current_user='agenttrace_content' AND expires_at>now() AND EXISTS(SELECT 1 FROM ingest_copies copy WHERE copy.current_version=ingest_content_inputs.version_ref))))"
+    )
