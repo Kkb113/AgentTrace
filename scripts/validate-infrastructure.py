@@ -60,6 +60,13 @@ def main() -> int:
     assert access["parameters"]["expectedResourceGroup"]["allowedValues"] == ["kb-agentdemo"]
     assert access["parameters"]["location"]["allowedValues"] == ["eastus"]
     assert all("condition" in resource for resource in access["resources"])
+    notifications = json.loads(
+        (output / "notification-transport.json").read_text(encoding="utf-8-sig")
+    )
+    assert notifications["parameters"]["enableProvisioning"]["defaultValue"] is False
+    assert notifications["parameters"]["expectedResourceGroup"]["allowedValues"] == ["kb-agentdemo"]
+    assert notifications["parameters"]["location"]["allowedValues"] == ["eastus"]
+    assert all("condition" in resource for resource in notifications["resources"])
     print(
         json.dumps(
             {

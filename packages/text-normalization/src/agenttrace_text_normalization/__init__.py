@@ -2,6 +2,10 @@
 
 from agenttrace_feasibility.mime import parse_mime
 
+from .extraction import EXTRACTION_VERSION, BodyExtractor, Extraction
+
+__all__ = ["EXTRACTION_VERSION", "BodyExtractor", "Extraction", "plain_text"]
+
 
 def plain_text(raw: bytes) -> str | None:
     if len(raw) > 2 * 1024 * 1024:

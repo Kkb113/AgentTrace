@@ -4,7 +4,7 @@
 - **Primary workspace:** `C:\AgentDetection`
 - **Repository:** [Kkb113/AgentTrace](https://github.com/Kkb113/AgentTrace)
 - **Plan date:** 28 October 2026
-- **Status:** Phases 0 through 2 are complete with recorded exit evidence. The foundation has reproducible secured local services, scoped Microsoft 365/Azure access and enforced PR validation. Phase 3 and later product work, statistical content scoring and release accuracy qualification remain unimplemented. See [foundation review](docs/repository-foundation.md) and [feasibility report](docs/feasibility-report.md).
+- **Status:** Phases 0 through 3 are complete with recorded exit evidence. Reliable read-only mailbox/audit ingestion and offline extraction now complement the secured foundation. Statistical content scoring, later evidence/correlation engines, UI and release accuracy qualification remain later work. See [ingestion review](docs/mail-ingestion-report.md), [foundation review](docs/repository-foundation.md) and [feasibility report](docs/feasibility-report.md).
 - **Delivery scope:** 15 phases, numbered Phase 0 through Phase 14.
 - **Product boundary:** Detection only. Two independent findings: email sent by an AI agent; email contains AI-generated content. English first for content; distinguish basic spelling/grammar assistance from generated drafts and substantial rewrites/translations.
 - **Priority:** Agent-sent detection is the primary release objective. Content detection is a required, measured best-effort capability; its accuracy does not determine whether the agent detector qualifies.
@@ -506,15 +506,17 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 - Simulate subscription expiry, service restart, webhook outage, token expiry, throttling, and malformed notifications.
 - Reconcile deliberately missed observable messages without duplicating logical records.
 - Verify that a source gap changes coverage state instead of implying no agent activity.
-- Test HTML/plain-text equivalents, nested quotes, long disclaimers, mixed languages, short replies, malformed/large bodies, and content updates. Review extraction correctness against a labeled fixture set and measure inference on the actual production-normalized text.
+- Test HTML/plain-text equivalents, nested quotes, long disclaimers, mixed languages, short replies, malformed/large bodies, and content updates. Review extraction correctness against a labeled fixture set and verify the actual production-normalized inference input. Measure real model inference on that same contract when the statistical model is installed in Phase 8; no model-score claim is made by ingestion alone.
 
 **Exit criteria**
 
-- [ ] Controlled outage/replay fixtures pass G7 with explicit accounting for unrecoverable gaps.
-- [ ] Subscription, checkpoint, and dead-letter health are visible.
-- [ ] Notification handlers persist accepted work before acknowledgment.
-- [ ] Content access and retention follow the approved minimum-data policy.
-- [ ] Authored/inherited regions, excluded content, version changes, and extraction failures are represented correctly; raw bodies do not leak into logs or queue diagnostics.
+- [x] Controlled outage/replay fixtures pass G7 with explicit accounting for unrecoverable gaps.
+- [x] Subscription, checkpoint, and dead-letter health are visible.
+- [x] Notification handlers persist accepted work before acknowledgment.
+- [x] Content access and retention follow the approved minimum-data policy.
+- [x] Authored/inherited regions, excluded content, version changes, and extraction failures are represented correctly; raw bodies do not leak into logs or queue diagnostics.
+
+Implementation evidence: [review](docs/mail-ingestion-report.md), [exit/test report](docs/evidence/mail-ingestion-validation.json), [actual live checks](docs/evidence/mail-ingestion-live-validation.json) and [runbook](docs/runbooks/mail-ingestion.md). The live optional Graph activity source remains explicitly unavailable; the eligible adapter is fixture-tested.
 
 ## Phase 4 — Build the evidence ledger and correlation model
 

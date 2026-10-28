@@ -1,0 +1,11 @@
+{
+  "review_version": "1.0.0",
+  "scope": "Synthetic read-only ingestion; detector accuracy qualification remains later work",
+  "exits": [
+    {"id":"G7_outage_replay_accounting","required_tests":["test_checkpoint_and_page_are_one_transaction_restart_recovers","test_expired_delta_full_resync_recovers_state_and_preserves_historical_gap","test_parallel_claims_have_one_winner_and_checkpoint_receipt_is_fenced","test_lost_receipts_retry_poison_replay_and_retention"]},
+    {"id":"subscription_checkpoint_deadletter_health","required_tests":["test_lifecycle_changes_coverage_not_actor_verdict","test_renewal_and_expired_subscription_recreation_are_bounded","test_invalid_native_payload_is_quarantined_before_receipt_deletion"]},
+    {"id":"durable_persistence_before_acknowledgment","required_tests":["test_end_to_end_webhook_commit_reconcile_extract_and_independent_analysis","test_database_failure_before_commit_returns_503_and_no_ack","test_atomic_batch_rolls_back_all_items_on_foreign_source","test_native_queue_is_deleted_only_after_durable_commit"]},
+    {"id":"minimum_authorized_content_and_retention","required_tests":["test_real_roles_preserve_source_and_axis_isolation","test_actual_sql_logins_cannot_access_private_ingestion_fields_or_enrollment","test_snapshot_opt_in_encryption_and_expiry","test_message_body_only_read_after_scope_and_synthetic_subject_checks","test_encryption_context_tamper_and_content_key_version_expiry_boundaries"]},
+    {"id":"extraction_versions_exclusions_and_no_body_leakage","required_tests":["test_labeled_reply_and_forward_regions","test_html_plain_equivalence_and_offsets_for_entities_and_unicode","test_non_english_and_mixed_language_are_unknown","test_duplicate_out_of_order_move_and_edit_supersede_stale_work","test_canary_never_enters_queue_locator_summary_or_health","test_protected_mime_and_attachments_excluded"]}
+  ]
+}

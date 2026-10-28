@@ -4,17 +4,19 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agenttrace-feasibility"
-version = "0.3.0"
+version = "0.4.0"
 description = "Detection-only AgentTrace foundation and evidence feasibility tools"
 requires-python = ">=3.12"
 dependencies = [
   "cryptography==50.0.2", "msal==1.39.0", "fastapi==0.162.0",
-  "pydantic==2.14.1", "uvicorn==0.54.0", "psycopg[binary]==3.3.6", "PyJWT==2.15.1"
+  "pydantic==2.14.1", "uvicorn==0.54.0", "psycopg[binary]==3.3.6", "PyJWT==2.15.1",
+  "langdetect==1.0.9"
 ]
 
 [project.scripts]
 agenttrace-feasibility = "agenttrace_feasibility.cli:main"
 agenttrace-foundation = "agenttrace_foundation.cli:main"
+agenttrace-ingestion = "agenttrace_ingestion.cli:main"
 
 [dependency-groups]
 build = ["setuptools==84.2.1"]
@@ -28,7 +30,7 @@ dev = [
 packages = [
   "agenttrace_feasibility", "agenttrace_foundation", "agenttrace_contracts",
   "agenttrace_attribution", "agenttrace_evidence_adapters", "agenttrace_content_detection",
-  "agenttrace_content_provenance", "agenttrace_text_normalization"
+  "agenttrace_content_provenance", "agenttrace_text_normalization", "agenttrace_ingestion"
 ]
 
 [tool.setuptools.package-dir]
@@ -40,6 +42,7 @@ agenttrace_evidence_adapters = "packages/evidence-adapters/src/agenttrace_eviden
 agenttrace_content_detection = "packages/content-detection/src/agenttrace_content_detection"
 agenttrace_content_provenance = "packages/content-provenance/src/agenttrace_content_provenance"
 agenttrace_text_normalization = "packages/text-normalization/src/agenttrace_text_normalization"
+agenttrace_ingestion = "src/agenttrace_ingestion"
 
 [tool.setuptools.package-data]
 "*" = ["py.typed"]
@@ -52,7 +55,7 @@ addopts = "-ra --strict-markers"
 markers = ["integration: requires the isolated local PostgreSQL service"]
 
 [tool.mypy]
-files = ["src/agenttrace_foundation", "packages"]
+files = ["src/agenttrace_foundation", "src/agenttrace_ingestion", "packages"]
 python_version = "3.12"
 strict = true
 plugins = ["pydantic.mypy"]

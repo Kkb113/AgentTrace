@@ -8,6 +8,7 @@ from agenttrace_contracts import DetectionFindings
 
 from agenttrace_foundation.api import create_app
 from agenttrace_foundation.artifacts import ArtifactComponent
+from agenttrace_ingestion.api import create_app as create_ingestion_app
 
 ROOT = Path(__file__).resolve().parents[1]
 FORBIDDEN_MODULES = {
@@ -34,6 +35,7 @@ def main() -> int:
     for path in [
         *(ROOT / "packages").rglob("*.py"),
         *(ROOT / "src/agenttrace_foundation").rglob("*.py"),
+        *(ROOT / "src/agenttrace_ingestion").rglob("*.py"),
     ]:
         for node in ast.walk(ast.parse(path.read_text())):
             if isinstance(node, ast.Import):
@@ -54,6 +56,11 @@ def main() -> int:
     schema = create_app().openapi()
     assert set(schema["paths"]) == {"/health/live", "/health/ready", "/v1/decisions/{decision_id}"}
     assert all(set(methods) == {"get"} for methods in schema["paths"].values())
+    ingestion = create_ingestion_app(None, None).openapi()
+    assert {path: set(methods) for path, methods in ingestion["paths"].items()} == {
+        "/v1/notifications": {"post"},
+        "/v1/ingestion/sources/{source_ref}": {"get"},
+    }
     catalog = json.loads((ROOT / "config/artifact-catalog.json").read_text())
     for entry in catalog["components"]:
         ArtifactComponent.model_validate(entry)

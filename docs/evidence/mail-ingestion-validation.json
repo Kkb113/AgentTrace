@@ -1,0 +1,244 @@
+{
+  "executed_at": "2026-10-28T20:17:07.378277+00:00",
+  "all_five_gates_pass": true,
+  "test_counts": {
+    "unit": {
+      "tests": 189,
+      "failed": 0,
+      "skipped": 0
+    },
+    "integration": {
+      "tests": 53,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "exits": [
+    {
+      "id": "G7_outage_replay_accounting",
+      "required_tests": [
+        "test_checkpoint_and_page_are_one_transaction_restart_recovers",
+        "test_expired_delta_full_resync_recovers_state_and_preserves_historical_gap",
+        "test_parallel_claims_have_one_winner_and_checkpoint_receipt_is_fenced",
+        "test_lost_receipts_retry_poison_replay_and_retention"
+      ],
+      "met": true
+    },
+    {
+      "id": "subscription_checkpoint_deadletter_health",
+      "required_tests": [
+        "test_lifecycle_changes_coverage_not_actor_verdict",
+        "test_renewal_and_expired_subscription_recreation_are_bounded",
+        "test_invalid_native_payload_is_quarantined_before_receipt_deletion"
+      ],
+      "met": true
+    },
+    {
+      "id": "durable_persistence_before_acknowledgment",
+      "required_tests": [
+        "test_end_to_end_webhook_commit_reconcile_extract_and_independent_analysis",
+        "test_database_failure_before_commit_returns_503_and_no_ack",
+        "test_atomic_batch_rolls_back_all_items_on_foreign_source",
+        "test_native_queue_is_deleted_only_after_durable_commit"
+      ],
+      "met": true
+    },
+    {
+      "id": "minimum_authorized_content_and_retention",
+      "required_tests": [
+        "test_real_roles_preserve_source_and_axis_isolation",
+        "test_actual_sql_logins_cannot_access_private_ingestion_fields_or_enrollment",
+        "test_snapshot_opt_in_encryption_and_expiry",
+        "test_message_body_only_read_after_scope_and_synthetic_subject_checks",
+        "test_encryption_context_tamper_and_content_key_version_expiry_boundaries"
+      ],
+      "met": true
+    },
+    {
+      "id": "extraction_versions_exclusions_and_no_body_leakage",
+      "required_tests": [
+        "test_labeled_reply_and_forward_regions",
+        "test_html_plain_equivalence_and_offsets_for_entities_and_unicode",
+        "test_non_english_and_mixed_language_are_unknown",
+        "test_duplicate_out_of_order_move_and_edit_supersede_stale_work",
+        "test_canary_never_enters_queue_locator_summary_or_health",
+        "test_protected_mime_and_attachments_excluded"
+      ],
+      "met": true
+    }
+  ],
+  "live_validation_passed": true,
+  "files": [
+    {
+      "path": "config/language-artifacts.json",
+      "sha256": "200b4b5963285f06fbdb203fd5be0ef4ee9738c926caad71b1a638a5caa3afac"
+    },
+    {
+      "path": "infra/bicep/notification-transport.bicep",
+      "sha256": "94a76eef46577dd8d8a4485be3275ceb7282ea7aab89a0cef8d4c4d598568905"
+    },
+    {
+      "path": "packages/text-normalization/src/agenttrace_text_normalization/__init__.py",
+      "sha256": "c1b9429dc266ddddac053d9d52a38eb4e6d3b37691203a0596b9222c6684a216"
+    },
+    {
+      "path": "packages/text-normalization/src/agenttrace_text_normalization/extraction.py",
+      "sha256": "afc79f8b12893086c2f49a269f852c963a869987ab530502b3d513b3d478612b"
+    },
+    {
+      "path": "packages/text-normalization/src/agenttrace_text_normalization/language.py",
+      "sha256": "cd752a43f0e382a26541759a7acb789e647c10fc10922039be8b42ee0f172f0d"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "a047aa14a3fdfc67a7d66a61804a8838ddbb4159861ceca4c4ec604607749091"
+    },
+    {
+      "path": "src/agenttrace_foundation/database_access.py",
+      "sha256": "b2919ba46dde8020522b89c8c80dbf09e1633e060c3d49e5aab480b8c774c7a5"
+    },
+    {
+      "path": "src/agenttrace_foundation/migrations/ingestion.sql",
+      "sha256": "1939f92b842d4ade2ad47a6305cc0b660ab81204e3ab5dfcea14d5b25195b03a"
+    },
+    {
+      "path": "src/agenttrace_ingestion/__init__.py",
+      "sha256": "9103054d75cd3dd2f8a769268fb6d8348bdd91b3365d134cbc7b86626199a603"
+    },
+    {
+      "path": "src/agenttrace_ingestion/api.py",
+      "sha256": "c680c2c5074cc4aac1d29ceb9955ecd40b1d7dc87f8940f8e5b5b567778ba2b7"
+    },
+    {
+      "path": "src/agenttrace_ingestion/audit.py",
+      "sha256": "0e3422d4287349a9669c2f6d10905d9842913ae583d18ed741eec73e00878899"
+    },
+    {
+      "path": "src/agenttrace_ingestion/cli.py",
+      "sha256": "aeb4cce2b0e61d39564a1cbe3ad956e9afe2e55644daae1d4966a6c26dae3fc1"
+    },
+    {
+      "path": "src/agenttrace_ingestion/contracts.py",
+      "sha256": "3a702f4da5e13f17641d67be91af73e638674524b5280817c603eeac40dbe3cd"
+    },
+    {
+      "path": "src/agenttrace_ingestion/daemon.py",
+      "sha256": "bcbd09fbc35b6450f9f3923eb2c0d8f5d6a92dece85045d96bd7686ec37e3dfd"
+    },
+    {
+      "path": "src/agenttrace_ingestion/dispatch.py",
+      "sha256": "0332180f05156fab61799f146dbd34f1ec2939ec455c878e84b99bf366741a48"
+    },
+    {
+      "path": "src/agenttrace_ingestion/graph_activity.py",
+      "sha256": "b083d951e79140863d5909d05c4a641bbeafce0c3051261d8a4e3f970a6eb0a5"
+    },
+    {
+      "path": "src/agenttrace_ingestion/mailbox.py",
+      "sha256": "b893caa09bcbb857fda2a7bd48e7f20ada156c316508cce2c5782f2b4655d1e8"
+    },
+    {
+      "path": "src/agenttrace_ingestion/notifications.py",
+      "sha256": "1b50bf2ea492a73ac97520c41a01f89bb30faebc107057b8d55a2e6580706a5f"
+    },
+    {
+      "path": "src/agenttrace_ingestion/pipeline.py",
+      "sha256": "1fd4d915fcdc67d4db0d02c753c2178fd09db3c17e6ceba3053ffd8cbba7bb11"
+    },
+    {
+      "path": "src/agenttrace_ingestion/protection.py",
+      "sha256": "26dbd6bec61fb79d76dded1e27b9b9d377a652f13b941b135f05c0b652d64c1f"
+    },
+    {
+      "path": "src/agenttrace_ingestion/queue_transport.py",
+      "sha256": "99a1614e62e589fe013e7f8756ca3946d857fc397dfa6b795110e3ee0a072c94"
+    },
+    {
+      "path": "src/agenttrace_ingestion/runtime.py",
+      "sha256": "e20d8ee58319ae18dc9a343f404b2bf05838e41a37ec298a718f4ef9b29129f0"
+    },
+    {
+      "path": "src/agenttrace_ingestion/snapshots.py",
+      "sha256": "2a09f0c25bd1a90d9b88cf3bf3c14fe68217548e8cfbeb44c7c22a856931892a"
+    },
+    {
+      "path": "src/agenttrace_ingestion/store.py",
+      "sha256": "ae9c6ea88a4885541f7cfa4ec0442eb595adf23a98beb011806ca8d86c1fb151"
+    },
+    {
+      "path": "src/agenttrace_ingestion/transport.py",
+      "sha256": "fd496b66355a2ddcd513e14a0ef8c25998767dce79da1d954ad35380e15ae5a3"
+    },
+    {
+      "path": "tests/integration/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/integration/conftest.py",
+      "sha256": "9e50505bec412410173e032371ac47a0bc01a2438774dfc25f66e541da4af17d"
+    },
+    {
+      "path": "tests/integration/test_audit_ingestion.py",
+      "sha256": "18815e22984bd069110467606b9b6a7e3566bce3ef1d72d38884d2d6a06fe668"
+    },
+    {
+      "path": "tests/integration/test_development_queue.py",
+      "sha256": "d197095c933262470f92e51dfb706d47cc86f1b30fa0f1b1d1e8964dfd072900"
+    },
+    {
+      "path": "tests/integration/test_ingestion_access.py",
+      "sha256": "f25c17f4b78460f4701fc5de9ddb6b65d9f751906fc42ebf0fe076621e3c0703"
+    },
+    {
+      "path": "tests/integration/test_ingestion_recovery.py",
+      "sha256": "e3330a06240c54e96b052a3a8a60099c9eafb99da96a0c7182acda8c68b11642"
+    },
+    {
+      "path": "tests/integration/test_mail_ingestion.py",
+      "sha256": "d4bb203ccd658b1dcc7584d5202b118c299d39eaa82983c6c97db81f20f2e8d8"
+    },
+    {
+      "path": "tests/integration/test_workload_access.py",
+      "sha256": "1afdafef15223c8709a25516c8df24bc80428d0335694479fcab0a11d015348a"
+    },
+    {
+      "path": "tests/unit/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/unit/test_artifact_policy.py",
+      "sha256": "dba95979d8fe817480379e527832033a838b0a420d1a040b7eafe7676e6f67f6"
+    },
+    {
+      "path": "tests/unit/test_body_extraction.py",
+      "sha256": "73cd244b349595df14f4c45729762672d1dc6205a54f44be371bd45fe7e90990"
+    },
+    {
+      "path": "tests/unit/test_detection_contracts.py",
+      "sha256": "5cdf73ae30a3d3a72e75b87e71aa31e1d889b48118fc615d315d5b535ceb6e4e"
+    },
+    {
+      "path": "tests/unit/test_local_settings.py",
+      "sha256": "1216ec7851944308b7df8f789b10e5ddd65020d722f533e63308f7bee0f9b09f"
+    },
+    {
+      "path": "tests/unit/test_mail_ingestion_contracts.py",
+      "sha256": "ef1397412c40f053e7dae199088eb02e4a0ad0669266e6d69d2dc6feab77a43c"
+    },
+    {
+      "path": "tests/unit/test_native_notification_queue.py",
+      "sha256": "22c0f2d4a4dcb6b90cc30dcb4f2caf8ab17960be99531a0e3875a3bbd799a285"
+    },
+    {
+      "path": "tests/unit/test_validation_configuration.py",
+      "sha256": "2dba6f17bed6f151af5702d0e8ca2577326a858810cc21805a422aeb487d0307"
+    },
+    {
+      "path": "uv.lock",
+      "sha256": "0edbda7282500b101ff7938724e07f7877190031e5177c2c039c1785b8d4c6ac"
+    }
+  ],
+  "file_hash_normalization": "Git LF text bytes",
+  "accuracy_qualification": "Not claimed; no statistical authorship model or production agent detector installed in this milestone.",
+  "all_exit_criteria_met": true
+}

@@ -13,3 +13,8 @@ Review state: accepted on 28 October 2026 by the user acting as project owner, M
 Azure Storage and Key Vault use dedicated resources in kb-agentdemo, East US, with Entra data-plane roles and operator-IP firewalls. The approved synthetic sandbox uses restricted public endpoints. Local services bind to loopback; content workers have an internal network without external access. No production deployment or Private Link claim is made.
 
 Role/credential revocation, certificate overlap rotation, signing-key version retention, access-log inspection and safe resource suspension are documented in the access runbook. Do not delete the shared resource group or change another workload's resource configuration.
+
+
+## Accepted notification transport addition
+
+Graph basic notifications now enter through a dedicated East US Event Grid/Standard LRS metadata zone, then the local encrypted durable inbox and separate analysis dispatch. The owner accepted a trusted-services exception and destination-account delivery roles only on this new notification account after live validation rejected narrower scopes. The existing raw-evidence store and Key Vault remain unchanged. No new mailbox send/write grant exists. See [the ingestion design](mail-ingestion.md) and [acceptance](evidence/notification-transport-acceptance.json).

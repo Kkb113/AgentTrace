@@ -1,0 +1,27 @@
+{
+  "kind": "actual_live_calls",
+  "checks": {
+    "live_graph_subscription_metadata_only": true,
+    "graph_subscription_folder_scope": true,
+    "graph_subscription_validation_secret_matches": true,
+    "partner_topic_activated": true,
+    "managed_identity_cloud_event_delivery": true,
+    "native_notification_received_and_processed": true,
+    "synthetic_inventory_reconciled": true,
+    "exact_synthetic_exchange_audit_ingested": true,
+    "dedicated_storage_standard_lrs": true,
+    "dedicated_storage_no_shared_keys": true,
+    "accepted_notification_network_exception_only": true,
+    "original_evidence_firewall_unchanged": true,
+    "original_vault_firewall_unchanged": true
+  },
+  "all_passed": true,
+  "observed_message_copies": 4,
+  "native_notifications": 3,
+  "exchange_audit_records": 3,
+  "email_write_actions": 0,
+  "raw_snapshots_enabled": false,
+  "graph_activity_source": "not_configured",
+  "office_audit_source": "graph_exchange_audit_query",
+  "content_scorer": "not_installed"
+}
