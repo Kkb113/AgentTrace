@@ -1,0 +1,56 @@
+{
+  "collected_at": "2026-10-28T13:28:39.253607+00:00",
+  "collection_mode": "read_only_existing_operator_session",
+  "resource_group_verified": true,
+  "resource_group_metadata_location": "eastus",
+  "new_resources_created": 0,
+  "checks": {
+    "subscription_context": {
+      "status": "observed"
+    },
+    "resource_group": {
+      "status": "observed"
+    },
+    "existing_resources": {
+      "status": "observed"
+    },
+    "operator_identity": {
+      "status": "observed"
+    },
+    "tenant_licenses": {
+      "status": "observed"
+    },
+    "operator_licenses": {
+      "status": "observed"
+    },
+    "operator_directory_roles": {
+      "status": "observed"
+    },
+    "agent_identity_endpoint": {
+      "status": "observed"
+    },
+    "synthetic_message_read": {
+      "status": "unavailable",
+      "reason": "access_denied"
+    },
+    "graph_log_diagnostic_settings": {
+      "status": "observed"
+    },
+    "office_management_feed": {
+      "status": "unavailable",
+      "reason": "expected_activity_feed_permission_missing",
+      "probe_basis": "separate read-only CLI subscriptions/list request"
+    }
+  },
+  "observations": {
+    "entra_p1_or_p2_tenant_plan_observed": true,
+    "exchange_tenant_plan_observed": true,
+    "graph_activity_logging_enabled": false,
+    "matching_synthetic_messages_returned": null,
+    "exchange_audit_enablement": "not_verified_requires_exchange_admin_evidence",
+    "actual_audit_availability_lag": "not_measured_requires_linked_live_observations",
+    "addin_authentication": "documented_candidate_not_runtime_tested",
+    "interactive_outlook_synthetic_export": "observed_separately_via_signed_in_UI"
+  },
+  "privacy": "No ordinary email body was requested. Raw identifiers and tenant responses stay in ignored private output."
+}

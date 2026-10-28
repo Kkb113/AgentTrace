@@ -1,0 +1,10 @@
+From: sender@example.invalid
+To: recipient@example.invalid
+Subject: Synthetic business-message contract example
+Message-ID: <message-example@example.invalid>
+Date: Wed, 28 Oct 2026 10:00:00 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+The meeting is scheduled for Thursday. Please bring the current agenda.

@@ -1,0 +1,124 @@
+{
+  "completed_at": "2026-10-28T14:51:05.477193+00:00",
+  "capture_basis": "msal_browser_pkce_validated_operator_and_tenant",
+  "source_authentication": "live_authenticated_microsoft_graph_api",
+  "source_registry": "vendor_documented_claude_m365_connector_id_corresponds_to_tenant_publisher_verified_application",
+  "tokens_written_to_disk": false,
+  "conditional_access_changed": false,
+  "new_azure_resources_created": 0,
+  "independent_live_messages": 3,
+  "copied_control_text_matches_supplied_generation": true,
+  "cases": [
+    {
+      "case_alias": "external_claude_send",
+      "creation_history": "project_owner_prepared_outside_agenttrace",
+      "ground_truth": {
+        "agent_sent": true,
+        "ai_content": "not_independently_established"
+      },
+      "findings": {
+        "agent_send_attribution": {
+          "status": "verified_agent",
+          "flagged": true,
+          "reason_codes": [
+            "authenticated_exchange_send_for_enrolled_agent_connector"
+          ]
+        },
+        "content_assessment": {
+          "status": "unknown",
+          "flagged": null,
+          "reason_codes": [
+            "statistical_content_experiment_not_run_by_evidence_spike"
+          ]
+        }
+      },
+      "audit_query_status": "succeeded",
+      "supporting_observations": {
+        "unique_sent_copy": true,
+        "matching_completed_send_events": 1,
+        "join_basis": "authenticated_tenant_mailbox_unique_sent_copy_internet_message_id",
+        "audit_to_graph_immutable_id_equivalence_established": false,
+        "first_successful_collection_age_seconds": 4460.669878,
+        "availability_interpretation": "available_by_this_age_not_exact_ingestion_latency",
+        "rule_scope": "enrolled_claude_connector_only_other_executors_remain_unknown"
+      }
+    },
+    {
+      "case_alias": "human_written_manual_send",
+      "creation_history": "project_owner_prepared_outside_agenttrace",
+      "ground_truth": {
+        "agent_sent": false,
+        "ai_content": false
+      },
+      "findings": {
+        "agent_send_attribution": {
+          "status": "unknown",
+          "flagged": null,
+          "reason_codes": [
+            "completed_scoped_agent_send_evidence_missing"
+          ]
+        },
+        "content_assessment": {
+          "status": "unknown",
+          "flagged": null,
+          "reason_codes": [
+            "statistical_content_experiment_not_run_by_evidence_spike"
+          ]
+        }
+      },
+      "audit_query_status": "succeeded",
+      "supporting_observations": {
+        "unique_sent_copy": true,
+        "matching_completed_send_events": 0,
+        "join_basis": "authenticated_tenant_mailbox_unique_sent_copy_internet_message_id",
+        "audit_to_graph_immutable_id_equivalence_established": false,
+        "first_successful_collection_age_seconds": null,
+        "availability_interpretation": "available_by_this_age_not_exact_ingestion_latency",
+        "rule_scope": "enrolled_claude_connector_only_other_executors_remain_unknown"
+      }
+    },
+    {
+      "case_alias": "ai_text_manually_pasted_and_sent",
+      "creation_history": "project_owner_prepared_outside_agenttrace",
+      "ground_truth": {
+        "agent_sent": false,
+        "ai_content": true
+      },
+      "findings": {
+        "agent_send_attribution": {
+          "status": "unknown",
+          "flagged": null,
+          "reason_codes": [
+            "completed_scoped_agent_send_evidence_missing"
+          ]
+        },
+        "content_assessment": {
+          "status": "unknown",
+          "flagged": null,
+          "reason_codes": [
+            "statistical_content_experiment_not_run_by_evidence_spike"
+          ]
+        }
+      },
+      "audit_query_status": "succeeded",
+      "supporting_observations": {
+        "unique_sent_copy": true,
+        "matching_completed_send_events": 0,
+        "join_basis": "authenticated_tenant_mailbox_unique_sent_copy_internet_message_id",
+        "audit_to_graph_immutable_id_equivalence_established": false,
+        "first_successful_collection_age_seconds": null,
+        "availability_interpretation": "available_by_this_age_not_exact_ingestion_latency",
+        "rule_scope": "enrolled_claude_connector_only_other_executors_remain_unknown"
+      }
+    }
+  ],
+  "earliest_observed_audit_availability": {
+    "event_at": "2026-10-28T13:34:24Z",
+    "first_successful_collection_at": "2026-10-28T14:31:33.482130+00:00",
+    "available_by_seconds": 3429.48213,
+    "exact_ingestion_latency_measured": false,
+    "basis": "First successful read occurred after access remediation; the event may have been available earlier."
+  },
+  "qualification_claim": "One agent-positive and two manual controls demonstrate this narrow feasibility path only. Unknown is not human. No G1/G2 qualification or content-scoring performance is claimed.",
+  "unexercised_live_control": "Conventional non-AI application sends are covered only by authored semantic tests in this stage; independent live population validation remains later work."
+}

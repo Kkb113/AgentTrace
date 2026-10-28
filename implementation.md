@@ -4,7 +4,7 @@
 - **Primary workspace:** `C:\AgentDetection`
 - **Repository:** [Kkb113/AgentTrace](https://github.com/Kkb113/AgentTrace)
 - **Plan date:** 28 October 2026
-- **Status:** Revised delivery plan; product implementation and performance validation have not started.
+- **Status:** Phase 0 completed with a live authenticated Claude/Exchange Send evidence path, two manual controls, and all nine exit criteria evidenced. Later product phases, statistical content scoring and release accuracy qualification have not started. See [feasibility report](docs/feasibility-report.md).
 - **Delivery scope:** 15 phases, numbered Phase 0 through Phase 14.
 - **Product boundary:** Detection only. Two independent findings: email sent by an AI agent; email contains AI-generated content. English first for content; distinguish basic spelling/grammar assistance from generated drafts and substantial rewrites/translations.
 - **Priority:** Agent-sent detection is the primary release objective. Content detection is a required, measured best-effort capability; its accuracy does not determine whether the agent detector qualifies.
@@ -305,7 +305,7 @@ Evaluate the final message-level union of provenance and statistical flags, not 
 
 ## 4. Phase overview
 
-All phases start as **Not started**. Research and read-only Azure inventory are preparation, not completed implementation phases. A phase is complete only when its exit criteria have recorded evidence. Prioritize the agent path through Phases 0–7, then agent decisions/UI/qualification in Phases 9–14. Phase 8 runs as a bounded secondary track; a poor content-accuracy result does not hold the agent path open. Its actual experiment, safety/isolation checks, and limitation report remain required for POC handover.
+Phase 0 is **In progress**, with its actual exit review in [the feasibility report](docs/feasibility-report.md). Phases 1–14 are **Not started**. A phase is complete only when its exit criteria have recorded evidence. Prioritize the agent path through Phases 0–7, then agent decisions/UI/qualification in Phases 9–14. Phase 8 runs as a bounded secondary track; a poor content-accuracy result does not hold the agent path open. Its actual experiment, safety/isolation checks, and limitation report remain required for POC handover.
 
 | Phase | Focus | Primary dependency | Principal exit artifact |
 | --- | --- | --- | --- |
@@ -328,6 +328,8 @@ All phases start as **Not started**. Research and read-only Azure inventory are 
 ## Phase 0 — Establish scope, risk boundaries, and feasibility
 
 **Objective:** Establish a viable, low-false-positive agent-send evidence path first; define a separate bounded content experiment and economical Azure deployment constraints.
+
+**Current evidence:** [feasibility report](docs/feasibility-report.md), [exit review](config/feasibility-exits.json), [live validation](docs/evidence/live-audit-validation.json), and [local validation](docs/evidence/local-validation.json). The owner accepted the concrete baseline/threat model and authorized a temporary operator-only reader. Browser PKCE sign-in, marked-message reads and Exchange audit search succeeded. A successful Send event identifies Anthropic's documented connector and the exact Internet Message-ID, matched to a unique Sent Items copy within the authenticated tenant/mailbox. The live Claude send was flagged; two independently prepared manual sends were not accused. Their agent results remain unknown rather than proof of human execution. The original Claude response still lacks IDs, audit/store-to-Graph immutable-ID equivalence remains unresolved, and observed event age is only an availability upper bound. These are disclosed source/coverage limits; the narrow minimum audit route works. No release accuracy or statistical content result is claimed.
 
 **Implementation work**
 
@@ -361,15 +363,15 @@ All phases start as **Not started**. Research and read-only Azure inventory are 
 
 **Exit criteria**
 
-- [ ] Project owner accepts the scope, terminology, threat model, and quantitative gates.
-- [ ] Microsoft administrator confirms required access and available licenses.
-- [ ] An exact-message evidence path is demonstrated, with unresolved gaps documented.
-- [ ] Synthetic-data policy and independently prepared test-email/evidence sources are accepted for the pilot environment.
-- [ ] The agreed product has exactly two detection findings and no email execution, approval management, or automation features.
-- [ ] No unresolved dependency prevents the minimum end-to-end path; unavailable optional feeds have explicit fallback/coverage behavior.
-- [ ] Content-policy rubric, English boundary, proposed numeric gates, private-processing permissions, and data acquisition plan are recorded.
-- [ ] The secondary content experiment is defined and resourced without blocking the primary agent evidence work or claiming accuracy from a small sample.
-- [ ] `kb-agentdemo`, explicit subscription selection, resource reuse boundaries, basic/consumption sizing, and incremental-cost estimates are recorded before provisioning.
+- [x] Project owner accepts the scope, terminology, threat model, and quantitative gates.
+- [x] Microsoft administrator confirms required access and available licenses.
+- [x] An exact-message evidence path is demonstrated, with unresolved gaps documented.
+- [x] Synthetic-data policy and independently prepared test-email/evidence sources are accepted for the pilot environment.
+- [x] The agreed product has exactly two detection findings and no email execution, approval management, or automation features.
+- [x] No unresolved dependency prevents the minimum end-to-end path; unavailable optional feeds have explicit fallback/coverage behavior.
+- [x] Content-policy rubric, English boundary, proposed numeric gates, private-processing permissions, and data acquisition plan are recorded.
+- [x] The secondary content experiment is defined and resourced without blocking the primary agent evidence work or claiming accuracy from a small sample.
+- [x] `kb-agentdemo`, explicit subscription selection, resource reuse boundaries, basic/consumption sizing, and incremental-cost estimates are recorded before provisioning.
 
 ## Phase 1 — Create the repository and reproducible foundation
 

@@ -1,0 +1,15 @@
+{
+  "displayName": "AgentTrace Feasibility Reader",
+  "signInAudience": "AzureADMyOrg",
+  "isFallbackPublicClient": true,
+  "publicClient": {"redirectUris": ["http://localhost"]},
+  "requiredResourceAccess": [
+    {
+      "resourceAppId": "00000003-0000-0000-c000-000000000000",
+      "resourceAccess": [
+        {"id": "570282fd-fa5c-430d-a7fd-fc8dc98a9dca", "type": "Scope"},
+        {"id": "6c8c71d2-c7e1-45b0-ac6d-1d2724fba6ae", "type": "Scope"}
+      ]
+    }
+  ]
+}

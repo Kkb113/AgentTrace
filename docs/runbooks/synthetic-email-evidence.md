@@ -1,0 +1,32 @@
+# Collect a synthetic agent-send test
+
+The external test owner uses an existing Claude/Microsoft 365 connection. AgentTrace supplies detection/import tooling only. Do not put production data, passwords, tokens, customer addresses or financial instructions in a test.
+
+1. In Claude, ask it to send a self-addressed email from the designated test mailbox. Use subject `AgentTrace synthetic test: <unique reference>` and a short synthetic body. Approve the exact send in Claude if it requests approval. The agent must execute Send; manually sending a saved draft is a separate negative agent-send control.
+2. Preserve the actual tool operation, parameters, result and source timestamps. Preserve any returned message/request/execution IDs exactly. If a field is absent, record null; do not reconstruct it from a later subject search.
+3. Retrieve the sent item through the existing source's authorized read operation and record its ID namespace, Internet Message-ID and sent time. Separately export the received test message as EML from Outlook's message menu → Download → Download as EML. Save a copy under `work/private/<test-reference>/received-message.eml`.
+4. Keep the source transcript in a private JSON file matching the contract exercised by `tests/test_export_inspection.py`. It contains source, send operation/result, nullable returned IDs/time, lookup operation and lookup message/Internet IDs/time. A user transcript is not a source-signed execution receipt.
+5. Run `inspect-export` as documented in the README. A matching Internet Message-ID confirms the sent/received copy relationship. A missing authenticated send-response link leaves agent attribution unknown. Never manufacture a signed vendor receipt from the transcript.
+6. For a verified route, obtain existing authenticated execution/audit records binding the actual agent send to the exact item/request. Configure an enrolled source only after its owner/trust, key validity, mailbox scope, replay behavior and shared-identity limits are reviewed. The signed contract example illustrates the required shape; it does not establish that Claude currently exports it.
+7. Prepare human-send, manual AI-paste and non-AI-application controls outside AgentTrace. Record independent creation/send history in a separate manifest. Keep labels out of detector input, use unique references, and retain unknowns and misses in evaluation.
+8. Observe an authorized audit feed at bounded intervals, retaining the first-seen timestamp for each matched event. Compute event/emission/collector/decision intervals separately. Without feed access, record lag as unmeasured; do not substitute Exchange transport time.
+
+## Authenticated Exchange audit route
+
+Use `inspect-reader` only after the designated temporary registration and operator-only consent have been approved. The manifest and scope reach are documented in `docs/access-remediation.md`. Copy the example settings into ignored private storage. Supply exact marked synthetic subjects; creation history and truth labels stay in a separate private manifest and are not scoring inputs. The command performs MSAL browser authorization with PKCE, validates the signed-in operator/tenant from the validated ID token, and keeps tokens in memory. It does not call `/me` to request unapproved profile access.
+
+For each subject, the reader requests at most five message metadata entries, requires a unique non-draft Sent Items observation, captures that item's MIME and verifies its Message-ID. It searches the designated mailbox's Exchange Send/SendAs/SendOnBehalf records in a four-minute window using the exact Internet Message-ID. Searches have bounded polling and returned pages; a partial capture cannot verify attribution. Preserve zero results as unknown, and repeat later into a new private capture when investigating latency.
+
+The enrolled Claude route requires the authoritative connector client ID in both audit application fields, a successful `Send`, consistent tenant/operator/mailbox identifiers, matching message ID and subject, and a unique Sent Items candidate. It uses the audit event's item-specific Internet Message-ID within the authenticated tenant/mailbox, with time as a consistency check. It does not infer an executor from a later subject lookup or pretend that raw Exchange/store IDs equal Graph immutable IDs. Unknown/default/shared application IDs remain unknown. The observed native audit route is separate from the authored signed-contract replay route.
+
+Record event age at first successful collection as an **availability upper bound**. If the first read is much later than the send, the event may have been available earlier; this does not measure actual ingestion latency or an SLA. More detailed availability distributions and multiple-source qualification belong to the later evaluation stages.
+
+Retention: private raw exports/transcripts seven days; decisions thirty days. The operator reviews exact paths before cleanup. The shared `kb-agentdemo` group and unrelated resources are never part of test-file cleanup.
+
+## Live test record
+
+On 28 October 2026 the project owner sent the marked self-test through Claude after selecting it as the external agent source. The tool operation was `mcp__Microsoft_365__outlook_send_mail`. Its literal result supplied no message/request ID or timestamp. A separate search returned a Sent Items ID, Internet Message-ID and sent time. The received Outlook EML was exported and its Internet Message-ID matched that lookup. The `x-ai-generated: mcp-office365` declaration was retained as unverified context.
+
+The local importer completed with **agent unknown; content unknown**. This is the correct conservative result for the available evidence and an observed miss on the operator-labeled agent-positive case. It is not proof that the message was human-sent, not qualification of a verified agent route, and not a completed statistical content experiment.
+
+The later authorized live-audit collector obtained the additional Exchange Send event and reproduced **agent verified; content unknown** for that same Claude message. Both manual controls remained agent unknown/unflagged, and the pasted control's body matched the supplied generated passage. This later result supersedes the initial missing-evidence outcome for the supported audit route; the EML-only importer correctly continues to return unknown. The sanitized three-message result is `docs/evidence/live-audit-validation.json`.

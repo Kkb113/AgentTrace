@@ -1,0 +1,29 @@
+[
+  {
+    "record": {
+      "schema_version": "1.0",
+      "evidence_id": "send-example",
+      "issuer": "source-example",
+      "key_id": "test-key",
+      "kind": "send_execution",
+      "binding": {
+        "tenant_ref": "tenant-example",
+        "mailbox_ref": "mailbox-example",
+        "immutable_id": "opaque-message-example",
+        "internet_message_id": "<message-example@example.invalid>",
+        "mime_sha256": "c7310e7b77fbd5096ed543a87d8968448da3fc7bb8cc8dadb693f15dca66780a"
+      },
+      "occurred_at": "2026-10-28T10:00:00Z",
+      "emitted_at": "2026-10-28T10:00:02Z",
+      "expires_at": "2026-10-29T10:00:00Z",
+      "facts": {
+        "executor_type": "ai_agent",
+        "actor_ref": "agent-example",
+        "action": "send",
+        "outcome": "completed",
+        "execution_id": "execution-example"
+      }
+    },
+    "signature_base64": "evMHMZ3aKsv30DriIn2vJqFj6NiCCaAnml9XSN2Qyrdm6EjP+ety+acUKyjsqneg4xesbvFeAqiem8qX6z8bCg=="
+  }
+]

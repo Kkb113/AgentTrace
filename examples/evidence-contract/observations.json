@@ -1,0 +1,13 @@
+[
+  {
+    "message_ref": "message-example",
+    "tenant_ref": "tenant-example",
+    "mailbox_ref": "mailbox-example",
+    "immutable_id": "opaque-message-example",
+    "internet_message_id": "<message-example@example.invalid>",
+    "state": "sent",
+    "observed_at": "2026-10-28T10:00:04Z",
+    "mime_file": "message.eml",
+    "body_language": "en"
+  }
+]

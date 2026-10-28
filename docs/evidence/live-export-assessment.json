@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "rule_version": "export-inspection/0.1.0",
+  "environment": "synthetic_test_tenant",
+  "observed_at": "2026-10-28T13:50:17.802076+00:00",
+  "validation_basis": "real_email_export_with_operator_supplied_unverified_source_transcript",
+  "findings": {
+    "agent_send_attribution": {
+      "status": "unknown",
+      "flagged": null,
+      "reason_codes": [
+        "operator_transcript_is_not_authenticated_source_execution",
+        "send_result_has_no_message_or_request_id"
+      ],
+      "evidence_refs": []
+    },
+    "content_assessment": {
+      "status": "unknown",
+      "flagged": null,
+      "reason_codes": [
+        "statistical_content_experiment_not_run_by_evidence_spike"
+      ],
+      "evidence_refs": []
+    }
+  },
+  "supporting_observations": {
+    "received_and_sent_lookup_internet_message_ids_match": true,
+    "send_response_contains_linking_id": false,
+    "header_declaration_present": true,
+    "header_declaration_trust": "unverified",
+    "source_reported_operation": "mcp__Microsoft_365__outlook_send_mail",
+    "source_reported_sent_at": "2026-10-28T13:34:24.000Z",
+    "actual_audit_availability_lag_seconds": null
+  },
+  "limitation": "A matching later Sent Items lookup identifies a message copy but does not itself bind the earlier send execution. No verified verdict or measured audit lag is asserted.",
+  "message_ref": "claude-self-test",
+  "privacy": "Raw message, actual IDs, source transcript and MIME digest retained only in ignored private storage."
+}

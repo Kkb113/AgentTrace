@@ -1,0 +1,44 @@
+{
+  "review_date": "2026-10-28",
+  "authorization": "project_owner_explicitly_approved_temporary_reader_and_operator_only_consent",
+  "registration": {
+    "single_tenant": true,
+    "delegated_resource_scopes": [
+      "Mail.Read",
+      "AuditLogsQuery-Exchange.Read.All"
+    ],
+    "consent_type": "Principal",
+    "designated_operator_only": true,
+    "application_only_permissions": false,
+    "mail_send_or_write_permission": false,
+    "password_credentials": 0,
+    "certificate_credentials": 0
+  },
+  "device_code_attempt": {
+    "outcome": "blocked_by_conditional_access",
+    "error_code": 53003,
+    "responsible_policy_identified": false,
+    "policy_changed": false
+  },
+  "browser_pkce_attempt": {
+    "outcome": "succeeded",
+    "operator_and_tenant_verified": true,
+    "marked_message_read_succeeded": true,
+    "exchange_audit_query_succeeded": true,
+    "token_cache": "memory_only",
+    "access_or_refresh_tokens_persisted": false
+  },
+  "retirement": {
+    "state": "retired_after_explicit_owner_approval",
+    "completed_at": "2026-10-28T15:01:39.009942+00:00",
+    "cleanup_executed": true,
+    "consent_revoked": true,
+    "service_principal_removed": true,
+    "application_removed": true,
+    "absence_verified_by_followup_reads": true,
+    "conditional_access_changed": false,
+    "other_applications_changed": false,
+    "approval_history": "Initial cleanup was blocked by automatic approval review; the owner then explicitly approved retirement before deletion ran."
+  },
+  "privacy": "Actual tenant, application, operator, mailbox and grant identifiers remain in ignored private inventory."
+}

@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "environment": "contract_example",
+  "tenant_ref": "tenant-example",
+  "mailbox_refs": [
+    "mailbox-example"
+  ],
+  "issuers": {
+    "source-example": {
+      "key_id": "test-key",
+      "public_key_base64": "SR+s0b6AvAru3R4vY6hbQbc6k1tnIUEpAUp1TbYBETs=",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_until": "2027-01-01T00:00:00Z",
+      "revoked": false,
+      "agent_actor_refs": [
+        "agent-example"
+      ],
+      "allowed_kinds": [
+        "send_execution",
+        "content_inclusion"
+      ]
+    }
+  }
+}

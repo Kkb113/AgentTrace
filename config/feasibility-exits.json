@@ -1,0 +1,95 @@
+{
+  "review_version": "1.1.0",
+  "review_date": "2026-10-28",
+  "overall_status": "complete_narrow_live_path_demonstrated_release_qualification_pending",
+  "exits": [
+    {
+      "id": "scope_and_threat_acceptance",
+      "met": true,
+      "state": "project_owner_explicitly_accepted_concrete_scope_threat_and_acceptance_pack_in_chat",
+      "evidence": [
+        "docs/scope.md",
+        "docs/threat-model.md",
+        "docs/acceptance.md"
+      ]
+    },
+    {
+      "id": "administrator_access_and_licenses",
+      "met": true,
+      "state": "owner_authorized_operator_reader_effective_mail_read_and_exchange_audit_query_demonstrated",
+      "evidence": [
+        "docs/tenant-capabilities.md",
+        "docs/evidence/tenant-capability-check.json",
+        "docs/evidence/live-audit-validation.json"
+      ]
+    },
+    {
+      "id": "exact_message_agent_path",
+      "met": true,
+      "state": "live_authenticated_exchange_send_known_connector_and_unique_scoped_sent_item_join_demonstrated",
+      "evidence": [
+        "docs/source-field-matrix.md",
+        "docs/evidence/live-export-assessment.json",
+        "docs/evidence/live-audit-validation.json"
+      ]
+    },
+    {
+      "id": "synthetic_policy_and_external_sources",
+      "met": true,
+      "state": "user_accepted_synthetic_policy_selected_claude_and_executed_self_test",
+      "evidence": [
+        "docs/scope.md",
+        "docs/runbooks/synthetic-email-evidence.md"
+      ]
+    },
+    {
+      "id": "two_detection_outputs_only",
+      "met": true,
+      "state": "contract_and_read_only_boundary_tests_pass",
+      "evidence": [
+        "src/agenttrace_feasibility/attribution.py",
+        "tests/test_evidence_attribution.py",
+        "tests/test_read_only_boundaries.py"
+      ]
+    },
+    {
+      "id": "minimum_end_to_end_dependency",
+      "met": true,
+      "state": "minimum_read_only_live_attribution_path_completed_optional_feeds_and_identifier_gaps_disclosed",
+      "evidence": [
+        "docs/feasibility-report.md",
+        "docs/source-field-matrix.md",
+        "docs/evidence/live-audit-validation.json"
+      ]
+    },
+    {
+      "id": "content_policy_permissions_and_acquisition",
+      "met": true,
+      "state": "accepted_synthetic_english_policy_private_processing_and_acquisition_protocol_recorded",
+      "evidence": [
+        "config/poc-baseline.json",
+        "docs/content-policy.md",
+        "docs/content-feasibility.md"
+      ]
+    },
+    {
+      "id": "bounded_secondary_experiment",
+      "met": true,
+      "state": "ten_engineer_day_forty_cpu_hour_local_first_protocol_recorded",
+      "evidence": [
+        "docs/content-feasibility.md",
+        "docs/azure-cost-baseline.md"
+      ]
+    },
+    {
+      "id": "azure_scope_and_incremental_cost",
+      "met": true,
+      "state": "explicit_subscription_and_group_verified_no_new_resources_retail_estimate_recorded",
+      "evidence": [
+        "docs/azure-cost-baseline.md",
+        "docs/evidence/azure-retail-prices.json",
+        "docs/evidence/tenant-capability-check.json"
+      ]
+    }
+  ]
+}
