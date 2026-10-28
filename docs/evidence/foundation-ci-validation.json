@@ -1,0 +1,73 @@
+{
+  "verified_at": "2026-10-28T17:12:08.458654+00:00",
+  "provider": "GitHub Actions",
+  "selection_basis": "owner_explicitly_selected_after_azure_project_creation_permission_denial",
+  "pull_request": "https://github.com/Kkb113/AgentTrace/pull/1",
+  "validated_head": "68b2c25f9c45e22afe477f8677147d5e3316cdfe",
+  "run_url": "https://github.com/Kkb113/AgentTrace/actions/runs/40731900640",
+  "event": "pull_request",
+  "conclusion": "success",
+  "checks": [
+    {
+      "name": "guard-controls",
+      "conclusion": "success",
+      "url": "https://github.com/Kkb113/AgentTrace/actions/runs/40731900640/job/122970144253"
+    },
+    {
+      "name": "integration",
+      "conclusion": "success",
+      "url": "https://github.com/Kkb113/AgentTrace/actions/runs/40731900640/job/122970144715"
+    },
+    {
+      "name": "infrastructure",
+      "conclusion": "success",
+      "url": "https://github.com/Kkb113/AgentTrace/actions/runs/40731900640/job/122970144798"
+    },
+    {
+      "name": "security",
+      "conclusion": "success",
+      "url": "https://github.com/Kkb113/AgentTrace/actions/runs/40731900640/job/122970144839"
+    },
+    {
+      "name": "Quality",
+      "conclusion": "success",
+      "url": "https://github.com/Kkb113/AgentTrace/actions/runs/40731900640/job/122970144970"
+    }
+  ],
+  "main_protection": {
+    "allow_deletions": false,
+    "allow_force_pushes": false,
+    "enforce_admins": true,
+    "linear_history": true,
+    "required_approvals": 0,
+    "required_checks": [
+      {
+        "app_id": 15368,
+        "context": "Quality"
+      },
+      {
+        "app_id": 15368,
+        "context": "security"
+      },
+      {
+        "app_id": 15368,
+        "context": "infrastructure"
+      },
+      {
+        "app_id": 15368,
+        "context": "integration"
+      },
+      {
+        "app_id": 15368,
+        "context": "guard-controls"
+      }
+    ],
+    "strict": true
+  },
+  "native_secret_scanning": "enabled",
+  "native_push_protection": "enabled",
+  "azure_pipeline_definition": "ci/azure-pipelines.yml",
+  "azure_pipeline_run_claimed": false,
+  "azure_credentials_or_resources_created": false,
+  "finalization_note": "This records the successful implementation-head PR run. The final documentation/trigger commit must pass the same enforced checks before merge."
+}

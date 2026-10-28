@@ -1,0 +1,45 @@
+{
+  "executed_at": "2026-10-28T16:49:17.597216+00:00",
+  "python_version": "3.12.14",
+  "gates": {
+    "quality": {
+      "exit_code": 0,
+      "elapsed_seconds": 9.0
+    },
+    "security": {
+      "exit_code": 0,
+      "elapsed_seconds": 4.422
+    },
+    "infrastructure": {
+      "exit_code": 0,
+      "elapsed_seconds": 8.828
+    },
+    "integration": {
+      "exit_code": 0,
+      "elapsed_seconds": 21.906
+    },
+    "guard-controls": {
+      "exit_code": 0,
+      "elapsed_seconds": 1.813
+    }
+  },
+  "junit_counts": {
+    "unit": {
+      "tests": 142,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "integration": {
+      "tests": 8,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "all_local_gates_pass": true,
+  "recorded_exit_criteria_met": 3,
+  "recorded_exit_criteria_total": 6,
+  "resources_provisioned_in_azure": 0,
+  "qualification_claim": "Foundation validation only; authored fixtures do not establish detector accuracy or Azure Queue parity."
+}

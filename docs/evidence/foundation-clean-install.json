@@ -1,0 +1,34 @@
+{
+  "verified_at": "2026-10-28T17:01:35.540054+00:00",
+  "source_basis": "exact_git_index_export_into_fresh_validation_repository",
+  "validated_tree": "0fdf52026df8d48176e88de8eb308c37de1b0367",
+  "exported_source_files": 150,
+  "copied_private_state": false,
+  "separate_virtual_environment": true,
+  "frozen_install_pass": true,
+  "fresh_tool_hash_verification_pass": true,
+  "fresh_database_and_generated_credential": true,
+  "loopback_api_and_workers_healthy": true,
+  "junit_counts": {
+    "unit": {
+      "tests": 142,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "integration": {
+      "tests": 8,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "negative_gate_exit_codes": {
+    "invalid_contract": 1,
+    "failing_test": 1,
+    "synthetic_secret": 1
+  },
+  "secret_privacy_license_vulnerability_gates_pass": true,
+  "infrastructure_compilation_pass": true,
+  "new_azure_resources": 0
+}

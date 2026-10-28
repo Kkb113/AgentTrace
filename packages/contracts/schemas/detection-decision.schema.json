@@ -1,0 +1,208 @@
+{
+  "$defs": {
+    "AgentSendFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_refs": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/+=-]{0,255}$",
+            "type": "string"
+          },
+          "maxItems": 100,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "flagged": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Flagged"
+        },
+        "reason_codes": {
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]{0,99}$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "verified_agent",
+            "no_agent_observed_in_monitored_path",
+            "unknown"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "flagged",
+        "reason_codes"
+      ],
+      "title": "AgentSendFinding",
+      "type": "object"
+    },
+    "ContentAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "calibration_ref": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/+=-]{0,255}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Calibration Ref"
+        },
+        "evidence_refs": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/+=-]{0,255}$",
+            "type": "string"
+          },
+          "maxItems": 100,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "flagged": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Flagged"
+        },
+        "qualification": {
+          "default": "not_run",
+          "enum": [
+            "not_run",
+            "experimental",
+            "qualified",
+            "provenance"
+          ],
+          "title": "Qualification",
+          "type": "string"
+        },
+        "reason_codes": {
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]{0,99}$",
+            "type": "string"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Score"
+        },
+        "status": {
+          "enum": [
+            "verified_ai_content",
+            "likely_ai_content",
+            "no_ai_signal_detected",
+            "inconclusive",
+            "unknown"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "flagged",
+        "reason_codes"
+      ],
+      "title": "ContentAssessment",
+      "type": "object"
+    },
+    "DetectionFindings": {
+      "additionalProperties": false,
+      "properties": {
+        "agent_send_attribution": {
+          "$ref": "#/$defs/AgentSendFinding"
+        },
+        "content_assessment": {
+          "$ref": "#/$defs/ContentAssessment"
+        }
+      },
+      "required": [
+        "agent_send_attribution",
+        "content_assessment"
+      ],
+      "title": "DetectionFindings",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "decision_id": {
+      "format": "uuid",
+      "title": "Decision Id",
+      "type": "string"
+    },
+    "findings": {
+      "$ref": "#/$defs/DetectionFindings"
+    },
+    "message_ref": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/+=-]{0,255}$",
+      "title": "Message Ref",
+      "type": "string"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "title": "Observed At",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "validation_basis": {
+      "enum": [
+        "authored_contract_example",
+        "live_authenticated_evidence",
+        "unverified"
+      ],
+      "title": "Validation Basis",
+      "type": "string"
+    }
+  },
+  "required": [
+    "decision_id",
+    "message_ref",
+    "observed_at",
+    "validation_basis",
+    "findings"
+  ],
+  "title": "DetectionDecision",
+  "type": "object"
+}

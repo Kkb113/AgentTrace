@@ -1,0 +1,27 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "fixture_ref": {
+      "const": "authored_contract_example",
+      "title": "Fixture Ref",
+      "type": "string"
+    },
+    "message_ref": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/+=-]{0,255}$",
+      "title": "Message Ref",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "fixture_ref",
+    "message_ref"
+  ],
+  "title": "DetectionJob",
+  "type": "object"
+}

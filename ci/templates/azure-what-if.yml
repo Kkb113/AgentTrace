@@ -1,0 +1,18 @@
+# Optional later-stage template. No connection, identity or Azure grant is created here.
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: subscriptionId
+    type: string
+steps:
+  - task: AzureCLI@2
+    displayName: Group-scoped what-if using an approved WIF service connection
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), ne(variables['Build.Reason'], 'PullRequest'))
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: pscore
+      scriptLocation: inlineScript
+      useGlobalConfig: false
+      inlineScript: |
+        az deployment group what-if --subscription '${{ parameters.subscriptionId }}' --resource-group kb-agentdemo --template-file work/infra/main.json --parameters '@work/infra/validation.parameters.json' --only-show-errors
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

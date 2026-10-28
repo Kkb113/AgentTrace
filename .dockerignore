@@ -1,0 +1,11 @@
+.git
+.venv
+work
+outputs
+**/__pycache__
+**/*.egg-info
+**/.mypy_cache
+.env*
+node_modules
+dist
+build

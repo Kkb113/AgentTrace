@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "storage_policy": "Private artifact storage or ignored work/artifacts; never Git",
+  "components": [
+    {"component_id":"fakespot-weights","kind":"model_weights","state":"not_acquired","source_url":"https://huggingface.co/fakespot-ai/roberta-base-ai-text-detection-v1"},
+    {"component_id":"fakespot-tokenizer","kind":"tokenizer","state":"not_acquired","source_url":"https://huggingface.co/fakespot-ai/roberta-base-ai-text-detection-v1"},
+    {"component_id":"desklib-weights","kind":"model_weights","state":"not_acquired","source_url":"https://huggingface.co/desklib/ai-text-detector-v1.01"},
+    {"component_id":"desklib-tokenizer","kind":"tokenizer","state":"not_acquired","source_url":"https://huggingface.co/desklib/ai-text-detector-v1.01"},
+    {"component_id":"content-study-corpus","kind":"dataset","state":"not_acquired","source_url":"local:approved-independent-acquisition"},
+    {"component_id":"content-calibration","kind":"calibration","state":"not_acquired","source_url":"local:future-locked-calibration"},
+    {"component_id":"research-code","kind":"research_code","state":"not_acquired","source_url":"local:future-reviewed-upstream-commit"}
+  ]
+}

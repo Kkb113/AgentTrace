@@ -4,7 +4,7 @@
 - **Primary workspace:** `C:\AgentDetection`
 - **Repository:** [Kkb113/AgentTrace](https://github.com/Kkb113/AgentTrace)
 - **Plan date:** 28 October 2026
-- **Status:** Phase 0 completed with a live authenticated Claude/Exchange Send evidence path, two manual controls, and all nine exit criteria evidenced. Later product phases, statistical content scoring and release accuracy qualification have not started. See [feasibility report](docs/feasibility-report.md).
+- **Status:** Phases 0 and 1 are complete with recorded exit evidence. The foundation has reproducible local services and enforced PR validation. Phase 2 and later product work, statistical content scoring and release accuracy qualification remain unimplemented. See [foundation review](docs/repository-foundation.md) and [feasibility report](docs/feasibility-report.md).
 - **Delivery scope:** 15 phases, numbered Phase 0 through Phase 14.
 - **Product boundary:** Detection only. Two independent findings: email sent by an AI agent; email contains AI-generated content. English first for content; distinguish basic spelling/grammar assistance from generated drafts and substantial rewrites/translations.
 - **Priority:** Agent-sent detection is the primary release objective. Content detection is a required, measured best-effort capability; its accuracy does not determine whether the agent detector qualifies.
@@ -99,7 +99,7 @@ Draft creation, editing, mailbox reads, and other workflow activity may supply c
 | Keys and secrets | Azure Key Vault | Signing keys and required credentials; rotation and access auditing |
 | Hosting | Azure Container Apps Consumption; existing suitable registry or ACR Basic | Small CPU API/workers, separately bounded content inference, scale-to-zero where latency permits; no GPU prerequisite |
 | Observability | OpenTelemetry, Azure Monitor, Log Analytics | Sanitized traces, connector health, latency, and operational alerts |
-| Infrastructure and CI | Bicep and Azure DevOps pipelines, connected to GitHub | Repeatable deployment, secret-free CI, rollback, and artifact versioning |
+| Infrastructure and CI | Bicep; GitHub Actions for active PR checks; equivalent Azure Pipelines YAML | Owner selected GitHub Actions after Azure project-creation permission was denied. Shared gates provide reproducible, secret-free validation; protected WIF deployment connection is later authorized work |
 | Test tooling | pytest, Playwright, integration and scenario harnesses | Unit, contract, UI, adversarial, and end-to-end validation |
 
 Pin supported dependency versions during Phase 1. Keep one backend codebase, with separate attribution and content-worker processes and queues so slow model inference cannot delay agent evidence. Deterministic attribution requires no GPU. Start content scoring with pretrained CPU encoders; larger scoring models, supervised adaptation, and bounded GPU experiments are optional improvements after measuring their benefit and cost. No vector database is required. Model-based detection is itself AI processing and must satisfy the customer's data policy, even when self-hosted. AgentTrace has no email-generation endpoint or mail-sending credentials. Synthetic examples may be prepared separately using permitted existing tools; do not send real email to public detector demos or consumer AI services.
@@ -305,7 +305,7 @@ Evaluate the final message-level union of provenance and statistical flags, not 
 
 ## 4. Phase overview
 
-Phase 0 is **In progress**, with its actual exit review in [the feasibility report](docs/feasibility-report.md). Phases 1–14 are **Not started**. A phase is complete only when its exit criteria have recorded evidence. Prioritize the agent path through Phases 0–7, then agent decisions/UI/qualification in Phases 9–14. Phase 8 runs as a bounded secondary track; a poor content-accuracy result does not hold the agent path open. Its actual experiment, safety/isolation checks, and limitation report remain required for POC handover.
+Phases 0 and 1 are **Complete**, with exit reviews in [the feasibility report](docs/feasibility-report.md) and [the foundation review](docs/repository-foundation.md). Phases 2–14 are **Not started**. A phase is complete only when its exit criteria have recorded evidence. Prioritize the agent path through Phases 0–7, then agent decisions/UI/qualification in Phases 9–14. Phase 8 runs as a bounded secondary track; a poor content-accuracy result does not hold the agent path open. Its actual experiment, safety/isolation checks, and limitation report remain required for POC handover.
 
 | Phase | Focus | Primary dependency | Principal exit artifact |
 | --- | --- | --- | --- |
@@ -377,6 +377,8 @@ Phase 0 is **In progress**, with its actual exit review in [the feasibility repo
 
 **Objective:** Establish a maintainable codebase in `C:\AgentDetection` that can be built, tested, and deployed from a clean checkout.
 
+**Implementation decision:** The owner explicitly selected GitHub Actions for live PR checks after Azure DevOps returned TF50309 for project creation. Equivalent Azure Pipelines YAML is retained and calls the same validation commands. No Azure DevOps run or WIF connection is claimed; compile/test CI requires neither Azure credentials nor new resources. All six exits are evidenced in `config/foundation-exits.json`, [the foundation review](docs/repository-foundation.md) and [hosted PR validation](docs/evidence/foundation-ci-validation.json). The final PR head is subject to the same required checks before merge.
+
 **Implementation work**
 
 - Continue the existing working checkout and supplied GitHub repository without overwriting unrelated work. Keep this plan at the repository root.
@@ -427,12 +429,12 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 
 **Exit criteria**
 
-- [ ] Repository foundation and architecture decisions are reviewed and committed.
-- [ ] Clean-checkout setup and CI are reproducible.
-- [ ] Required checks run on a pull request.
-- [ ] No credentials, real email, or tenant-specific sensitive values are present in tracked files.
-- [ ] Model/data artifacts are versioned outside Git with a documented reproducibility and licensing procedure.
-- [ ] Product packages and deployment manifests contain no mail-send client, agent runtime, approval service, or workflow orchestration component.
+- [x] Repository foundation and architecture decisions are reviewed and committed.
+- [x] Clean-checkout setup and CI are reproducible.
+- [x] Required checks run on a pull request.
+- [x] No credentials, real email, or tenant-specific sensitive values are present in tracked files.
+- [x] Model/data artifacts are versioned outside Git with a documented reproducibility and licensing procedure.
+- [x] Product packages and deployment manifests contain no mail-send client, agent runtime, approval service, or workflow orchestration component.
 
 ## Phase 2 — Configure tenant access and secure identities
 

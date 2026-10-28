@@ -54,4 +54,4 @@ The machine-readable record is `config/feasibility-exits.json`.
 | Defined and resourced bounded secondary experiment | Met | Ten engineer-days, forty CPU-hours, zero default GPU/paid API; acquisition and promotion protocol |
 | Required Azure scope, reuse boundaries, basic sizing and incremental cost | Met | Explicit subscription/group checks, retail snapshot, illustrative $37.78/month pilot; no compute provisioned |
 
-The later G1Ã¢â‚¬â€œG9 and C1Ã¢â‚¬â€œC7 release obligations remain frozen and unmeasured. They are not Phase 0 exit claims. The next implementation work is the repository/product foundation and production-grade identity/collection design, followed by the separately bounded content experiment and independent qualification populations.
+The later G1-G9 and C1-C7 release obligations remain frozen and unmeasured. They are not Phase 0 exit claims. The next implementation work is the repository/product foundation and production-grade identity/collection design, followed by the separately bounded content experiment and independent qualification populations.

@@ -1,0 +1,69 @@
+{
+  "review_version": "1.1.0",
+  "status": "complete_with_local_fresh_install_and_enforced_pr_validation",
+  "active_ci": "github_actions_owner_selected_after_azure_project_permission_denial",
+  "exits": [
+    {
+      "id": "reviewed_repository_and_architecture",
+      "met": true,
+      "state": "reviewed_typed_contracts_read_only_boundaries_transactions_and_architecture_committed",
+      "evidence": [
+        "docs/adr/detection-contracts.md",
+        "docs/adr/local-storage-and-queues.md",
+        "docs/adr/identity-and-retention.md",
+        "docs/evidence/foundation-ci-validation.json"
+      ]
+    },
+    {
+      "id": "clean_checkout_and_ci_reproducible",
+      "met": true,
+      "state": "fresh_local_install_and_actual_github_checkout_build_runtime_checks_passed",
+      "evidence": [
+        "docs/runbooks/local-development.md",
+        "uv.lock",
+        "compose.yaml",
+        "docs/evidence/foundation-ci-validation.json"
+      ]
+    },
+    {
+      "id": "required_pull_request_checks",
+      "met": true,
+      "state": "five_real_pr_checks_passed_main_requires_same_provider_checks_and_prs",
+      "evidence": [
+        ".github/workflows/validation.yml",
+        "ci/azure-pipelines.yml",
+        "docs/evidence/foundation-ci-validation.json"
+      ]
+    },
+    {
+      "id": "no_sensitive_tracked_material",
+      "met": true,
+      "state": "secret_privacy_and_license_gates_passed_local_test_credential_rotated",
+      "evidence": [
+        "scripts/check-privacy.py",
+        "scripts/ci-checks.py",
+        "tests/security/test_credential_redaction.py"
+      ]
+    },
+    {
+      "id": "external_artifact_reproducibility",
+      "met": true,
+      "state": "separate_component_hash_and_rights_contracts_enforced_no_model_or_dataset_acquired",
+      "evidence": [
+        "config/artifact-catalog.json",
+        "docs/runbooks/artifact-review.md",
+        "tests/unit/test_artifact_policy.py"
+      ]
+    },
+    {
+      "id": "detection_only_product_and_manifests",
+      "met": true,
+      "state": "two_finding_contract_read_only_routes_and_package_boundary_gates_passed",
+      "evidence": [
+        "scripts/check-boundaries.py",
+        "packages/contracts/schemas/detection-decision.schema.json",
+        "infra/bicep/main.bicep"
+      ]
+    }
+  ]
+}
