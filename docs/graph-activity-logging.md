@@ -61,12 +61,22 @@ results alone cannot demonstrate cross-table data denial. Actual conditional rol
 readback and actual wrong-identity tests are recorded in the live validation report.
 [Granular RBAC](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/granular-rbac-use-case).
 
+This new workspace uses Azure's public TLS ingestion/query endpoints with Entra
+authorization. It does not inherit the storage account's operator-IP firewall and
+must not be described as a private endpoint deployment. Private networking is a
+separate production design decision with additional resources and cost. The original
+evidence account and Key Vault retain their existing firewall controls.
+
 ## Collection and interpretation
 
 The collector overlaps the previous event-time watermark by 24 hours and waits five
 minutes behind current time. Microsoft commonly delivers logs within about thirty
 minutes, with less common delays up to two hours; the overlap is intended to recover
-delayed arrivals. It is a finite replay
+delayed arrivals. Initial diagnostic routing can take about ninety minutes to start;
+do not repeatedly reconfigure a healthy destination during that startup interval.
+If no data arrives after twenty-four hours, follow Microsoft's routing troubleshooting
+guidance and preserve the observed gap. [Diagnostic startup and troubleshooting](https://learn.microsoft.com/en-us/azure/azure-monitor/data-collection/diagnostic-settings#expected-latency-after-creating-a-diagnostic-setting).
+It is a finite replay
 horizon, not a guarantee that every arbitrarily late event is collected. Current
 means the bounded query window was observed successfully, not that all provider
 events have arrived. Initial empty delivery stays `catching_up` with a pending reason.

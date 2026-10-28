@@ -1,5 +1,5 @@
 {
-  "executed_at": "2026-10-28T21:13:50.502406+00:00",
+  "executed_at": "2026-10-28T21:36:47.735855+00:00",
   "all_five_local_gates_pass": true,
   "primary_test_counts": {
     "unit": 216,
@@ -65,7 +65,7 @@
     },
     {
       "path": "scripts/verify-graph-activity.py",
-      "sha256": "07a146139c43c3dc0118534e390ff95bc6be1390a6ee4020c643263d3972422d"
+      "sha256": "b0d081c20a1a981b6eddf66b089365336bb5a6892dc9c434a0d385450a5a2a8e"
     },
     {
       "path": "scripts/validate-infrastructure.py",

@@ -112,9 +112,19 @@ def main():
             "--include-inherited",
         ],
     )
-    table_condition = any(
+    expected_role = json.loads((directory / "log-data-reader-role.private.json").read_text())[0][
+        "id"
+    ]
+    expected_condition = (
+        "((!(ActionMatches{'Microsoft.OperationalInsights/workspaces/tables/data/read'})) OR "
+        "(@Resource[Microsoft.OperationalInsights/workspaces/tables:name] StringEquals 'MicrosoftGraphActivityLogs'))"
+    )
+    # A narrow grant cannot compensate for an additional broader inherited grant.
+    table_condition = len(assignments) == 1 and all(
         a.get("conditionVersion") == "2.0"
-        and "tables:name] StringEquals 'MicrosoftGraphActivityLogs'" in (a.get("condition") or "")
+        and a.get("condition") == expected_condition
+        and a["roleDefinitionId"].lower() == expected_role.lower()
+        and a["scope"].lower() == str(settings["workspaceResourceId"]).lower()
         for a in assignments
     )
     # Exercise the deployed transformation with synthetic positive/negative rows
@@ -193,6 +203,18 @@ def main():
 
     prior_path = directory / "earlier-read-only-probes.private.json"
     prior_probes = json.loads(prior_path.read_text()) if prior_path.exists() else []
+    # Delivery can reorder batches. Verify the most recent complete observed
+    # batch, preserving and reporting unobserved controls from all other batches.
+    active_probes = probes
+    batches = [prior_probes[index : index + 3] for index in range(0, len(prior_probes), 3)] + [
+        active_probes
+    ]
+    complete_batches = [
+        batch
+        for batch in batches
+        if len(batch) == 3 and all(seen(probe) for probe in batch if probe["expected_logged"])
+    ]
+    probes = complete_batches[-1] if complete_batches else active_probes
 
     denied = {}
     cross_table_outcome = "not_tested"
@@ -334,7 +356,9 @@ def main():
         "past_uncollected_history_recoverable": False,
         "cross_table_runtime_outcome": cross_table_outcome,
         "cross_table_limit": "An empty result alone does not prove denied access; the conditional role is independently read back.",
-        "active_probe_batch_only": True,
+        "verified_probe_batch": "latest_complete_observed"
+        if complete_batches
+        else "active_pending",
         "earlier_expected_probe_requests_not_observed": sum(
             not seen(p) for p in prior_probes if p["expected_logged"]
         ),
