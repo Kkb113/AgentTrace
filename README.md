@@ -8,7 +8,7 @@ The owner's Human policy is inferred manual sending: a complete inspection finds
 
 Phase 0 of the Outlook-native baseline is complete, with [four exit criteria evidenced](config/outlook-baseline-exits.json). Its [frozen contract](config/outlook-production-baseline.json) and [implementation plan](implementation.md) define scope, colors, data/retention, ownership, permissions and release gates. The [baseline review](docs/outlook-production-baseline.md) records actual feasibility evidence and open dependencies.
 
-The working demo uses experimental binary header rules, including a Human fallback. It is preserved separately; it does not establish production accuracy. The narrow authenticated Microsoft/Claude Exchange Send route has actual source evidence. Category writes, the new production runner and accuracy qualification remain later milestones.
+The working demo uses experimental binary header rules, including a Human fallback. It is preserved separately; it does not establish production accuracy. The narrow authenticated Microsoft/Claude Exchange Send route has actual source evidence. Phase 1 is complete, with [four exits validated](docs/outlook-runtime-review.md). Its separate runner processes synthetic metadata into durable Unknown previews. Mailbox synchronization, qualified actor rules and category writes remain later milestones. See the [runtime runbook](docs/runbooks/outlook-runtime.md) for preparation, commands and recovery behavior.
 
 ## Run the existing terminal demo
 

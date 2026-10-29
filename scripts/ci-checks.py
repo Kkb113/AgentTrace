@@ -159,6 +159,8 @@ def main() -> int:
         [PYTHON, "scripts/export-locks.py", "--check"],
         [PYTHON, "scripts/export-contracts.py", "--check"],
         [PYTHON, "scripts/verify-outlook-baseline.py"],
+        [PYTHON, "scripts/export-outlook-contracts.py", "--check"],
+        [PYTHON, "scripts/check-outlook-boundaries.py"],
         [
             PYTHON,
             "-m",
