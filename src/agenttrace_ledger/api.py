@@ -94,6 +94,8 @@ def create_app(
         try:
             with ledger.database.connect() as connection:
                 row = connection.execute("SELECT version FROM ledger_schema").fetchone()
+                connection.execute("SELECT history_epoch,revision FROM ledger_inputs LIMIT 0")
+                connection.execute("SELECT source_event_at FROM ledger_messages LIMIT 0")
             available = bool(row and row["version"] == 1)
         except (StorageUnavailable, OSError, ValueError):
             available = False

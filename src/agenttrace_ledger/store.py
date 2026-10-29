@@ -758,11 +758,12 @@ class EvidenceLedger:
             except ValidationError:
                 raise LedgerError("invalid_persisted_input_schema") from None
             prior = c.execute(
-                "SELECT input_ref,revision FROM ledger_inputs WHERE scope_ref=%s AND message_ref=%s AND expires_at>%s ORDER BY revision DESC LIMIT 1",
+                "SELECT input_ref,revision,history_epoch FROM ledger_inputs WHERE scope_ref=%s AND message_ref=%s AND expires_at>%s ORDER BY revision DESC LIMIT 1",
                 (scope, message, now),
             ).fetchone()
             revision = prior["revision"] + 1 if prior else 1
             prior_ref = prior["input_ref"] if prior else None
+            epoch = prior["history_epoch"] if prior else ref
             expires = now + timedelta(days=30)
             snapshot = {
                 "view": view,
@@ -774,6 +775,7 @@ class EvidenceLedger:
                             "message_ref": message,
                             "version_ref": version,
                             "revision": revision,
+                            "history_epoch": epoch,
                             "prior_input_ref": prior_ref,
                             "recorded_at": now,
                             "expires_at": expires,
@@ -784,13 +786,14 @@ class EvidenceLedger:
                 ),
             }
             c.execute(
-                "INSERT INTO ledger_inputs(input_ref,scope_ref,message_ref,version_ref,schema_version,rule_version,revision,prior_input_ref,view_cipher,view_digest,recorded_at,expires_at) VALUES(%s,%s,%s,%s,'1.0','correlation-v1',%s,%s,%s,%s,%s,%s)",
+                "INSERT INTO ledger_inputs(input_ref,scope_ref,message_ref,version_ref,schema_version,rule_version,revision,history_epoch,prior_input_ref,view_cipher,view_digest,recorded_at,expires_at) VALUES(%s,%s,%s,%s,'1.0','correlation-v1',%s,%s,%s,%s,%s,%s,%s)",
                 (
                     ref,
                     scope,
                     message,
                     version,
                     revision,
+                    epoch,
                     prior_ref,
                     self.cipher.seal(snapshot, context="ledger-input:" + str(ref)),
                     fingerprint(self._key(tenant), tenant, "input-view", snapshot),
@@ -829,6 +832,7 @@ class EvidenceLedger:
                     {
                         "input_ref": str(row["input_ref"]),
                         "revision": row["revision"],
+                        "history_epoch": str(row["history_epoch"]),
                         "input_digest": row["view_digest"],
                         "prior_input_ref": str(row["prior_input_ref"])
                         if row["prior_input_ref"]

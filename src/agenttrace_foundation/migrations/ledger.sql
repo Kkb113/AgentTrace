@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS ledger_inputs (
     schema_version text NOT NULL CHECK(schema_version='1.0'),
     rule_version text NOT NULL CHECK(rule_version='correlation-v1'),
     revision integer NOT NULL CHECK(revision>0),
+    history_epoch uuid NOT NULL DEFAULT gen_random_uuid(),
     prior_input_ref uuid,
     view_cipher bytea NOT NULL, view_digest text NOT NULL CHECK(view_digest ~ '^[a-f0-9]{64}$'),
     recorded_at timestamptz NOT NULL DEFAULT now(), expires_at timestamptz NOT NULL DEFAULT now()+interval '30 days',
@@ -87,7 +88,18 @@ CREATE TABLE IF NOT EXISTS ledger_inputs (
 -- Also upgrade an empty development preview without dropping any stored records.
 ALTER TABLE ledger_inputs ADD COLUMN IF NOT EXISTS revision integer NOT NULL DEFAULT 1 CHECK(revision>0);
 ALTER TABLE ledger_inputs ALTER COLUMN revision DROP DEFAULT;
-CREATE UNIQUE INDEX IF NOT EXISTS ledger_input_revisions ON ledger_inputs(scope_ref,message_ref,revision);
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='ledger_inputs' AND column_name='history_epoch') THEN
+        LOCK TABLE ledger_inputs IN ACCESS EXCLUSIVE MODE;
+        IF EXISTS(SELECT 1 FROM ledger_inputs) THEN
+            RAISE EXCEPTION 'ledger_existing_input_epoch_migration_requires_review';
+        END IF;
+        ALTER TABLE ledger_inputs ADD COLUMN history_epoch uuid NOT NULL DEFAULT gen_random_uuid();
+    END IF;
+END $$;
+DROP INDEX IF EXISTS ledger_input_revisions;
+CREATE UNIQUE INDEX IF NOT EXISTS ledger_input_epoch_revisions ON ledger_inputs(scope_ref,message_ref,history_epoch,revision);
 CREATE INDEX IF NOT EXISTS ledger_receipts_message ON ledger_receipts(scope_ref,message_ref,version_ref);
 CREATE INDEX IF NOT EXISTS ledger_inputs_message ON ledger_inputs(scope_ref,message_ref,recorded_at);
 CREATE OR REPLACE FUNCTION ledger_input_binding() RETURNS trigger LANGUAGE plpgsql AS $$
@@ -95,8 +107,11 @@ BEGIN
     IF NOT EXISTS(SELECT 1 FROM ledger_messages WHERE scope_ref=NEW.scope_ref AND message_ref=NEW.message_ref AND version_ref=NEW.version_ref AND expires_at>now()) THEN
         RAISE EXCEPTION 'ledger_input_message_binding_required';
     END IF;
-    IF NEW.prior_input_ref IS NOT NULL AND NOT EXISTS(SELECT 1 FROM ledger_inputs WHERE input_ref=NEW.prior_input_ref AND scope_ref=NEW.scope_ref AND message_ref=NEW.message_ref AND expires_at>now()) THEN
+    IF NEW.prior_input_ref IS NOT NULL AND NOT EXISTS(SELECT 1 FROM ledger_inputs WHERE input_ref=NEW.prior_input_ref AND scope_ref=NEW.scope_ref AND message_ref=NEW.message_ref AND history_epoch=NEW.history_epoch AND revision=NEW.revision-1 AND expires_at>now()) THEN
         RAISE EXCEPTION 'ledger_prior_input_binding_required';
+    END IF;
+    IF NEW.prior_input_ref IS NULL AND (NEW.revision<>1 OR EXISTS(SELECT 1 FROM ledger_inputs WHERE scope_ref=NEW.scope_ref AND message_ref=NEW.message_ref AND expires_at>now())) THEN
+        RAISE EXCEPTION 'ledger_new_epoch_requires_no_retained_history';
     END IF;
     RETURN NEW;
 END $$;

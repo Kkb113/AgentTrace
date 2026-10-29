@@ -21,6 +21,7 @@ ingestion integration and a real TCP HTTP service restart.
 | Local FastAPI dependency resolution and established token-role restrictions | Runtime-resolved dependencies; existing app-viewer boundary preserved; issuer enrollment/signature checked separately; delegated investigator required for reassessment |
 | Altered event replay could roll back its own conflict record on exception | Conflict is committed before returning the rejection; original receipt/history unchanged |
 | Concurrent transaction-start times are not revision order | Scope lock, explicit revision sequence, post-lock evaluation time and metadata-bound history |
+| Expired but unpurged revisions can collide with a new assessment | Explicit authenticated history epochs; retained history extends its prior revision and expiry can start a new epoch without waiting for purge |
 | Encryption/hash without metadata binding leaves a substitution gap | Observation and input bindings are authenticated; privileged metadata-tampering regressions fail closed |
 | Database rollback is not detected by a database-only hash | Independently held authenticated anchor validates the retained history prefix; explicit owner/OS/key-compromise limits |
 | Identical bodies, subjects and Internet Message-IDs are ambiguous | Scoped distinct copies, exact-versus-candidate classes, explicit mappings and no implicit actor propagation |
@@ -40,7 +41,7 @@ tests. Graph activity delivery remains explicitly unqualified and was not used t
 manufacture a passing result. Existing live Exchange audit feasibility is independent;
 the ledger tests use synthetic source records and do not establish release accuracy.
 
-All five exits passed with 252 unit/security tests, 52 subtests and 121 integration
+All five exits passed with 252 unit/security tests, 52 subtests and 123 integration
 tests across the full repository gates. CI also validates pull requests targeting
 managed `codex/**` branches so this phase can be reviewed separately from its pending
 Graph-source dependency. Workflow permissions remain read-only and no cloud/live

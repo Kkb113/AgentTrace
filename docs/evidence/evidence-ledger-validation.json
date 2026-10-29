@@ -1,9 +1,9 @@
 {
-  "executed_at": "2026-10-29T07:12:54.443181+00:00",
+  "executed_at": "2026-10-29T07:41:08.910788+00:00",
   "all_five_local_gates_pass": true,
   "primary_test_counts": {
     "unit": 252,
-    "integration": 121
+    "integration": 123
   },
   "additional_unit_subtests": 52,
   "exits": [
@@ -68,7 +68,9 @@
         "test_snapshot_reference_is_not_a_claim_that_bytes_or_model_replay_are_available": true,
         "test_expired_raw_and_decision_records_are_physically_purged_by_operator_only": true,
         "test_ambiguous_extraction_does_not_acquire_authored_provenance": true,
-        "test_unavailable_content_does_not_block_independent_exact_action_evidence": true
+        "test_unavailable_content_does_not_block_independent_exact_action_evidence": true,
+        "test_expired_unpurged_history_cannot_block_a_new_reassessment_epoch": true,
+        "test_nonempty_pre_epoch_preview_requires_review_and_preserves_records": true
       }
     }
   ],
@@ -80,7 +82,7 @@
     },
     {
       "path": "src/agenttrace_ledger/api.py",
-      "sha256": "7254eb608601c2f6c8fc1cd16b76e7b06e7ce39b1e47d464ea53f1798a54f500"
+      "sha256": "1b854709cd4aa662a58380a4d24fd2dc4b5a26a803b8ee777d516e35945a16b1"
     },
     {
       "path": "src/agenttrace_ledger/bridge.py",
@@ -108,11 +110,11 @@
     },
     {
       "path": "src/agenttrace_ledger/store.py",
-      "sha256": "7f93e6ca3ab729e858dc12c8ca4d5950ad87b1025bc46e041444fe1c49d4baf8"
+      "sha256": "d0ae16dcb53c56f268d09f984b859610532f9d8479ae697d1d5392f1aada0329"
     },
     {
       "path": "src/agenttrace_foundation/migrations/ledger.sql",
-      "sha256": "68750bcbc1cd12c12c7a4e45c2571aacf424b8faa48f00cee2d2958a9776398a"
+      "sha256": "9475c1538460d73e6b0b090b240b121206411a0d7062dbe5817085362cf206ce"
     },
     {
       "path": "src/agenttrace_foundation/database.py",
@@ -120,7 +122,7 @@
     },
     {
       "path": "src/agenttrace_foundation/database_access.py",
-      "sha256": "8e72c1da6e6877c78e87fbb32d8f4d983bd3fb39800851d77d352ca21e94fa84"
+      "sha256": "721148c99afee5d987deff170c9d67d21ac4e6a1402518c7b0f332733f4feb77"
     },
     {
       "path": "src/agenttrace_foundation/settings.py",
@@ -160,15 +162,15 @@
     },
     {
       "path": "config/evidence-ledger-exits.json",
-      "sha256": "039c96d739de33ed8e2d1ee1f5d40bde11d4ceb9d8cd0c3a5dd1d90c2714c1d4"
+      "sha256": "977c38c906a59acb17ba728fd62f7bac4227f10c9799321294b1365172973112"
     },
     {
       "path": "docs/evidence-schema.md",
-      "sha256": "d3378663bf408f46a29f815ffc8304b3ce59f562bb989083bede6a0afc1b89cf"
+      "sha256": "9561f7bb76849dd8e9c2c5140230bba681c515ef3b6cfbb3d60ee576b5b8594f"
     },
     {
       "path": "docs/correlation-rules.md",
-      "sha256": "779deac4949c1c109d2bbb0591019c035f034fd6b60223d0af6cb39c3f62adb2"
+      "sha256": "2026fc56b957c68313bed14e13f35b1275b7965bfac136438282f4f22c5bad73"
     },
     {
       "path": "docs/runbooks/evidence-ledger.md",
@@ -177,6 +179,10 @@
     {
       "path": "tests/integration/test_evidence_ledger.py",
       "sha256": "9ad4b423eeb514c4753b83a57aaa7a355d6a153a085e47f09f98d1b370de56ad"
+    },
+    {
+      "path": "tests/integration/test_ledger_history_retention.py",
+      "sha256": "bd2a1075df164773010afce6c51750f0fd24ab654162b28f7e2e74731b84ffb8"
     },
     {
       "path": "tests/integration/test_ledger_ingestion_bridge.py",

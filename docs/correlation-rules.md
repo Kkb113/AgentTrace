@@ -69,6 +69,9 @@ old results are not edited. Consumers must not use a historical snapshot as a cu
 trust verdict. The later decision worker is responsible for scheduling reassessment
 of cached product findings; this milestone supplies the current-trust gate and
 append-only reassessment operation.
+Revision numbers are ordered within an authenticated history epoch. Once its last
+retained input expires, the next assessment starts a new epoch; old expired rows can
+remain until physical purge without blocking that assessment or extending retention.
 
 ## Ingestion integration
 

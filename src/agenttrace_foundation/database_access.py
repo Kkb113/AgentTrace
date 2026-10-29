@@ -205,7 +205,7 @@ def configure_ledger_access(connection: Connection[DictRow]) -> None:
         "GRANT SELECT(scope_ref,message_ref,version_ref,source_ref,source_event_ref,source_schema_version,copy_role,message_state,observed_at,expires_at) ON ledger_messages TO agenttrace_api,agenttrace_attribution"
     )
     connection.execute(
-        "GRANT SELECT(input_ref,scope_ref,message_ref,version_ref,schema_version,rule_version,revision,prior_input_ref,recorded_at,expires_at) ON ledger_inputs TO agenttrace_api,agenttrace_attribution"
+        "GRANT SELECT(input_ref,scope_ref,message_ref,version_ref,schema_version,rule_version,history_epoch,revision,prior_input_ref,recorded_at,expires_at) ON ledger_inputs TO agenttrace_api,agenttrace_attribution"
     )
 
 

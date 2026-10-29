@@ -15,7 +15,7 @@ findings, `agent_send_attribution` and `content_assessment`.
 | Message observation | Scope, source/event/version references, case-sensitive provider identifier, observed state/copy role, source and capture times | Sensitive identifiers become tenant-keyed fingerprints; canonical material and its metadata binding are encrypted |
 | Issuer/key | Exact application client and subject, allowed fact kinds, pinned Ed25519 public key, issue-time validity | Operator-only append; rotation adds a new key; revocation adds a permanent record |
 | Signed evidence | Issuer, event UUID, exact scope/message/version, occurrence/issue/expiry times, schema and discriminated fact | Signature checked against enrolled identity/capability; envelope encrypted; seven-day maximum |
-| Input revision | Reconstructed correlation view, source/schema/digest references, rule version, prior input and revision number | Encrypted and authenticated metadata, append-only, thirty-day maximum |
+| Input revision | Reconstructed correlation view, source/schema/digest references, rule version, history epoch, prior input and revision number | Encrypted and authenticated metadata, append-only, thirty-day maximum |
 | History anchor | Ordered input references/digests and expiry, authenticated with the tenant key | Held independently by an operator; expires with its earliest retained input |
 
 Frozen JSON Schemas are in `packages/contracts/schemas/`: `signed-evidence`,
@@ -108,6 +108,11 @@ are bound inside authenticated material. Sealed input digests and an independent
 held history anchor detect modification and rollback in their stated scope. Concurrent
 submissions, revocations and revision creation serialize under a scope transaction
 lock; revision order does not rely on a transaction's pre-lock start timestamp.
+When all retained history expires, a new authenticated epoch starts at revision one.
+Expired rows awaiting physical cleanup cannot collide with that new epoch. Live
+epochs must extend their prior revision; they cannot silently fork or reset through
+the application. A nonempty pre-epoch development preview fails migration for explicit
+review rather than silently relabeling authenticated history.
 
 This is application-level append-only storage with tamper detection, not a claim of
 WORM storage or protection from a database owner changing DDL plus compromising the
