@@ -1,0 +1,340 @@
+{
+  "$defs": {
+    "Category": {
+      "additionalProperties": false,
+      "properties": {
+        "color": {
+          "enum": [
+            "red",
+            "green",
+            "yellow"
+          ],
+          "title": "Color",
+          "type": "string"
+        },
+        "name": {
+          "enum": [
+            "AI Agent",
+            "Human",
+            "Unknown"
+          ],
+          "title": "Name",
+          "type": "string"
+        },
+        "preset": {
+          "enum": [
+            "preset0",
+            "preset4",
+            "preset3"
+          ],
+          "title": "Preset",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "color",
+        "preset"
+      ],
+      "title": "Category",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "activation": {
+      "const": "record_utc_on_first_production_start",
+      "title": "Activation",
+      "type": "string"
+    },
+    "annotation_ownership": {
+      "const": "enrolled_ids_names_colors_only",
+      "title": "Annotation Ownership",
+      "type": "string"
+    },
+    "azure_region": {
+      "const": "eastus",
+      "title": "Azure Region",
+      "type": "string"
+    },
+    "azure_resource_group": {
+      "const": "kb-agentdemo",
+      "title": "Azure Resource Group",
+      "type": "string"
+    },
+    "backfill": {
+      "const": "explicit_bounded_operator_request_only",
+      "title": "Backfill",
+      "type": "string"
+    },
+    "categories": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "$ref": "#/$defs/Category"
+        },
+        {
+          "$ref": "#/$defs/Category"
+        },
+        {
+          "$ref": "#/$defs/Category"
+        }
+      ],
+      "title": "Categories",
+      "type": "array"
+    },
+    "category_collision": {
+      "const": "stop_until_owner_enrolls_or_chooses_new_names",
+      "title": "Category Collision",
+      "type": "string"
+    },
+    "category_lifetime_days": {
+      "const": 30,
+      "title": "Category Lifetime Days",
+      "type": "integer"
+    },
+    "category_writes_enabled": {
+      "const": false,
+      "title": "Category Writes Enabled",
+      "type": "boolean"
+    },
+    "clients": {
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "const": "outlook_web",
+          "type": "string"
+        },
+        {
+          "const": "new_outlook_windows",
+          "type": "string"
+        }
+      ],
+      "title": "Clients",
+      "type": "array"
+    },
+    "complete_inspection_no_automation_category": {
+      "const": "Human",
+      "title": "Complete Inspection No Automation Category",
+      "type": "string"
+    },
+    "confidence_level": {
+      "maximum": 0.95,
+      "minimum": 0.95,
+      "title": "Confidence Level",
+      "type": "number"
+    },
+    "decision_retention_days": {
+      "const": 30,
+      "title": "Decision Retention Days",
+      "type": "integer"
+    },
+    "default_category": {
+      "const": "Unknown",
+      "title": "Default Category",
+      "type": "string"
+    },
+    "demo_predictions_eligible_for_write": {
+      "const": false,
+      "title": "Demo Predictions Eligible For Write",
+      "type": "boolean"
+    },
+    "false_human_upper_bound": {
+      "maximum": 0.001,
+      "minimum": 0.001,
+      "title": "False Human Upper Bound",
+      "type": "number"
+    },
+    "generic_api_category": {
+      "const": "Unknown",
+      "title": "Generic Api Category",
+      "type": "string"
+    },
+    "host": {
+      "const": "designated_always_on_windows_host_not_yet_enrolled",
+      "title": "Host",
+      "type": "string"
+    },
+    "human_result_basis": {
+      "const": "inferred_manual_client_not_proof_of_executor",
+      "title": "Human Result Basis",
+      "type": "string"
+    },
+    "human_rule_status": {
+      "const": "policy_feasible_accuracy_qualification_pending",
+      "title": "Human Rule Status",
+      "type": "string"
+    },
+    "incomplete_inspection_category": {
+      "const": "Unknown",
+      "title": "Incomplete Inspection Category",
+      "type": "string"
+    },
+    "live_diagnostic_access": {
+      "const": "owner_authorized_incoming_metadata_only",
+      "title": "Live Diagnostic Access",
+      "type": "string"
+    },
+    "new_cloud_resources_required": {
+      "const": false,
+      "title": "New Cloud Resources Required",
+      "type": "boolean"
+    },
+    "new_permissions_authorized": {
+      "const": false,
+      "title": "New Permissions Authorized",
+      "type": "boolean"
+    },
+    "no_body_or_attachment_analysis": {
+      "const": true,
+      "title": "No Body Or Attachment Analysis",
+      "type": "boolean"
+    },
+    "no_send_or_draft_execution": {
+      "const": true,
+      "title": "No Send Or Draft Execution",
+      "type": "boolean"
+    },
+    "no_standalone_application": {
+      "const": true,
+      "title": "No Standalone Application",
+      "type": "boolean"
+    },
+    "non_ai_automation_category": {
+      "const": "Unknown",
+      "title": "Non Ai Automation Category",
+      "type": "string"
+    },
+    "positive_agent_fpr_upper_bound": {
+      "maximum": 0.001,
+      "minimum": 0.001,
+      "title": "Positive Agent Fpr Upper Bound",
+      "type": "number"
+    },
+    "profile": {
+      "const": "outlook_native_production_baseline",
+      "title": "Profile",
+      "type": "string"
+    },
+    "qualification_data": {
+      "const": "synthetic_only",
+      "title": "Qualification Data",
+      "type": "string"
+    },
+    "qualification_status": {
+      "const": "not_measured",
+      "title": "Qualification Status",
+      "type": "string"
+    },
+    "raw_retention_days": {
+      "const": 7,
+      "title": "Raw Retention Days",
+      "type": "integer"
+    },
+    "receiving_routes": {
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "const": "gmail_to_outlook",
+          "type": "string"
+        },
+        {
+          "const": "outlook_to_outlook",
+          "type": "string"
+        }
+      ],
+      "title": "Receiving Routes",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "setup_permission_proposal": {
+      "const": "manual_or_temporary_MailboxSettings.ReadWrite",
+      "title": "Setup Permission Proposal",
+      "type": "string"
+    },
+    "state": {
+      "const": "planned_local_sqlite_single_host",
+      "title": "State",
+      "type": "string"
+    },
+    "supported_agent_positive_minimum": {
+      "const": 1000,
+      "title": "Supported Agent Positive Minimum",
+      "type": "integer"
+    },
+    "supported_agent_recall_target": {
+      "maximum": 0.99,
+      "minimum": 0.99,
+      "title": "Supported Agent Recall Target",
+      "type": "number"
+    },
+    "unattended_data_boundary": {
+      "const": "must_be_recorded_before_enablement",
+      "title": "Unattended Data Boundary",
+      "type": "string"
+    },
+    "untrusted_declaration_category": {
+      "const": "Unknown",
+      "title": "Untrusted Declaration Category",
+      "type": "string"
+    },
+    "writer_permission_proposal": {
+      "const": "mailbox_scoped_Application_Mail.ReadWrite",
+      "title": "Writer Permission Proposal",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "profile",
+    "categories",
+    "receiving_routes",
+    "clients",
+    "activation",
+    "backfill",
+    "category_collision",
+    "category_lifetime_days",
+    "raw_retention_days",
+    "decision_retention_days",
+    "qualification_data",
+    "live_diagnostic_access",
+    "unattended_data_boundary",
+    "host",
+    "state",
+    "default_category",
+    "complete_inspection_no_automation_category",
+    "incomplete_inspection_category",
+    "human_result_basis",
+    "untrusted_declaration_category",
+    "generic_api_category",
+    "non_ai_automation_category",
+    "human_rule_status",
+    "demo_predictions_eligible_for_write",
+    "category_writes_enabled",
+    "new_permissions_authorized",
+    "writer_permission_proposal",
+    "setup_permission_proposal",
+    "annotation_ownership",
+    "no_send_or_draft_execution",
+    "no_body_or_attachment_analysis",
+    "no_standalone_application",
+    "azure_resource_group",
+    "azure_region",
+    "new_cloud_resources_required",
+    "positive_agent_fpr_upper_bound",
+    "confidence_level",
+    "supported_agent_recall_target",
+    "supported_agent_positive_minimum",
+    "false_human_upper_bound",
+    "qualification_status"
+  ],
+  "title": "OutlookBaseline",
+  "type": "object"
+}

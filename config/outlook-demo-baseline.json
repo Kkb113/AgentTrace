@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "profile": "archived_experimental_demo",
+  "production_write_eligible": false,
+  "source_sha256": {
+    "scripts/watch-incoming-mail.py": "1435b283b64ccc39df3e64ad2cd3a5937821b4c141a21fededd220ccca0c2bc5",
+    "src/agenttrace_feasibility/mail_monitor.py": "db4baa3378b1992c53b1d336e3de9fc0f236bd5746191669ed1b3d47fd698f77",
+    "tests/test_mail_monitor.py": "f05a58c22b999debc9328179792078a09f0687c6a89cd34a822145a137e65706"
+  },
+  "basis": "Working terminal demonstration preserved separately; predictions are not production qualification."
+}
