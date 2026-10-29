@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "profile": "outlook_foundation",
+  "scope": {
+    "tenant_id": "00000000-0000-0000-0000-000000000001",
+    "mailbox_id": "00000000-0000-0000-0000-000000000002"
+  },
+  "state_directory": "REPLACE_WITH_AN_ABSOLUTE_PRIVATE_LOCAL_DIRECTORY",
+  "mode": "dry_run",
+  "sync_enabled": true,
+  "reader_identity": {
+    "client_id": "00000000-0000-0000-0000-000000000003",
+    "certificate_thumbprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+  },
+  "sync_poll_seconds": 30,
+  "folder_refresh_seconds": 300,
+  "sync_operations_per_cycle": 10,
+  "page_size": 100,
+  "lease_seconds": 120,
+  "backfill_since": null,
+  "data_boundary": "synthetic_only",
+  "synthetic_subject_prefix": "AgentTrace synthetic test:",
+  "production_positive_rules": []
+}

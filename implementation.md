@@ -78,7 +78,7 @@ Keep the following distinct: independent test ground truth, vendor/source observ
 
 ## 3. Small implementation and operational design
 
-The separate runner is scripts/monitor-outlook-mail.py (also installed as agenttrace-outlook), backed by src/agenttrace_outlook/. Phase 1 implements validated synthetic fixture replay and durable Unknown previews; live synchronization, qualified actor rules and category writes remain later deliverables. See the [runtime runbook](docs/runbooks/outlook-runtime.md). Keep modules focused on configuration, authentication, mailbox synchronization, header parsing, evidence adapters, decisions, durable state, category updates and process supervision. Reuse the existing transport/authentication/audit code only after reviewing its production assumptions; do not copy the entire demo loop into a new filename.
+The separate runner is scripts/monitor-outlook-mail.py (also installed as agenttrace-outlook), backed by src/agenttrace_outlook/. Phase 1 implements validated synthetic fixture replay and durable Unknown previews; Phase 2 adds read-only mailbox synchronization; qualified actor rules and category writes remain later deliverables. See the [runtime runbook](docs/runbooks/outlook-runtime.md). Keep modules focused on configuration, authentication, mailbox synchronization, header parsing, evidence adapters, decisions, durable state, category updates and process supervision. Reuse the existing transport/authentication/audit code only after reviewing its production assumptions; do not copy the entire demo loop into a new filename.
 
 | Area | Minimal design |
 | --- | --- |
@@ -173,7 +173,7 @@ Every phase has an objective, implementation scope, expected outcomes, validatio
 | --- | --- | --- |
 | 0 | Freeze Outlook-native production scope and source feasibility | Complete; [review](docs/outlook-production-baseline.md), [exit evidence](docs/evidence/outlook-production-baseline-validation.json) |
 | 1 | Separate production runner, contracts and durable state foundation | Complete; [review](docs/outlook-runtime-review.md), [exit evidence](docs/evidence/outlook-runtime-validation.json) |
-| 2 | Reliable incoming-mail synchronization and restart recovery | Not started for new runner |
+| 2 | Reliable incoming-mail synchronization and restart recovery | Complete; [review](docs/outlook-sync-review.md), [exit evidence](docs/evidence/outlook-sync-validation.json) |
 | 3 | Qualified AI/human evidence rules and conservative Unknown policy | Existing narrow audit route reusable; new qualification open |
 | 4 | Independent accuracy and adversarial validation in dry-run | Not complete |
 | 5 | Scoped category permissions, ownership and setup preview | Not started; no new grants |
@@ -248,10 +248,12 @@ Executed evidence: [engineering review](docs/outlook-runtime-review.md), [valida
 
 **Exit criteria**
 
-- [ ] Controlled scenarios account for all observable messages or explicit unrecoverable gaps.
-- [ ] No fixed page/session cap silently skips mail; backlogs remain durable and visible.
-- [ ] Restart/move/replay tests yield one logical message decision per relevant version.
-- [ ] Category-generated delta events do not create decision/write loops.
+- [x] Controlled scenarios account for all observable messages or explicit unrecoverable gaps.
+- [x] No fixed page/session cap silently skips mail; backlogs remain durable and visible.
+- [x] Restart/move/replay tests yield one logical message decision per relevant version.
+- [x] Category-generated delta events do not create decision/write loops.
+
+Executed evidence: [engineering review](docs/outlook-sync-review.md), [clean-source validation](docs/evidence/outlook-sync-validation.json), [live move/restart evidence](docs/evidence/outlook-sync-live-validation.json) and [operations](docs/runbooks/outlook-mailbox-sync.md). This closes read-only synchronization; qualified actor rules and category writes remain later phases.
 
 ## Phase 3 — Qualify sender-evidence rules
 
@@ -420,4 +422,4 @@ Prefer understandable deterministic source rules to an unexplained score. Do not
 
 Each phase review records tested revision, run IDs, actual versus simulated data, open defects, category-write status, accuracy/coverage, latency and cost. Freeze no claim from a green authored suite alone. Use descriptive file/module names and preserve prior evidence/demo behavior. No extra frontend, API, LLM, Gmail-receiving integration or cloud platform is needed to satisfy this roadmap.
 
-Phase 0 now has a frozen validated baseline, an archived demo and recorded feasibility/exit evidence. The running demo, mailbox permissions and Outlook categories remain unchanged. The separate Phase 1 foundation processes synthetic fixtures into durable Unknown previews; mailbox synchronization, qualified actor rules and category writes remain gated by later phases.
+Phase 0 now has a frozen validated baseline, an archived demo and recorded feasibility/exit evidence. The running demo, mailbox permissions and Outlook categories remain unchanged. The separate runner supports synthetic fixture replay and durable read-only incoming-mail synchronization. Qualified actor rules and category writes remain gated by later phases.

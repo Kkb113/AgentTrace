@@ -25,9 +25,12 @@ ALLOWED_IMPORTS = {
     "urllib",
     "uuid",
     "pydantic",
+    "random",
     "agenttrace_feasibility.validation",
     "agenttrace_foundation.workload_identity",
+    "agenttrace_foundation.authorization",
     "agenttrace_ingestion.transport",
+    "agenttrace_ingestion.contracts",
 }
 
 

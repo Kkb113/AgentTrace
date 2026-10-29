@@ -15,8 +15,10 @@ from agenttrace_feasibility.validation import InputError, canonical_bytes, load_
 from .config import read_config
 from .contracts import FixtureBatch
 from .errors import OutlookError
+from .reader import certificate_reader
 from .runner import run_once
 from .state import StateStore
+from .synchronizer import Synchronizer
 
 
 def emit(event: str, **fields: object) -> None:
@@ -32,6 +34,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Import a bounded synthetic metadata batch, never decisions or message bodies.",
     )
     parser.add_argument("--once", action="store_true")
+    parser.add_argument(
+        "--retry-failed-sync",
+        action="store_true",
+        help="Explicitly requeue blocked/dead-letter read jobs without discarding cursors or historical gaps.",
+    )
     parser.add_argument(
         "--check",
         action="store_true",
@@ -50,30 +57,40 @@ def main(argv: list[str] | None = None) -> int:
         fixture = None
         if args.fixture:
             fixture = FixtureBatch.model_validate_json(canonical_bytes(load_json(args.fixture)))
+        if config.sync_enabled and fixture:
+            raise OutlookError("fixture_and_live_sync_are_separate")
+        if args.retry_failed_sync and not config.sync_enabled:
+            raise OutlookError("sync_not_enabled")
         if args.check:
             emit(
                 "configuration_valid",
                 mode=config.mode,
-                runtime_stage="foundation_only",
+                runtime_stage="mailbox_sync_dry_run" if config.sync_enabled else "foundation_only",
                 category_writes=False,
             )
             return 0
         with StateStore(config) as store:
+            sync = Synchronizer(store, certificate_reader(config)) if config.sync_enabled else None
+            if sync and args.retry_failed_sync:
+                emit("sync_requeued", jobs=sync.state.retry_failed())
             if fixture:
                 accepted = store.observe(fixture.observations)
                 emit("fixture_imported", accepted=accepted, synthetic=True)
             emit(
                 "ready",
                 mode="dry_run",
-                mailbox_collection="not_implemented_until_phase_2",
+                mailbox_collection="read_only_delta" if sync else "disabled",
                 actor_rules="not_qualified",
                 category_writes=False,
             )
             while True:
+                if sync:
+                    sync.run_cycle()
+                    emit("sync_cycle_completed", **sync.state.summary())
                 processed = run_once(store)
                 emit("cycle_completed", processed=processed, **store.summary())
                 if args.once:
-                    return 0
+                    return 1 if sync and sync.state.summary()["sync_health"] == "degraded" else 0
                 time.sleep(config.poll_seconds)
     except KeyboardInterrupt:
         emit("stopped", reason="operator_interrupt", category_writes=False)
@@ -83,6 +100,11 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     except (InputError, ValidationError, OSError, ValueError, sqlite3.Error):
         emit("error", code="invalid_input_or_runtime_unavailable", category_writes=False)
+        return 1
+    except Exception:
+        # Last-resort process boundary: never print third-party exception text,
+        # tokens, URLs or source data, and never turn a failure into a verdict.
+        emit("error", code="unexpected_runtime_failure", category_writes=False)
         return 1
 
 
