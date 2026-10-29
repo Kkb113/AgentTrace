@@ -11,6 +11,11 @@ def test_both_ci_definitions_call_the_shared_fail_fast_gates():
     azure = (ROOT / "ci/azure-pipelines.yml").read_text()
     document = yaml.load(github, Loader=yaml.BaseLoader)
     assert "pull_request" in document["on"]
+    assert set(document["on"]["pull_request"]["branches"]) == {"main", "codex/**"}
+    assert set(yaml.load(azure, Loader=yaml.BaseLoader)["pr"]["branches"]["include"]) == {
+        "main",
+        "codex/**",
+    }
     assert document["permissions"] == {"contents": "read"}
     assert "pull_request_target" not in document["on"]
     gates = document["jobs"]["validation"]["strategy"]["matrix"]["gate"]

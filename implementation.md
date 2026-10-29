@@ -305,7 +305,7 @@ Evaluate the final message-level union of provenance and statistical flags, not 
 
 ## 4. Phase overview
 
-Phases 0 through 2 are **Complete**, with exit reviews in [the feasibility report](docs/feasibility-report.md), [the foundation review](docs/repository-foundation.md) and [the secure-access review](docs/secure-access-report.md). Phases 3–14 are **Not started**. A phase is complete only when its exit criteria have recorded evidence. Prioritize the agent path through Phases 0–7, then agent decisions/UI/qualification in Phases 9–14. Phase 8 runs as a bounded secondary track; a poor content-accuracy result does not hold the agent path open. Its actual experiment, safety/isolation checks, and limitation report remain required for POC handover.
+Phases 0 through 4 are **Complete**, with exit reviews in [the feasibility report](docs/feasibility-report.md), [the foundation review](docs/repository-foundation.md), [the secure-access review](docs/secure-access-report.md), [the ingestion review](docs/mail-ingestion-report.md) and [the ledger review](docs/evidence-ledger-review.md). Phases 5–14 are **Not started**. The separately added Graph activity source remains unqualified; this does not imply a passing live Graph exit. A phase is complete only when its exit criteria have recorded evidence. Prioritize the agent path through Phases 0–7, then agent decisions/UI/qualification in Phases 9–14. Phase 8 runs as a bounded secondary track; a poor content-accuracy result does not hold the agent path open. Its actual experiment, safety/isolation checks, and limitation report remain required for POC handover.
 
 | Phase | Focus | Primary dependency | Principal exit artifact |
 | --- | --- | --- | --- |
@@ -564,11 +564,20 @@ This one message does not qualify broader coverage, latency or false-positive ra
 
 **Exit criteria**
 
-- [ ] Exact joins and uncertain candidate joins are distinguishable in storage and APIs.
-- [ ] Signature and replay tests pass without promoting untrusted declarations.
-- [ ] Canonicalization and transport-mapping limitations are documented and tested.
-- [ ] Every persisted decision input has a traceable source and schema version.
-- [ ] Content-lineage and action-lineage tests pass independently; snapshot retention and replay limits are explicit.
+- [x] Exact joins and uncertain candidate joins are distinguishable in storage and APIs.
+- [x] Signature and replay tests pass without promoting untrusted declarations.
+- [x] Canonicalization and transport-mapping limitations are documented and tested.
+- [x] Every persisted decision input has a traceable source and schema version.
+- [x] Content-lineage and action-lineage tests pass independently; snapshot retention and replay limits are explicit.
+
+Implementation evidence: [engineering review](docs/evidence-ledger-review.md),
+[schema/trust contract](docs/evidence-schema.md), [correlation and replay rules](docs/correlation-rules.md),
+[executed exit report](docs/evidence/evidence-ledger-validation.json) and
+[operations](docs/runbooks/evidence-ledger.md). Validation includes actual restricted
+SQL logins and a real loopback HTTP service restart, using fictional Entra tokens and
+independently signed synthetic receipts. The ledger qualifies evidence relationships;
+final detector policies, new source adapters, content models and accuracy qualification
+remain later work. No new Azure resource or Microsoft 365 permission was introduced.
 
 ## Phase 5 — Establish independent ground truth and detection fixtures
 

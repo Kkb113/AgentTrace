@@ -7,6 +7,13 @@ canary passed; it does not qualify the Graph publisher. See the
 [recovery findings and next steps](docs/graph-routing-recovery.md). Authenticated
 Exchange Send audit correlation remains an independent supported evidence path.
 
+The scoped [evidence ledger](docs/evidence-schema.md) now adds authenticated signed
+receipt submission, exact/candidate correlation, independent action/content lineage,
+revocation and append-only input history. See [the review and exit evidence](docs/evidence-ledger-review.md)
+and [operations](docs/runbooks/evidence-ledger.md). It introduces no email execution
+or content-generation feature; final detection policy and accuracy qualification
+remain later work.
+
 This checkout contains the typed product foundation, a secured local synthetic PostgreSQL/API/worker stack, scoped Microsoft 365 access, a minimal Azure access sandbox, reliable versioned mailbox/audit ingestion, offline text extraction and reproducible CI/security/infrastructure gates. The dashboard/add-in UI and production rollout remain later work. Statistical content models are not installed. Read [the implementation plan](implementation.md), [the secure-access review](docs/secure-access-report.md) and [the feasibility report](docs/feasibility-report.md) before interpreting access tests or authored fixtures as detector qualification.
 
 ## Run locally

@@ -1,0 +1,236 @@
+{
+  "executed_at": "2026-10-29T07:41:08.910788+00:00",
+  "all_five_local_gates_pass": true,
+  "primary_test_counts": {
+    "unit": 252,
+    "integration": 123
+  },
+  "additional_unit_subtests": 52,
+  "exits": [
+    {
+      "id": "exact_and_candidate_links_distinct",
+      "met": true,
+      "required_tests": {
+        "test_exact_send_candidates_restart_and_independent_history": true,
+        "test_accepted_failed_and_candidate_actions_never_become_exact": true,
+        "test_identical_bodies_subjects_and_duplicate_message_ids_do_not_merge_copies": true,
+        "test_signed_copy_and_archive_mappings_never_propagate_send_or_content": true,
+        "test_cross_mailbox_mapping_requires_dual_matching_issuer_enrollment": true,
+        "test_tied_versions_and_contradictory_completed_actions_remain_uncertain": true
+      }
+    },
+    {
+      "id": "signature_replay_and_trust_validation",
+      "met": true,
+      "required_tests": {
+        "test_signature_binds_key_record_scope_and_expiry": true,
+        "test_altered_replay_is_persisted_as_conflict_without_rewriting_history": true,
+        "test_wrong_source_principal_and_revoked_keys_fail_closed": true,
+        "test_key_rotation_does_not_resurrect_revoked_evidence_and_axes_remain_separate": true,
+        "test_concurrent_replays_and_input_revisions_are_serialized": true,
+        "test_issuer_kind_and_observer_schema_enrollment_are_enforced": true
+      }
+    },
+    {
+      "id": "canonicalization_and_transport_limits",
+      "met": true,
+      "required_tests": {
+        "test_canonical_transport_and_recipient_semantics_are_explicit": true,
+        "test_tenant_keyed_fingerprints_cannot_be_matched_globally": true,
+        "test_canonical_evidence_normalizes_timezone_and_dictionary_order": true,
+        "test_invalid_region_offsets_never_establish_content_lineage": true,
+        "test_absent_body_or_recipients_cannot_acquire_a_complete_payload_fingerprint": true
+      }
+    },
+    {
+      "id": "traceable_versioned_persisted_inputs",
+      "met": true,
+      "required_tests": {
+        "test_signed_submission_traceable_inputs_and_restart_history_end_to_end": true,
+        "test_committed_ingestion_extraction_and_ledger_have_an_exact_version_chain": true,
+        "test_loopback_http_with_real_runtime_identity_survives_server_restart": true,
+        "test_effective_sql_logins_cannot_rewrite_enroll_read_raw_or_cross_mailbox": true,
+        "test_append_triggers_and_scope_bindings_hold_even_for_owner_mistakes": true,
+        "test_privileged_message_and_history_metadata_tampering_is_detected": true,
+        "test_separate_anchor_detects_privileged_rollback_and_allows_append": true
+      }
+    },
+    {
+      "id": "independent_lineages_and_bounded_replay",
+      "met": true,
+      "required_tests": {
+        "test_generation_and_inclusion_are_required_independently_of_send": true,
+        "test_echoes_templates_basic_correction_and_similarity_are_not_verified_origin": true,
+        "test_generation_reuse_requires_new_scoped_inclusion_and_no_cross_mailbox_lookup": true,
+        "test_unchanged_span_edit_lineage_is_separate_from_changed_output_and_old_version": true,
+        "test_issuer_revocation_requires_reassessment_without_rewriting_old_inputs": true,
+        "test_retention_expiry_is_checked_before_raw_evidence_is_opened": true,
+        "test_snapshot_reference_is_not_a_claim_that_bytes_or_model_replay_are_available": true,
+        "test_expired_raw_and_decision_records_are_physically_purged_by_operator_only": true,
+        "test_ambiguous_extraction_does_not_acquire_authored_provenance": true,
+        "test_unavailable_content_does_not_block_independent_exact_action_evidence": true,
+        "test_expired_unpurged_history_cannot_block_a_new_reassessment_epoch": true,
+        "test_nonempty_pre_epoch_preview_requires_review_and_preserves_records": true
+      }
+    }
+  ],
+  "missing_required_artifacts": [],
+  "files": [
+    {
+      "path": "src/agenttrace_ledger/__init__.py",
+      "sha256": "fe5e4a4f24e9776bbe6c5e90592d353865c4de9c271908b8199d9353c6399fd3"
+    },
+    {
+      "path": "src/agenttrace_ledger/api.py",
+      "sha256": "1b854709cd4aa662a58380a4d24fd2dc4b5a26a803b8ee777d516e35945a16b1"
+    },
+    {
+      "path": "src/agenttrace_ledger/bridge.py",
+      "sha256": "9f4067837b5c7ef40b49d60c11f313f1107d26e5483b1b998d2bdda99ade11fc"
+    },
+    {
+      "path": "src/agenttrace_ledger/canonical.py",
+      "sha256": "6576edf44650a472396be43e2c1b9a96bbbd3961d609582f3834e3c5b7c808f8"
+    },
+    {
+      "path": "src/agenttrace_ledger/contracts.py",
+      "sha256": "3a0828262f3832d611fba761ad0f351616d9b6e0ba030f37ffcbafb5213787ee"
+    },
+    {
+      "path": "src/agenttrace_ledger/retention.py",
+      "sha256": "5c4c12d1efd76038592673505a6766085b7b9dd451306f1da2392ef77d90b1f9"
+    },
+    {
+      "path": "src/agenttrace_ledger/runtime.py",
+      "sha256": "0a44440b2e6ae59f2206c55cb74f81be6b9bf7e58897b0b93de803c9798bd305"
+    },
+    {
+      "path": "src/agenttrace_ledger/signatures.py",
+      "sha256": "ecb0b5db87aefde83c7949aafc704d78ab93a4ddf09aec46bab4838919dc6925"
+    },
+    {
+      "path": "src/agenttrace_ledger/store.py",
+      "sha256": "d0ae16dcb53c56f268d09f984b859610532f9d8479ae697d1d5392f1aada0329"
+    },
+    {
+      "path": "src/agenttrace_foundation/migrations/ledger.sql",
+      "sha256": "9475c1538460d73e6b0b090b240b121206411a0d7062dbe5817085362cf206ce"
+    },
+    {
+      "path": "src/agenttrace_foundation/database.py",
+      "sha256": "d86adc50dae48159e4a03edddfbe79bdcba9229b52005fb4ba6b971bed197d39"
+    },
+    {
+      "path": "src/agenttrace_foundation/database_access.py",
+      "sha256": "721148c99afee5d987deff170c9d67d21ac4e6a1402518c7b0f332733f4feb77"
+    },
+    {
+      "path": "src/agenttrace_foundation/settings.py",
+      "sha256": "36ea122d11825f40c16c63f338f7aaa165c48e3b3732486072995406d0dcd4da"
+    },
+    {
+      "path": "compose.yaml",
+      "sha256": "b52cac7e96a67c92785291c92b2e3d2f232dfcc55c7fd66b7061a398f291b5c1"
+    },
+    {
+      "path": ".github/workflows/validation.yml",
+      "sha256": "21f6e1bd61f2dac046f39bfd19b508eb86105345258e82e516d81adec367dd9f"
+    },
+    {
+      "path": "ci/azure-pipelines.yml",
+      "sha256": "7ced44bc46e22bc9a5b82ef51e2add1481c410ed07efab7d6fb753a78e9ed87e"
+    },
+    {
+      "path": "scripts/prepare-local-security.py",
+      "sha256": "e19bb8d2d3be88bb38e2d85a07dfc9c6b3d2b1bb6acce824bdbc8200f6ba1186"
+    },
+    {
+      "path": "tests/unit/test_validation_configuration.py",
+      "sha256": "a314c182691cc4d4e66a14543c12ff85fa195984899596ad40b833e976c2922c"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "2d58af48f9001da48b31df5e32992772949c332412d41de63663c644e7e2fdc2"
+    },
+    {
+      "path": "scripts/check-boundaries.py",
+      "sha256": "6522a2a525a205a3ddc5919e93e1fd871f8f19e4eff2679fdbee3aea989f0b1c"
+    },
+    {
+      "path": "scripts/export-contracts.py",
+      "sha256": "01ba9d666fe428915f914f4c8685e08d742af7d941afed44779316460dc40f92"
+    },
+    {
+      "path": "config/evidence-ledger-exits.json",
+      "sha256": "977c38c906a59acb17ba728fd62f7bac4227f10c9799321294b1365172973112"
+    },
+    {
+      "path": "docs/evidence-schema.md",
+      "sha256": "9561f7bb76849dd8e9c2c5140230bba681c515ef3b6cfbb3d60ee576b5b8594f"
+    },
+    {
+      "path": "docs/correlation-rules.md",
+      "sha256": "2026fc56b957c68313bed14e13f35b1275b7965bfac136438282f4f22c5bad73"
+    },
+    {
+      "path": "docs/runbooks/evidence-ledger.md",
+      "sha256": "238af88b43ba305fc6534d633a64c1c0812daceca13066b91959efda6af90e01"
+    },
+    {
+      "path": "tests/integration/test_evidence_ledger.py",
+      "sha256": "9ad4b423eeb514c4753b83a57aaa7a355d6a153a085e47f09f98d1b370de56ad"
+    },
+    {
+      "path": "tests/integration/test_ledger_history_retention.py",
+      "sha256": "bd2a1075df164773010afce6c51750f0fd24ab654162b28f7e2e74731b84ffb8"
+    },
+    {
+      "path": "tests/integration/test_ledger_ingestion_bridge.py",
+      "sha256": "126c94850008b30c73ee5f5d1b867a3dec94000f50ab9a99e00b22e27fe5be08"
+    },
+    {
+      "path": "tests/integration/test_ledger_permissions.py",
+      "sha256": "32525b640592bc4c07708cd608d7511b95fd319e07e54bcb16755de15460f6e0"
+    },
+    {
+      "path": "tests/integration/test_ledger_source_boundaries.py",
+      "sha256": "850dcbaed025544763a905df1c5a1c7829c9fe3a65c89f80486cd6cdfa8cba21"
+    },
+    {
+      "path": "tests/integration/test_evidence_api.py",
+      "sha256": "a34cbed8901839414c0f85328e84cfe4e6792325f649bbdfa802d19773d05756"
+    },
+    {
+      "path": "tests/ledger_support.py",
+      "sha256": "c5b13f361d13f85fb0a6b6dc926ff11c1baa533b8e5c433eb6b18eddf9aa91ca"
+    },
+    {
+      "path": "tests/unit/test_evidence_canonicalization.py",
+      "sha256": "bfa885928f5a68a0486ca9d0d05186303571bb83e68cb3a58ce68502021a0c33"
+    },
+    {
+      "path": "tests/unit/test_ledger_runtime.py",
+      "sha256": "254261b2d0b635c74de8be209d1fdbad8bec327951f7e7d3636d34514e155a89"
+    },
+    {
+      "path": "packages/contracts/schemas/signed-evidence.schema.json",
+      "sha256": "f311b4dd227a913f906ed860f7baaf9c0e0cf516ba2e2486118f5af6ecb31121"
+    },
+    {
+      "path": "packages/contracts/schemas/message-observation.schema.json",
+      "sha256": "8dda6b676d2128b9329679cbaa0afbc38d557911876a94a0f4123a2046e5d079"
+    },
+    {
+      "path": "packages/contracts/schemas/correlation-view.schema.json",
+      "sha256": "8f4eeea8de86b9c64e4e027cde68210a6b44819d46ef83a4664ee88a59529408"
+    }
+  ],
+  "hash_normalization": "Git LF text bytes",
+  "test_environment": "Local PostgreSQL 17 and real loopback HTTP with fictional Entra tokens and independently signed synthetic evidence",
+  "new_azure_resources": 0,
+  "new_microsoft_365_permissions": 0,
+  "email_mutations": 0,
+  "graph_activity_source_qualified_by_this_validation": false,
+  "production_accuracy_or_WORM_qualification_claimed": false,
+  "all_exit_criteria_met": true
+}

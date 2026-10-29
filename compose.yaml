@@ -32,6 +32,7 @@ services:
       - {source: attribution_password, target: attribution-password}
       - {source: content_password, target: content-password}
       - {source: collector_password, target: collector-password}
+      - {source: ledger_password, target: ledger-password}
     depends_on:
       postgres: {condition: service_healthy}
     networks: [private]
@@ -131,6 +132,8 @@ secrets:
     file: ./work/local/roles/content-password
   collector_password:
     file: ./work/local/roles/collector-password
+  ledger_password:
+    file: ./work/local/roles/ledger-password
   development_authorization:
     file: ./work/local/development-authorization.json
   development_jwks:

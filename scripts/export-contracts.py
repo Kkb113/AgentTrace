@@ -6,6 +6,8 @@ from pathlib import Path
 
 from agenttrace_contracts import DetectionDecision, DetectionJob
 
+from agenttrace_ledger.contracts import CorrelationView, MessageObservation, SignedEvidence
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -13,7 +15,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    for name, model in [("detection-decision", DetectionDecision), ("detection-job", DetectionJob)]:
+    for name, model in [
+        ("detection-decision", DetectionDecision),
+        ("detection-job", DetectionJob),
+        ("signed-evidence", SignedEvidence),
+        ("message-observation", MessageObservation),
+        ("correlation-view", CorrelationView),
+    ]:
         path = ROOT / "packages/contracts/schemas" / (name + ".schema.json")
         expected = json.dumps(model.model_json_schema(), indent=2, sort_keys=True) + "\n"
         if args.check:

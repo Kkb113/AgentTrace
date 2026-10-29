@@ -1,0 +1,372 @@
+{
+  "$defs": {
+    "CorrelationLink": {
+      "additionalProperties": false,
+      "properties": {
+        "actor": {
+          "anyOf": [
+            {
+              "enum": [
+                "ai_agent",
+                "human",
+                "non_ai_application",
+                "unknown"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Actor"
+        },
+        "classification": {
+          "enum": [
+            "exact",
+            "candidate",
+            "unsupported",
+            "context",
+            "invalid",
+            "conflicting",
+            "exact_mapping"
+          ],
+          "title": "Classification",
+          "type": "string"
+        },
+        "evidence_ref": {
+          "format": "uuid",
+          "title": "Evidence Ref",
+          "type": "string"
+        },
+        "execution_ref": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Execution Ref"
+        },
+        "ingested_at": {
+          "format": "date-time",
+          "title": "Ingested At",
+          "type": "string"
+        },
+        "key_ref": {
+          "format": "uuid",
+          "title": "Key Ref",
+          "type": "string"
+        },
+        "occurred_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Occurred At"
+        },
+        "parent_ref": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Ref"
+        },
+        "reason": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_./-]{0,63}$",
+          "title": "Reason",
+          "type": "string"
+        },
+        "record_digest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Record Digest",
+          "type": "string"
+        },
+        "relation": {
+          "anyOf": [
+            {
+              "enum": [
+                "delivery_copy",
+                "documented_id_translation",
+                "archive_move",
+                "forward_context"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Relation"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_ref": {
+          "format": "uuid",
+          "title": "Source Ref",
+          "type": "string"
+        },
+        "source_schema_version": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_./-]{0,63}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Schema Version"
+        }
+      },
+      "required": [
+        "evidence_ref",
+        "source_ref",
+        "key_ref",
+        "record_digest",
+        "schema_version",
+        "ingested_at",
+        "classification",
+        "reason"
+      ],
+      "title": "CorrelationLink",
+      "type": "object"
+    },
+    "Correlations": {
+      "additionalProperties": false,
+      "properties": {
+        "agent_send_attribution": {
+          "items": {
+            "$ref": "#/$defs/CorrelationLink"
+          },
+          "title": "Agent Send Attribution",
+          "type": "array"
+        },
+        "content_assessment": {
+          "items": {
+            "$ref": "#/$defs/CorrelationLink"
+          },
+          "title": "Content Assessment",
+          "type": "array"
+        }
+      },
+      "required": [
+        "agent_send_attribution",
+        "content_assessment"
+      ],
+      "title": "Correlations",
+      "type": "object"
+    },
+    "ObservationSource": {
+      "additionalProperties": false,
+      "properties": {
+        "canonicalization_version": {
+          "const": "mail-text-v1",
+          "title": "Canonicalization Version",
+          "type": "string"
+        },
+        "capture_basis": {
+          "enum": [
+            "synthetic_fixture",
+            "committed_ingestion"
+          ],
+          "title": "Capture Basis",
+          "type": "string"
+        },
+        "content_available": {
+          "title": "Content Available",
+          "type": "boolean"
+        },
+        "normalization_version": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_./-]{0,63}$",
+          "title": "Normalization Version",
+          "type": "string"
+        },
+        "observation_digest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Observation Digest",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "recipients_complete": {
+          "title": "Recipients Complete",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_./-]{0,63}$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_event_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Event At"
+        },
+        "source_event_ref": {
+          "format": "uuid",
+          "title": "Source Event Ref",
+          "type": "string"
+        },
+        "source_ref": {
+          "format": "uuid",
+          "title": "Source Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_ref",
+        "source_event_ref",
+        "schema_version",
+        "normalization_version",
+        "canonicalization_version",
+        "observation_digest",
+        "capture_basis",
+        "content_available",
+        "recipients_complete",
+        "source_event_at",
+        "observed_at"
+      ],
+      "title": "ObservationSource",
+      "type": "object"
+    },
+    "ReplayCapability": {
+      "additionalProperties": false,
+      "properties": {
+        "model_reexecution_available": {
+          "const": false,
+          "default": false,
+          "title": "Model Reexecution Available",
+          "type": "boolean"
+        },
+        "reason": {
+          "const": "model_not_installed_and_artifacts_not_pinned",
+          "title": "Reason",
+          "type": "string"
+        },
+        "snapshot_bytes_verified": {
+          "const": false,
+          "default": false,
+          "title": "Snapshot Bytes Verified",
+          "type": "boolean"
+        },
+        "snapshot_ref": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Snapshot Ref"
+        },
+        "snapshot_reference_within_retention": {
+          "title": "Snapshot Reference Within Retention",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "snapshot_ref",
+        "snapshot_reference_within_retention",
+        "reason"
+      ],
+      "title": "ReplayCapability",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "copy_mappings": {
+      "items": {
+        "$ref": "#/$defs/CorrelationLink"
+      },
+      "title": "Copy Mappings",
+      "type": "array"
+    },
+    "correlations": {
+      "$ref": "#/$defs/Correlations"
+    },
+    "current_message_version": {
+      "title": "Current Message Version",
+      "type": "boolean"
+    },
+    "message_ref": {
+      "format": "uuid",
+      "title": "Message Ref",
+      "type": "string"
+    },
+    "qualification": {
+      "const": "evidence_correlation_only_not_a_detection_accuracy_claim",
+      "title": "Qualification",
+      "type": "string"
+    },
+    "replay": {
+      "$ref": "#/$defs/ReplayCapability"
+    },
+    "rule_version": {
+      "const": "correlation-v1",
+      "title": "Rule Version",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/ObservationSource"
+    },
+    "version_ref": {
+      "format": "uuid",
+      "title": "Version Ref",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "rule_version",
+    "message_ref",
+    "version_ref",
+    "source",
+    "current_message_version",
+    "correlations",
+    "copy_mappings",
+    "replay",
+    "qualification"
+  ],
+  "title": "CorrelationView",
+  "type": "object"
+}
