@@ -1,0 +1,15 @@
+{
+  "executed_at": "2026-10-29T04:55:37.865146+00:00",
+  "recorded_from_saved_API_receipts": true,
+  "disabled_write_confirmed": true,
+  "disabled_readback_returned_not_found": true,
+  "enabled_readback_confirmed": true,
+  "current_enabled_state_independently_verified": true,
+  "other_tenant_settings_preserved": true,
+  "interval_seconds": 16.19,
+  "coverage_gap_recorded": true,
+  "known_lost_events": null,
+  "graph_delivery_proven_by_refresh": false,
+  "email_mutations": 0,
+  "refresh_operation_passed": true
+}

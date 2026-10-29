@@ -1,0 +1,28 @@
+{
+  "executed_at": "2026-10-29T05:33:34.951211+00:00",
+  "case": "owner_prepared_fresh_claude_synthetic_test",
+  "capture_basis": "live_certificate_authenticated_Microsoft_Graph_mail_and_Exchange_audit_APIs",
+  "enrolled_connector_publisher_verified": true,
+  "bounded_audit_query_completed": true,
+  "agent_send_finding": {
+    "status": "verified_agent",
+    "flagged": true,
+    "reason_codes": [
+      "authenticated_exchange_send_for_enrolled_agent_connector"
+    ]
+  },
+  "supporting_observations": {
+    "unique_sent_copy": true,
+    "matching_completed_send_events": 1,
+    "join_basis": "authenticated_tenant_mailbox_unique_sent_copy_internet_message_id",
+    "audit_to_graph_immutable_id_equivalence_established": false,
+    "first_successful_collection_age_seconds": 31725.951211,
+    "availability_interpretation": "available_by_this_age_not_exact_ingestion_latency",
+    "rule_scope": "enrolled_claude_connector_only_other_executors_remain_unknown"
+  },
+  "graph_activity_log_records_required": false,
+  "new_mail_permissions": false,
+  "email_mutations": 0,
+  "qualification_limit": "One enrolled-connector message; not an accuracy or universal-coverage measurement.",
+  "independent_audit_attribution_passed": true
+}

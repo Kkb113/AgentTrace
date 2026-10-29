@@ -52,6 +52,16 @@ write/send role or broader mailbox read role was added. See
 
 ## Graph activity source addition
 
+Delivery troubleshooting also enables redacted `LogErrors` diagnostics on the
+dedicated transformation DCR. A synthetic direct-ingestion canary has an operator
+User grant of Monitoring Metrics Publisher at its own DCR only; no product identity
+or Microsoft 365 grant changes. The owner separately accepted the temporary
+[raw-metadata archive exception](graph-route-isolation-proposal.md): one dedicated
+Standard LRS account, its trusted-services firewall exception, and an operator-only
+Blob Data Reader grant on the single Graph archive container. Seven-day retention
+applies. This exception can expose tenant-wide raw request metadata and is not a
+claim that the standing product collector has broader approved data scope.
+
 The owner subsequently authorized enabling Microsoft Graph activity logging, checking licensing/permissions, minimizing cost, and testing the source end to end. A dedicated pay-as-you-go East US workspace/DCR in kb-agentdemo keeps a filtered seven-day Graph table. The existing audit collector receives only a workspace-scoped Log Analytics Data Reader assignment conditioned on that table. This adds no Microsoft 365 mailbox/send/write permissions. Tenant-wide source export is minimized downstream and remains broader than a mailbox authorization boundary. Shared workspaces and existing evidence firewalls stay unchanged. See [the design and cost controls](graph-activity-logging.md).
 
 The new workspace uses public Azure TLS endpoints with Entra authorization;

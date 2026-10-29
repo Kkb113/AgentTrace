@@ -32,7 +32,7 @@ earlier batches remain visible when fresh probes are generated. An empty non-tar
 table is distinguished from an explicit access denial. Source export remains
 tenant-wide before downstream minimization.
 
-Local validation passed all five gates: 216 unit/security tests, 52 subtests and 65
+Local validation passed all five gates: 238 unit/security tests, 52 subtests and 65
 integration/end-to-end tests. The added tests cover send-versus-draft/read/move
 semantics, failure statuses, URI redaction, delayed arrivals, deduplication, empty
 initial delivery, throttling, malformed/partial results and transaction rollback.
@@ -48,6 +48,23 @@ table schema default, with three NoChange resources and thirteen ignored resourc
 [Design, costs and runbook](graph-activity-logging.md),
 [live evidence](evidence/graph-activity-live-validation.json),
 [software evidence](evidence/graph-activity-validation.json).
+
+The subsequent delivery investigation added sample-aware metrics, redacted DCR error
+logging and a separate direct-ingestion canary. The canary passed an actual 204 plus
+an exact returned row, proving that destination path works. It does not validate the
+Graph publisher or Graph-table authorization. One controlled export refresh was
+restored and its 16.19-second coverage gap recorded. The owner separately accepted
+an isolated raw-metadata Blob diagnostic, with its own network/data-scope exception;
+that test has separate evidence and does not broaden the product collector's scope.
+See [recovery findings](graph-routing-recovery.md) and the
+[accepted isolation proposal](graph-route-isolation-proposal.md).
+
+The independent Exchange audit recheck identified the latest owner-prepared Claude
+synthetic message as `verified_agent`, using a completed Send event, enrolled verified
+publisher and unique exact Internet Message-ID in the same tenant/mailbox. It did
+not require Graph activity-log rows. This is a fresh narrow-route demonstration,
+not a detection-accuracy measurement or a source-latency SLA. See the
+[actual audit evidence](evidence/agent-audit-fallback-validation.json).
 
 API activity is evidence for later message-specific correlation. It does not prove
 AI execution or generated wording, and no detection-accuracy qualification is claimed.

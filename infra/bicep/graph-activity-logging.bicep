@@ -9,6 +9,8 @@ param readerPrincipalId string
 param logDataReaderRoleId string
 param transformationKql string
 param attachExistingTransformation bool = false
+param enableErrorDiagnostics bool = false
+param errorTransformationKql string = 'source | project TimeGenerated'
 
 var permitted = enableProvisioning && resourceGroup().name == expectedResourceGroup && !empty(transformationKql)
 var suffix = uniqueString(resourceGroup().id, 'agenttrace-graph-activity')
@@ -39,6 +41,16 @@ resource graphTable 'Microsoft.OperationalInsights/workspaces/tables@2023-09-01'
     schema: { name: 'MicrosoftGraphActivityLogs' }
   }
 }
+resource errorTable 'Microsoft.OperationalInsights/workspaces/tables@2023-09-01' = if (permitted && enableErrorDiagnostics) {
+  parent: workspace
+  name: 'DCRLogErrors'
+  properties: {
+    plan: 'Analytics'
+    retentionInDays: 7
+    totalRetentionInDays: 7
+    schema: { name: 'DCRLogErrors' }
+  }
+}
 resource rule 'Microsoft.Insights/dataCollectionRules@2023-03-11' = if (permitted) {
   name: 'agenttrace-graph-${suffix}'
   location: location
@@ -46,7 +58,19 @@ resource rule 'Microsoft.Insights/dataCollectionRules@2023-03-11' = if (permitte
   kind: 'WorkspaceTransforms'
   properties: {
     destinations: { logAnalytics: [{ name: 'filteredGraphWorkspace', workspaceResourceId: workspace.id }] }
-    dataFlows: [{ streams: ['Microsoft-Table-MicrosoftGraphActivityLogs'], destinations: ['filteredGraphWorkspace'], transformKql: transformationKql }]
+    dataFlows: concat(
+      [{ streams: ['Microsoft-Table-MicrosoftGraphActivityLogs'], destinations: ['filteredGraphWorkspace'], transformKql: transformationKql }],
+      enableErrorDiagnostics ? [{ streams: ['Microsoft-Table-DCRLogErrors'], destinations: ['filteredGraphWorkspace'], transformKql: errorTransformationKql }] : []
+    )
+  }
+  dependsOn: [graphTable, errorTable]
+}
+resource errorDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (permitted && enableErrorDiagnostics) {
+  name: 'AgentTraceTransformationErrors'
+  scope: rule
+  properties: {
+    workspaceId: workspace.id
+    logs: [{ category: 'LogErrors', enabled: true }]
   }
 }
 resource readerGrant 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (permitted) {

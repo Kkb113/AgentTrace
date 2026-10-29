@@ -1,0 +1,9 @@
+{
+  "accepted": true,
+  "recorded_at": "2026-10-29T05:21:21.352549+00:00",
+  "accepted_by": "User acting as project owner, Microsoft 365 administrator and security owner",
+  "authorization": "Approve the isolated raw-metadata diagnostic",
+  "proposal_sha256": "aa4545958984c2986c410b89fc85932324357ae4e97b460304388c024ebacb0d",
+  "scope": "Separate tenant-wide raw Graph metadata diagnostic, single East US Standard LRS account in kb-agentdemo, operator reader, account-specific trusted-services exception, seven-day retention, stop export after foreground test",
+  "email_send_or_write_permissions": false
+}

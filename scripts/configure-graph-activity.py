@@ -13,6 +13,7 @@ from deployment_review import review_changes
 
 from agenttrace_feasibility.audit import CLAUDE_CONNECTOR_APP_ID
 from agenttrace_feasibility.capabilities import azure_cli_prefix
+from agenttrace_ingestion.activity_diagnostics import error_minimization_transform
 from agenttrace_ingestion.activity_policy import ActivityScope
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -80,6 +81,8 @@ def main():
         "readerPrincipalId": identities["audit-collector"]["service_principal"]["id"],
         "logDataReaderRoleId": role[0]["id"],
         "transformationKql": scope.transform(),
+        "enableErrorDiagnostics": True,
+        "errorTransformationKql": error_minimization_transform(),
         "attachExistingTransformation": any(
             r["type"].lower() == "microsoft.insights/datacollectionrules"
             and r.get("tags", {}).get("purpose") == "filtered-graph-activity"
@@ -200,10 +203,11 @@ def main():
             raise RuntimeError("existing_named_diagnostic_setting_requires_review")
     body = directory / "diagnostic-setting-request.private.json"
     body.write_text(json.dumps({"properties": expected}))
-    az(
-        "graph-diagnostic-setting",
-        ["rest", "--method", "put", "--url", url, "--body", "@" + str(body)],
-    )
+    if not prior:
+        az(
+            "graph-diagnostic-setting",
+            ["rest", "--method", "put", "--url", url, "--body", "@" + str(body)],
+        )
     previous_path = directory / "logging-settings.private.json"
     previous = json.loads(previous_path.read_text()) if previous_path.is_file() else {}
     settings.update(
@@ -218,6 +222,7 @@ def main():
             "reader_thumbprint": identities["audit-collector"]["certificate"]["thumbprint"],
             "diagnostic_setting_name": SETTING,
             "enabled": True,
+            "error_diagnostics_enabled": True,
         }
     )
     (directory / "logging-settings.private.json").write_text(json.dumps(settings, indent=2))

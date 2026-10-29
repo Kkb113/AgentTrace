@@ -9,6 +9,7 @@ from pathlib import Path
 
 from agenttrace_feasibility.capabilities import azure_cli_prefix
 from agenttrace_foundation.workload_identity import CertificateTokenProvider
+from agenttrace_ingestion.activity_diagnostics import error_minimization_transform
 from agenttrace_ingestion.activity_runtime import load_activity
 from agenttrace_ingestion.contracts import IngestionError
 from agenttrace_ingestion.mailbox import instant
@@ -98,7 +99,52 @@ def main():
             + "?api-version=2023-03-11",
         ],
     )
-    rules = rule["properties"]["dataFlows"]
+    rules = [
+        flow
+        for flow in rule["properties"]["dataFlows"]
+        if flow["streams"] == ["Microsoft-Table-MicrosoftGraphActivityLogs"]
+    ]
+    if len(rules) != 1:
+        raise RuntimeError("exactly_one_graph_activity_transformation_required")
+    error_diagnostics_verified = False
+    if settings.get("error_diagnostics_enabled"):
+        error_table = az(
+            "verified-error-table",
+            [
+                "rest",
+                "--method",
+                "get",
+                "--url",
+                "https://management.azure.com"
+                + str(settings["workspaceResourceId"])
+                + "/tables/DCRLogErrors?api-version=2023-09-01",
+            ],
+        )
+        error_setting = az(
+            "verified-error-setting",
+            [
+                "rest",
+                "--method",
+                "get",
+                "--url",
+                "https://management.azure.com"
+                + str(settings["transformationRuleId"])
+                + "/providers/Microsoft.Insights/diagnosticSettings/AgentTraceTransformationErrors?api-version=2021-05-01-preview",
+            ],
+        )
+        error_diagnostics_verified = (
+            error_table["properties"]["retentionInDays"] == 7
+            and error_table["properties"]["totalRetentionInDays"] == 7
+            and any(
+                flow["streams"] == ["Microsoft-Table-DCRLogErrors"]
+                and flow["transformKql"] == error_minimization_transform()
+                for flow in rule["properties"]["dataFlows"]
+            )
+            and error_setting["properties"]["workspaceId"].lower()
+            == str(settings["workspaceResourceId"]).lower()
+            and [v["category"] for v in error_setting["properties"]["logs"] if v["enabled"]]
+            == ["LogErrors"]
+        )
     assignments = az(
         "verified-reader-assignments",
         [
@@ -332,6 +378,7 @@ def main():
         "table_restricted_role_condition_verified": table_condition,
         "non_target_table_exposes_no_rows": cross_table_outcome in {"denied", "filtered_or_empty"},
         "deployed_transform_passes_scope_and_redaction_controls": transform_passed,
+        "minimized_seven_day_error_diagnostics_verified": error_diagnostics_verified,
         "content_identity_denied_activity_data": denied["content"],
         "api_identity_denied_activity_data": denied["api"],
         "observed_controls_reach_encrypted_durable_source": len(request_ids) >= 2

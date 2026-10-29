@@ -518,6 +518,19 @@ Large datasets, raw evidence, model weights/checkpoints, production logs, and se
 
 Implementation evidence: [review](docs/mail-ingestion-report.md), [exit/test report](docs/evidence/mail-ingestion-validation.json), [actual live checks](docs/evidence/mail-ingestion-live-validation.json) and [runbook](docs/runbooks/mail-ingestion.md). Graph activity logging was subsequently authorized and configured in a dedicated filtered East US workspace; see [configuration and live validation](docs/graph-activity-logging.md). The original Phase 3 snapshot remains historical.
 
+Graph delivery troubleshooting is tracked in the [recovery runbook](docs/graph-routing-recovery.md).
+An actual synthetic destination canary passed, but that result alone cannot qualify
+the Graph publisher. Redacted DCR errors and sample-aware metrics preserve unknown
+coverage. A separately accepted temporary raw-metadata archive test isolates the
+Graph-to-Storage path; it is not a new automation feature or an expanded product
+collection policy. Keep Graph source exits open until actual request traces and
+durable read-only ingestion pass. Exchange Send audit evidence remains an independent
+supported attribution route with its previously disclosed coverage limits.
+The latest owner-prepared Claude synthetic email was independently rechecked using
+authenticated Exchange Send audit evidence and classified `verified_agent`; see
+[fresh audit validation](docs/evidence/agent-audit-fallback-validation.json).
+This one message does not qualify broader coverage, latency or false-positive rates.
+
 ## Phase 4 — Build the evidence ledger and correlation model
 
 **Objective:** Link actions and generated content to the correct message while preserving their different evidence requirements.

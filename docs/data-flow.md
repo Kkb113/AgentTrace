@@ -28,3 +28,13 @@ The new logging workspace uses public Azure TLS ingestion/query endpoints with
 Entra authorization. It does not inherit storage's operator-IP firewall; private
 endpoints are outside this minimal-cost POC. Source delivery remains pending until
 the live trace and durable-ingestion checks pass.
+
+The recovery test adds a separate synthetic canary table/DCR and redacted DCR error
+stream, each with seven-day retention. Canary publishing is operator-only at that
+DCR. The [accepted archive diagnostic](graph-route-isolation-proposal.md) temporarily
+routes tenant-wide raw Graph metadata to a separate restricted Standard LRS account
+to isolate delivery faults; it bypasses the product's pre-storage transformation.
+It has an explicitly accepted account-specific trusted-services exception and an
+operator-only container read grant. The test stops that temporary export afterward.
+Its raw metadata must not be described as synthetic-only or become product evidence
+without the reviewed minimization, source qualification and authorization controls.

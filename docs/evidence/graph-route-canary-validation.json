@@ -1,0 +1,13 @@
+{
+  "executed_at": "2026-10-29T04:48:18.581741+00:00",
+  "ingestion_http_status": 204,
+  "exact_canary_rows": 1,
+  "workspace_ingestion_and_query_canary_passed": true,
+  "graph_publisher_verified_by_this_test": false,
+  "contains_email_or_customer_data": false,
+  "new_mail_permissions": false,
+  "operator_canary_publish_grant_verified": true,
+  "operator_publish_scope": "synthetic_canary_dcr_only",
+  "authorization_propagation_retries": 0,
+  "retention_days": 7
+}

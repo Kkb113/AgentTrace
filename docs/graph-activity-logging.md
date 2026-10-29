@@ -122,6 +122,20 @@ and cap state during the POC. [Daily cap behavior](https://learn.microsoft.com/e
 
 ## Operations and validation
 
+For an empty feed, follow the [delivery investigation runbook](graph-routing-recovery.md).
+The dedicated workspace now also has seven-day `DCRLogErrors` storage; a separate
+transformation reduces error messages to fixed buckets and removes raw error/request
+identifiers before storage. Its resource diagnostic setting enables only `LogErrors`.
+Missing metric samples remain unknown rather than measured zero.
+
+A separate `AgentTraceRouteCanary_CL` table and direct-ingestion DCR accept only
+synthetic timestamp/nonce/test-label records. The designated operator has Monitoring
+Metrics Publisher on that DCR only. The product reader receives no canary publishing
+grant. Both canary and error tables use seven-day retention. Actual success of that
+canary proves its own ingestion/query path, not Graph export, filtering or table access.
+The separately accepted [raw archive diagnostic](graph-route-isolation-proposal.md)
+is a temporary investigation exception; it is not a standing product ingestion source.
+
 1. Run `python scripts/inspect-graph-activity.py` using the already authenticated
    operator session. Raw license/role/settings inventories stay in `work/private`.
 2. Compile Bicep using `python scripts/validate-infrastructure.py`. Review

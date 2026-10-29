@@ -2,6 +2,11 @@
 
 AgentTrace detects two independent things in Outlook/Exchange Online email: whether an AI agent executed the send, and whether the body contains AI-generated content. Accurate agent attribution with low false positives is the priority. Content scoring is a separate best-effort capability.
 
+Graph API activity delivery is under investigation. The independent workspace
+canary passed; it does not qualify the Graph publisher. See the
+[recovery findings and next steps](docs/graph-routing-recovery.md). Authenticated
+Exchange Send audit correlation remains an independent supported evidence path.
+
 This checkout contains the typed product foundation, a secured local synthetic PostgreSQL/API/worker stack, scoped Microsoft 365 access, a minimal Azure access sandbox, reliable versioned mailbox/audit ingestion, offline text extraction and reproducible CI/security/infrastructure gates. The dashboard/add-in UI and production rollout remain later work. Statistical content models are not installed. Read [the implementation plan](implementation.md), [the secure-access review](docs/secure-access-report.md) and [the feasibility report](docs/feasibility-report.md) before interpreting access tests or authored fixtures as detector qualification.
 
 ## Run locally

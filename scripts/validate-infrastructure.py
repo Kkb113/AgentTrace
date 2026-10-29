@@ -72,19 +72,74 @@ def main() -> int:
     assert graph["parameters"]["expectedResourceGroup"]["allowedValues"] == ["kb-agentdemo"]
     assert graph["parameters"]["location"]["allowedValues"] == ["eastus"]
     assert all("condition" in resource for resource in graph["resources"])
-    table = next(
+    tables = [
         r
         for r in graph["resources"]
         if r["type"] == "Microsoft.OperationalInsights/workspaces/tables"
-    )
-    assert (
+    ]
+    assert len(tables) == 2
+    assert all(
         table["properties"]["retentionInDays"] == table["properties"]["totalRetentionInDays"] == 7
+        for table in tables
     )
+    assert graph["parameters"]["enableErrorDiagnostics"]["defaultValue"] is False
     rule = next(
         r for r in graph["resources"] if r["type"] == "Microsoft.Insights/dataCollectionRules"
     )
     assert rule["kind"] == "WorkspaceTransforms"
-    assert "outputStream" not in rule["properties"]["dataFlows"][0]
+    assert "outputStream" not in json.dumps(rule["properties"]["dataFlows"])
+    diagnostics = next(
+        r for r in graph["resources"] if r["type"] == "Microsoft.Insights/diagnosticSettings"
+    )
+    assert diagnostics["properties"]["logs"] == [{"category": "LogErrors", "enabled": True}]
+    canary = json.loads((output / "graph-route-canary.json").read_text(encoding="utf-8-sig"))
+    assert canary["parameters"]["enableProvisioning"]["defaultValue"] is False
+    assert canary["parameters"]["expectedResourceGroup"]["allowedValues"] == ["kb-agentdemo"]
+    assert canary["parameters"]["location"]["allowedValues"] == ["eastus"]
+    assert all("condition" in r for r in canary["resources"])
+    canary_table = next(r for r in canary["resources"] if r["type"].endswith("/tables"))
+    assert (
+        canary_table["properties"]["retentionInDays"]
+        == canary_table["properties"]["totalRetentionInDays"]
+        == 7
+    )
+    assert {c["name"] for c in canary_table["properties"]["schema"]["columns"]} == {
+        "TimeGenerated",
+        "CanaryId",
+        "ProbeKind",
+    }
+    canary_rule = next(
+        r for r in canary["resources"] if r["type"] == "Microsoft.Insights/dataCollectionRules"
+    )
+    assert canary_rule["kind"] == "Direct"
+    canary_grant = next(
+        r for r in canary["resources"] if r["type"] == "Microsoft.Authorization/roleAssignments"
+    )
+    assert canary_grant["properties"]["principalType"] == "User"
+    assert "dataCollectionRules" in canary_grant["scope"]
+    archive = json.loads((output / "graph-archive-diagnostic.json").read_text(encoding="utf-8-sig"))
+    assert archive["parameters"]["enableProvisioning"]["defaultValue"] is False
+    assert archive["parameters"]["expectedResourceGroup"]["allowedValues"] == ["kb-agentdemo"]
+    assert archive["parameters"]["location"]["allowedValues"] == ["eastus"]
+    assert all("condition" in r for r in archive["resources"])
+    account = next(
+        r for r in archive["resources"] if r["type"] == "Microsoft.Storage/storageAccounts"
+    )
+    assert account["sku"]["name"] == "Standard_LRS"
+    assert account["properties"]["allowSharedKeyAccess"] is False
+    assert account["properties"]["allowBlobPublicAccess"] is False
+    assert account["properties"]["supportsHttpsTrafficOnly"] is True
+    assert account["properties"]["minimumTlsVersion"] == "TLS1_2"
+    firewall = account["properties"]["networkAcls"]
+    assert firewall["defaultAction"] == "Deny" and firewall["bypass"] == "AzureServices"
+    assert len(firewall["ipRules"]) == 1
+    expiry = next(r for r in archive["resources"] if r["type"].endswith("/managementPolicies"))
+    retention = expiry["properties"]["policy"]["rules"][0]["definition"]
+    assert retention["actions"]["baseBlob"]["delete"]["daysAfterModificationGreaterThan"] == 7
+    assert retention["filters"]["prefixMatch"] == ["insights-logs-microsoftgraphactivitylogs/"]
+    assert not any(
+        r["type"] == "Microsoft.Insights/diagnosticSettings" for r in archive["resources"]
+    )
     print(
         json.dumps(
             {
