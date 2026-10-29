@@ -1,0 +1,107 @@
+{
+  "$defs": {
+    "Observation": {
+      "additionalProperties": false,
+      "properties": {
+        "inspection_complete": {
+          "title": "Inspection Complete",
+          "type": "boolean"
+        },
+        "message_id": {
+          "pattern": "^[A-Za-z0-9_.:/+=-]{1,2048}$",
+          "title": "Message Id",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "received_at": {
+          "format": "date-time",
+          "title": "Received At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/$defs/Scope"
+        },
+        "source_digest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Source Digest",
+          "type": "string"
+        },
+        "source_version": {
+          "pattern": "^[A-Za-z0-9_.:/+=-]{1,2048}$",
+          "title": "Source Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scope",
+        "message_id",
+        "source_version",
+        "observed_at",
+        "received_at",
+        "inspection_complete",
+        "source_digest"
+      ],
+      "title": "Observation",
+      "type": "object"
+    },
+    "Scope": {
+      "additionalProperties": false,
+      "properties": {
+        "mailbox_id": {
+          "format": "uuid",
+          "title": "Mailbox Id",
+          "type": "string"
+        },
+        "tenant_id": {
+          "format": "uuid",
+          "title": "Tenant Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tenant_id",
+        "mailbox_id"
+      ],
+      "title": "Scope",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "observations": {
+      "items": {
+        "$ref": "#/$defs/Observation"
+      },
+      "maxItems": 1000,
+      "title": "Observations",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "synthetic": {
+      "const": true,
+      "title": "Synthetic",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "synthetic",
+    "observations"
+  ],
+  "title": "FixtureBatch",
+  "type": "object"
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "profile": "outlook_foundation",
+  "scope": {
+    "tenant_id": "00000000-0000-0000-0000-000000000001",
+    "mailbox_id": "00000000-0000-0000-0000-000000000002"
+  },
+  "state_directory": "REPLACE_WITH_AN_ABSOLUTE_PRIVATE_LOCAL_DIRECTORY",
+  "mode": "dry_run",
+  "poll_seconds": 10,
+  "lease_seconds": 120,
+  "batch_size": 50,
+  "max_attempts": 3,
+  "data_boundary": "synthetic_only",
+  "production_positive_rules": []
+}

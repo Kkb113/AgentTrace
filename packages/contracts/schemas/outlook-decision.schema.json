@@ -1,0 +1,122 @@
+{
+  "$defs": {
+    "Scope": {
+      "additionalProperties": false,
+      "properties": {
+        "mailbox_id": {
+          "format": "uuid",
+          "title": "Mailbox Id",
+          "type": "string"
+        },
+        "tenant_id": {
+          "format": "uuid",
+          "title": "Tenant Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tenant_id",
+        "mailbox_id"
+      ],
+      "title": "Scope",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "basis": {
+      "enum": [
+        "production",
+        "experimental"
+      ],
+      "title": "Basis",
+      "type": "string"
+    },
+    "category": {
+      "enum": [
+        "AI Agent",
+        "Human",
+        "Unknown"
+      ],
+      "title": "Category",
+      "type": "string"
+    },
+    "decided_at": {
+      "format": "date-time",
+      "title": "Decided At",
+      "type": "string"
+    },
+    "evidence_refs": {
+      "default": [],
+      "items": {
+        "pattern": "^[A-Za-z0-9_.:/+=-]{1,2048}$",
+        "type": "string"
+      },
+      "maxItems": 100,
+      "title": "Evidence Refs",
+      "type": "array"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "message_id": {
+      "pattern": "^[A-Za-z0-9_.:/+=-]{1,2048}$",
+      "title": "Message Id",
+      "type": "string"
+    },
+    "qualification": {
+      "enum": [
+        "qualified",
+        "not_required",
+        "unqualified"
+      ],
+      "title": "Qualification",
+      "type": "string"
+    },
+    "reason_codes": {
+      "items": {
+        "pattern": "^[a-z][a-z0-9_]{0,99}$",
+        "type": "string"
+      },
+      "maxItems": 32,
+      "minItems": 1,
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "rule_version": {
+      "pattern": "^[A-Za-z0-9_.:/+=-]{1,2048}$",
+      "title": "Rule Version",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "$ref": "#/$defs/Scope"
+    },
+    "source_version": {
+      "pattern": "^[A-Za-z0-9_.:/+=-]{1,2048}$",
+      "title": "Source Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "scope",
+    "message_id",
+    "source_version",
+    "category",
+    "rule_version",
+    "basis",
+    "qualification",
+    "reason_codes",
+    "decided_at",
+    "expires_at"
+  ],
+  "title": "Decision",
+  "type": "object"
+}

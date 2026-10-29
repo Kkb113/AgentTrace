@@ -18,6 +18,7 @@ agenttrace-feasibility = "agenttrace_feasibility.cli:main"
 agenttrace-foundation = "agenttrace_foundation.cli:main"
 agenttrace-ingestion = "agenttrace_ingestion.cli:main"
 agenttrace-ledger = "agenttrace_ledger.runtime:main"
+agenttrace-outlook = "agenttrace_outlook.cli:main"
 
 [dependency-groups]
 build = ["setuptools==84.2.1"]
@@ -31,7 +32,8 @@ dev = [
 packages = [
   "agenttrace_feasibility", "agenttrace_foundation", "agenttrace_contracts",
   "agenttrace_attribution", "agenttrace_evidence_adapters", "agenttrace_content_detection",
-  "agenttrace_content_provenance", "agenttrace_text_normalization", "agenttrace_ingestion", "agenttrace_ledger"
+  "agenttrace_content_provenance", "agenttrace_text_normalization", "agenttrace_ingestion", "agenttrace_ledger",
+  "agenttrace_outlook"
 ]
 
 [tool.setuptools.package-dir]
@@ -45,6 +47,7 @@ agenttrace_content_provenance = "packages/content-provenance/src/agenttrace_cont
 agenttrace_text_normalization = "packages/text-normalization/src/agenttrace_text_normalization"
 agenttrace_ingestion = "src/agenttrace_ingestion"
 agenttrace_ledger = "src/agenttrace_ledger"
+agenttrace_outlook = "src/agenttrace_outlook"
 
 [tool.setuptools.package-data]
 "*" = ["py.typed"]
@@ -57,7 +60,7 @@ addopts = "-ra --strict-markers"
 markers = ["integration: requires the isolated local PostgreSQL service"]
 
 [tool.mypy]
-files = ["src/agenttrace_foundation", "src/agenttrace_ingestion", "src/agenttrace_ledger", "packages"]
+files = ["src/agenttrace_foundation", "src/agenttrace_ingestion", "src/agenttrace_ledger", "src/agenttrace_outlook", "packages"]
 python_version = "3.12"
 strict = true
 plugins = ["pydantic.mypy"]

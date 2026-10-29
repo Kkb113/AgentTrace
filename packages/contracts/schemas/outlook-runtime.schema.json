@@ -1,0 +1,196 @@
+{
+  "$defs": {
+    "CategoryMapping": {
+      "additionalProperties": false,
+      "properties": {
+        "ai_agent": {
+          "const": "AI Agent",
+          "default": "AI Agent",
+          "title": "Ai Agent",
+          "type": "string"
+        },
+        "ai_color": {
+          "const": "preset0",
+          "default": "preset0",
+          "title": "Ai Color",
+          "type": "string"
+        },
+        "human": {
+          "const": "Human",
+          "default": "Human",
+          "title": "Human",
+          "type": "string"
+        },
+        "human_color": {
+          "const": "preset4",
+          "default": "preset4",
+          "title": "Human Color",
+          "type": "string"
+        },
+        "unknown": {
+          "const": "Unknown",
+          "default": "Unknown",
+          "title": "Unknown",
+          "type": "string"
+        },
+        "unknown_color": {
+          "const": "preset3",
+          "default": "preset3",
+          "title": "Unknown Color",
+          "type": "string"
+        }
+      },
+      "title": "CategoryMapping",
+      "type": "object"
+    },
+    "ReaderIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "certificate_thumbprint": {
+          "pattern": "^[a-fA-F0-9]{40}$",
+          "title": "Certificate Thumbprint",
+          "type": "string"
+        },
+        "client_id": {
+          "format": "uuid",
+          "title": "Client Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "client_id",
+        "certificate_thumbprint"
+      ],
+      "title": "ReaderIdentity",
+      "type": "object"
+    },
+    "Scope": {
+      "additionalProperties": false,
+      "properties": {
+        "mailbox_id": {
+          "format": "uuid",
+          "title": "Mailbox Id",
+          "type": "string"
+        },
+        "tenant_id": {
+          "format": "uuid",
+          "title": "Tenant Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tenant_id",
+        "mailbox_id"
+      ],
+      "title": "Scope",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "batch_size": {
+      "default": 50,
+      "maximum": 100,
+      "minimum": 1,
+      "title": "Batch Size",
+      "type": "integer"
+    },
+    "categories": {
+      "$ref": "#/$defs/CategoryMapping"
+    },
+    "data_boundary": {
+      "const": "synthetic_only",
+      "default": "synthetic_only",
+      "title": "Data Boundary",
+      "type": "string"
+    },
+    "decision_retention_days": {
+      "const": 30,
+      "default": 30,
+      "title": "Decision Retention Days",
+      "type": "integer"
+    },
+    "lease_seconds": {
+      "default": 120,
+      "maximum": 600,
+      "minimum": 30,
+      "title": "Lease Seconds",
+      "type": "integer"
+    },
+    "max_attempts": {
+      "default": 3,
+      "maximum": 10,
+      "minimum": 1,
+      "title": "Max Attempts",
+      "type": "integer"
+    },
+    "mode": {
+      "default": "dry_run",
+      "enum": [
+        "dry_run",
+        "apply_categories"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "poll_seconds": {
+      "default": 10,
+      "maximum": 60,
+      "minimum": 1,
+      "title": "Poll Seconds",
+      "type": "integer"
+    },
+    "production_positive_rules": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Production Positive Rules",
+      "type": "array"
+    },
+    "profile": {
+      "const": "outlook_foundation",
+      "default": "outlook_foundation",
+      "title": "Profile",
+      "type": "string"
+    },
+    "raw_retention_days": {
+      "const": 7,
+      "default": 7,
+      "title": "Raw Retention Days",
+      "type": "integer"
+    },
+    "reader_identity": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ReaderIdentity"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "$ref": "#/$defs/Scope"
+    },
+    "state_directory": {
+      "maxLength": 2048,
+      "minLength": 1,
+      "title": "State Directory",
+      "type": "string"
+    }
+  },
+  "required": [
+    "scope",
+    "state_directory"
+  ],
+  "title": "RuntimeConfig",
+  "type": "object"
+}

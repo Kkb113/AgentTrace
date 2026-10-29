@@ -1,0 +1,86 @@
+{
+  "executed_at": "2026-10-29T16:44:39.324522+00:00",
+  "milestone": "Outlook-native runtime foundation",
+  "python_version": "3.12.14",
+  "sqlite_version": "3.53.1",
+  "validation_basis": "Clean selected-index export; unfinished evaluation work and client workbook excluded",
+  "validated_source_sha256": "f1408b58bf3dae7cb708916b32be8a3d78f7945d6ea1ae46465f1e7fecae9496",
+  "source_files_hashed": 228,
+  "source_hash_scope": "Sorted tracked src/, packages/, scripts/, tests/, config/ plus pyproject.toml, uv.lock and requirements files. SHA256 stream: UTF-8 path + NUL + ASCII byte length + NUL + LF-normalized bytes. Documentation and generated validation record excluded.",
+  "gates": {
+    "quality": "passed",
+    "security": "passed",
+    "infrastructure": "passed",
+    "guard_controls": "passed",
+    "integration_end_to_end": "passed",
+    "standalone_installed_command": "passed",
+    "standalone_script_replay": "passed"
+  },
+  "unit_primary_tests_passed": 325,
+  "unit_subtests_passed": 97,
+  "unit_skipped": 1,
+  "integration_tests_passed": 123,
+  "new_runtime_tests_passed": 42,
+  "new_runtime_tests_skipped": 1,
+  "junit_counts_including_subtests": {
+    "unit": {
+      "tests": 423,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "integration": {
+      "tests": 123,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "platform_limit": "Windows symlink creation requires extra privileges; Linux CI executes that test. Hard-link alias rejection passed locally.",
+  "fault_tests": [
+    "uncommitted schema crash",
+    "committed observation plus uncommitted work crash",
+    "committed decision crash",
+    "SQLite FULL rollback/retry",
+    "outbox insertion failure rollback",
+    "multiple processes",
+    "stale lease fencing",
+    "scope/schema drift/corruption rejection",
+    "idempotency and version supersession",
+    "safe error output",
+    "zero-network dry-run",
+    "experimental and unenrolled positive decision rejection"
+  ],
+  "exit_criteria": [
+    {
+      "id": "independent_runner",
+      "status": "passed"
+    },
+    {
+      "id": "durable_state_migrations_and_leases",
+      "status": "passed"
+    },
+    {
+      "id": "dry_run_and_annotation_admission",
+      "status": "passed"
+    },
+    {
+      "id": "relevant_engineering_gates",
+      "status": "passed"
+    }
+  ],
+  "exit_criteria_met": 4,
+  "exit_criteria_total": 4,
+  "demo_source_archive_verified": true,
+  "mail_mutations": 0,
+  "new_permissions": 0,
+  "azure_resources_created": 0,
+  "additional_azure_cost": 0,
+  "category_writes_enabled": false,
+  "positive_rules_enabled": false,
+  "live_collection_implemented": false,
+  "runtime_stage": "foundation_only",
+  "qualification_claim": "Engineering foundation and synthetic replay only; no live sender accuracy or Outlook category-application claim.",
+  "integration_setup": "Regression stack used a separate synthetic database volume. Containers stopped after tests; original volumes retained.",
+  "review": "docs/outlook-runtime-review.md"
+}
