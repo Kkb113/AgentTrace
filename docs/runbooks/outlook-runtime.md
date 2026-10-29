@@ -1,6 +1,6 @@
 # Outlook runtime foundation
 
-The standalone runner is installable and runs without the historical web/API/content workers, Docker, Azure resources or mailbox credentials. Fixture mode validates configuration and processes **synthetic metadata fixtures** into durable **Unknown previews**. The [mailbox synchronization mode](outlook-mailbox-sync.md) now adds durable read-only Graph collection. Neither mode enables qualified AI Agent/Human rules or applies Outlook categories. The existing experimental terminal demo remains unchanged.
+The standalone runner is installable and runs without the historical web/API/content workers, Docker, Azure resources or mailbox credentials. Fixture mode validates configuration and processes **synthetic metadata fixtures** into durable **Unknown previews**. The [mailbox synchronization mode](outlook-mailbox-sync.md) now adds durable read-only Graph collection. The [sender-rule extension](sender-detection-rules.md) adds the approved corroborated POC AI and Human-capable rules. Outlook category application remains disabled. The existing experimental terminal demo remains unchanged.
 
 ## Prepare and run
 
@@ -15,7 +15,7 @@ uv run python scripts/monitor-outlook-mail.py --config work/outlook-dry-run/runt
 
 Remove `--once` to keep processing until Ctrl+C. The installed `agenttrace-outlook` command and script invoke the same code. Replaying the same fixture creates no additional logical decision or preview. Configuration validation with `--check` opens neither state nor network. The preparation command refuses to overwrite an existing directory; choose a fresh one. Fixtures expire seven days after their observation time.
 
-Output is newline-delimited JSON. `ready` states whether collection is disabled or uses read-only delta, and that actor rules remain unqualified. `cycle_completed` reports work counts and preview counts. A decision and its annotation preview are distinct records; **preview never means applied**. No record can be marked applied in this schema. Positive category contracts exist for later use, but no positive rule is enrolled. All fixture observations, including those marked fully inspected, remain Unknown with `sender_rules_not_qualified`.
+Output is newline-delimited JSON. `ready` states whether collection is disabled or uses read-only delta, and that actor rules remain unqualified. `cycle_completed` reports work counts and preview counts. A decision and its annotation preview are distinct records; **preview never means applied**. No record can be marked applied in this schema. Metadata-only fixtures without a complete retained snapshot remain Unknown. Live snapshots can use the registered POC rules; their evidence and qualification limits are described in the sender-rule runbook.
 
 ## Configuration and safety
 

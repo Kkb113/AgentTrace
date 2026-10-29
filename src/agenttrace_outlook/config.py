@@ -16,7 +16,7 @@ from .errors import OutlookError
 
 class CategoryMapping(Record):
     ai_agent: Literal["AI Agent"] = "AI Agent"
-    human: Literal["Human"] = "Human"
+    human: Literal["Human-capable"] = "Human-capable"
     unknown: Literal["Unknown"] = "Unknown"
     ai_color: Literal["preset0"] = "preset0"
     human_color: Literal["preset4"] = "preset4"
@@ -26,6 +26,16 @@ class CategoryMapping(Record):
 class ReaderIdentity(Record):
     client_id: UUID
     certificate_thumbprint: str = Field(pattern=r"^[a-fA-F0-9]{40}$", repr=False)
+
+
+class SenderSource(Record):
+    subscription_id: UUID
+    mailbox_address: str = Field(pattern=r"^[^\s<>@]+@[^\s<>@]+$", repr=False)
+    exchange_mailbox_guid: UUID
+    audit_identity: ReaderIdentity
+    publisher_id: str = Field(pattern=r"^[A-Za-z0-9_.-]{1,100}$")
+    publisher_owner_tenant: UUID
+    refresh_seconds: int = Field(default=300, ge=300, le=900)
 
 
 class RuntimeConfig(Record):
@@ -51,6 +61,7 @@ class RuntimeConfig(Record):
     page_size: int = Field(default=100, ge=1, le=100)
     backfill_since: AwareDatetime | None = None
     synthetic_subject_prefix: Literal["AgentTrace synthetic test:"] = "AgentTrace synthetic test:"
+    sender_source: SenderSource | None = None
 
     @field_validator("state_directory")
     @classmethod
@@ -65,6 +76,8 @@ class RuntimeConfig(Record):
             raise ValueError("positive_rules_not_qualified_in_foundation")
         if self.sync_enabled and self.reader_identity is None:
             raise ValueError("sync_reader_identity_required")
+        if self.sender_source and not self.sync_enabled:
+            raise ValueError("sender_source_requires_live_sync")
         if self.sync_enabled and self.lease_seconds < 120:
             raise ValueError("sync_lease_too_short_for_bounded_network_calls")
         if self.lease_seconds < self.poll_seconds * 3:

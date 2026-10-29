@@ -16,8 +16,8 @@
           "type": "string"
         },
         "human": {
-          "const": "Human",
-          "default": "Human",
+          "const": "Human-capable",
+          "default": "Human-capable",
           "title": "Human",
           "type": "string"
         },
@@ -83,6 +83,56 @@
         "mailbox_id"
       ],
       "title": "Scope",
+      "type": "object"
+    },
+    "SenderSource": {
+      "additionalProperties": false,
+      "properties": {
+        "audit_identity": {
+          "$ref": "#/$defs/ReaderIdentity"
+        },
+        "exchange_mailbox_guid": {
+          "format": "uuid",
+          "title": "Exchange Mailbox Guid",
+          "type": "string"
+        },
+        "mailbox_address": {
+          "pattern": "^[^\\s<>@]+@[^\\s<>@]+$",
+          "title": "Mailbox Address",
+          "type": "string"
+        },
+        "publisher_id": {
+          "pattern": "^[A-Za-z0-9_.-]{1,100}$",
+          "title": "Publisher Id",
+          "type": "string"
+        },
+        "publisher_owner_tenant": {
+          "format": "uuid",
+          "title": "Publisher Owner Tenant",
+          "type": "string"
+        },
+        "refresh_seconds": {
+          "default": 300,
+          "maximum": 900,
+          "minimum": 300,
+          "title": "Refresh Seconds",
+          "type": "integer"
+        },
+        "subscription_id": {
+          "format": "uuid",
+          "title": "Subscription Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "subscription_id",
+        "mailbox_address",
+        "exchange_mailbox_guid",
+        "audit_identity",
+        "publisher_id",
+        "publisher_owner_tenant"
+      ],
+      "title": "SenderSource",
       "type": "object"
     }
   },
@@ -206,6 +256,17 @@
     },
     "scope": {
       "$ref": "#/$defs/Scope"
+    },
+    "sender_source": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SenderSource"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "state_directory": {
       "maxLength": 2048,

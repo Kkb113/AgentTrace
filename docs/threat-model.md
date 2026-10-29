@@ -1,5 +1,8 @@
 # Sender-attribution threat model
 
+Current POC policy revision: [Human-capable and corroborated indicators](adr/human-capable-classification.md). This supersedes earlier Human/controller and independent received-item-proof definitions for this POC; historical evidence below retains its original scope.
+
+
 **Current Outlook-native extension:** [The production plan](../implementation.md) supersedes the earlier absolute read-only boundary solely for managed category annotation. New risks are broad Mail.ReadWrite capability, wrong-message labels, user-category loss during concurrent edits, stale labels and write/delta loops. A dedicated exact-mailbox writer, categories-only route/payload guards, validated concurrency, confirmed/idempotent outbox updates, annotation expiry and owned-label rollback are required. The owner's subsequent Human policy permits inferred manual sending after complete inspection finds no automation indicators. Untagged/browser agents can defeat that inference and must be included in false-human evaluation. Failed/incomplete inspection stays Unknown; marker-only AI remains unqualified. The earlier model below remains useful history; no permission is granted by this extension.
 
 Historical revision 2.0, 29 October 2026. The owner's earlier baseline/security acceptance remains historical; this revision introduces no mailbox access, Google consent or tenant-policy exception. [Current scope change](adr/outlook-native-categorization.md).

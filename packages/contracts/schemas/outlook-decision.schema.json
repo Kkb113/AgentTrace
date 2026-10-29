@@ -35,6 +35,7 @@
     "category": {
       "enum": [
         "AI Agent",
+        "Human-capable",
         "Human",
         "Unknown"
       ],

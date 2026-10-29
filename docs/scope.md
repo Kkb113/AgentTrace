@@ -1,5 +1,8 @@
 # AgentTrace Outlook-native scope
 
+Current POC policy revision: [Human-capable and corroborated indicators](adr/human-capable-classification.md). This supersedes earlier Human/controller and independent received-item-proof definitions for this POC; historical evidence below retains its original scope.
+
+
 Current revision: 29 October 2026. The owner's latest change replaces the standalone application roadmap with a production-quality Python monitor and native Outlook color categories. [Decision record](adr/outlook-native-categorization.md), [current implementation plan](../implementation.md).
 
 ## Product

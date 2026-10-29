@@ -1,14 +1,14 @@
 # AgentTrace
 
-AgentTrace is becoming an Outlook-native sender detector: a small supervised Python monitor that applies **AI Agent** (red), **Human** (green) or **Unknown** (yellow) categories. No standalone application, custom API, add-in or AI-text detector is required.
+AgentTrace is becoming an Outlook-native sender detector: a small supervised Python monitor that applies **AI Agent** (red), **Human-capable** (green) or **Unknown** (yellow) categories. No standalone application, custom API, add-in or AI-text detector is required.
 
-The owner's Human policy is inferred manual sending: a complete inspection finds no MCP/API/other automation indicators, independently of who wrote the text. Incomplete inspection, known automation and conflicts remain Unknown. This is an inference to qualify, not proof of the executor.
+The current [owner-approved POC policy](docs/adr/human-capable-classification.md) uses Human-capable for a complete normal-client-compatible inspection, whether a person or an agent controls the browser. AI Agent requires the narrow corroborated MCP/audit rule. Missing/conflicting evidence remains Unknown; neither label claims forensic controller identity.
 
 ## Current delivery
 
 Phase 0 of the Outlook-native baseline is complete, with [four exit criteria evidenced](config/outlook-baseline-exits.json). Its [frozen contract](config/outlook-production-baseline.json) and [implementation plan](implementation.md) define scope, colors, data/retention, ownership, permissions and release gates. The [baseline review](docs/outlook-production-baseline.md) records actual feasibility evidence and open dependencies.
 
-The working demo uses experimental binary header rules, including a Human fallback. It is preserved separately; it does not establish production accuracy. The narrow authenticated Microsoft/Claude Exchange Send route has actual source evidence. Phase 1 is complete, with [four exits validated](docs/outlook-runtime-review.md). Its separate runner processes synthetic metadata into durable Unknown previews. Phase 2 adds [durable read-only mailbox synchronization](docs/runbooks/outlook-mailbox-sync.md), including receiving-folder discovery, delta checkpoints, move/restart recovery and synthetic-only header capture. Qualified actor rules and category writes remain later milestones. See the [runtime runbook](docs/runbooks/outlook-runtime.md) for preparation, commands and recovery behavior.
+The working demo uses experimental binary header rules, including a Human fallback. It is preserved separately; it does not establish production accuracy. The narrow authenticated Microsoft/Claude Exchange Send route has actual source evidence. Phase 1 is complete, with [four exits validated](docs/outlook-runtime-review.md). Its separate runner processes synthetic metadata into durable Unknown previews. Phase 2 adds [durable read-only mailbox synchronization](docs/runbooks/outlook-mailbox-sync.md), including receiving-folder discovery, delta checkpoints, move/restart recovery and synthetic-only header capture. Phase 3 adds the [approved POC sender rules](docs/runbooks/sender-detection-rules.md). Independent numeric accuracy and category writes remain later milestones. See the [runtime runbook](docs/runbooks/outlook-runtime.md) for preparation, commands and recovery behavior.
 
 ## Run the existing terminal demo
 

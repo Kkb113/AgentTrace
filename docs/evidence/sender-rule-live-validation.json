@@ -1,0 +1,54 @@
+{
+  "executed_at": "2026-10-29T19:24:33.015334+00:00",
+  "policy": "corroborated-poc-human-capable/v1",
+  "cases": [
+    {
+      "scenario": "new_live_manual_outlook_send",
+      "expected_policy_class": "Human-capable",
+      "observed_qualified_class": "Human-capable",
+      "first_qualified_decision_at": "2026-10-29T18:38:20.199375Z",
+      "initial_decision_class": "Unknown",
+      "observation_received_at": "2026-10-29T17:59:55Z",
+      "delayed_evidence_reassessment_observed": false,
+      "private_capture_sha256": "ab4a6e91910eaa0f337ade9906a065fae68af9554b71601bda3b38f24729f697",
+      "body_requested": false,
+      "subject_used_as_classifier_feature": false
+    },
+    {
+      "scenario": "new_live_claude_send",
+      "expected_policy_class": "AI Agent",
+      "observed_qualified_class": "AI Agent",
+      "first_qualified_decision_at": "2026-10-29T19:22:21.353047Z",
+      "initial_decision_class": "Unknown",
+      "observation_received_at": "2026-10-29T17:59:05Z",
+      "delayed_evidence_reassessment_observed": true,
+      "private_capture_sha256": "9e0809300969e1f2429c6f5cadde1379080e0233d5251b87064e0a54b6c4ca6b",
+      "body_requested": false,
+      "subject_used_as_classifier_feature": false
+    },
+    {
+      "scenario": "retrospective_prior_claude_send_fresh_authenticated_api_reads",
+      "observed_qualified_class": "AI Agent",
+      "captured_at": "2026-10-29T19:22:54.722865+00:00",
+      "private_capture_sha256": "0c3bdb910f9d20c59d5aa0fa30775198b9cb2b793ae822a74eddbea2c6743d68",
+      "body_requested": false,
+      "real_time_latency_claimed": false
+    }
+  ],
+  "ground_truth": "Owner-prepared synthetic tests and reported send actions; not an independent holdout",
+  "source_capture": "Certificate-authenticated mailbox/audit reads, scoped completed query, current publisher and matching provider-copy reads",
+  "mail_mutations_by_agenttrace": 0,
+  "permissions_added": 0,
+  "azure_resources_created": 0,
+  "category_writes_enabled": false,
+  "statistical_accuracy_qualified": false,
+  "independent_forensic_identity_claimed": false,
+  "physical_human_identity_claimed": false,
+  "privacy": "Only redacted summaries and private capture digests are published; messages, addresses, provider IDs, source records and headers stay ignored/private",
+  "limits": [
+    "Enrolled own-mailbox Claude Microsoft 365 route only",
+    "Delayed audit evidence was actually observed; no immediate-delivery SLA",
+    "Human-capable includes agent-controlled ordinary clients",
+    "Copied-ID full replacement remains an accepted POC risk"
+  ]
+}

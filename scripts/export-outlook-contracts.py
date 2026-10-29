@@ -6,6 +6,7 @@ from pathlib import Path
 
 from agenttrace_outlook.config import RuntimeConfig
 from agenttrace_outlook.contracts import Decision, FixtureBatch, Observation
+from agenttrace_outlook.sender_rules import RuleAssessment
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -19,6 +20,7 @@ def main() -> int:
         ("outlook-observation", Observation),
         ("outlook-decision", Decision),
         ("outlook-fixtures", FixtureBatch),
+        ("sender-rule-assessment", RuleAssessment),
     ):
         path = ROOT / "packages/contracts/schemas" / (name + ".schema.json")
         expected = json.dumps(model.model_json_schema(), indent=2, sort_keys=True) + "\n"

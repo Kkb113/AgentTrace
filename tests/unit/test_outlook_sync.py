@@ -369,7 +369,7 @@ def test_v1_additive_migration_preserves_activation_and_rejects_drift(tmp_path: 
         db.execute("INSERT INTO messages VALUES ('legacy',1,0)")
         db.execute("INSERT INTO work(observation_id,status) VALUES (1,'pending')")
     with StateStore(cfg, clock=lambda: NOW) as store:
-        assert store.db.execute("PRAGMA user_version").fetchone()[0] == 2
+        assert store.db.execute("PRAGMA user_version").fetchone()[0] == 4
         assert store.summary()["activation_utc"] == NOW.isoformat()
         sync = Synchronizer(store, MailReader(cfg, Graph()))
         assert sync.state.cutoff == NOW
