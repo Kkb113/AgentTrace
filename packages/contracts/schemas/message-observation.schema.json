@@ -1,0 +1,277 @@
+{
+  "$defs": {
+    "Recipient": {
+      "additionalProperties": false,
+      "properties": {
+        "address": {
+          "maxLength": 320,
+          "minLength": 3,
+          "title": "Address",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "to",
+            "cc",
+            "bcc"
+          ],
+          "title": "Role",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "address"
+      ],
+      "title": "Recipient",
+      "type": "object"
+    },
+    "Region": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "exclusiveMinimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "role": {
+          "enum": [
+            "authored",
+            "inherited"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start",
+        "end",
+        "role"
+      ],
+      "title": "Region",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "body": {
+      "maxLength": 262144,
+      "title": "Body",
+      "type": "string"
+    },
+    "content_available": {
+      "default": true,
+      "title": "Content Available",
+      "type": "boolean"
+    },
+    "copy_role": {
+      "enum": [
+        "sender",
+        "recipient",
+        "unknown"
+      ],
+      "title": "Copy Role",
+      "type": "string"
+    },
+    "immutable_id": {
+      "maxLength": 2048,
+      "minLength": 1,
+      "title": "Immutable Id",
+      "type": "string"
+    },
+    "internet_message_id": {
+      "anyOf": [
+        {
+          "maxLength": 2048,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Internet Message Id"
+    },
+    "mailbox_id": {
+      "format": "uuid",
+      "title": "Mailbox Id",
+      "type": "string"
+    },
+    "namespace": {
+      "enum": [
+        "graph_immutable",
+        "exchange_store",
+        "external_source"
+      ],
+      "title": "Namespace",
+      "type": "string"
+    },
+    "normalization_version": {
+      "default": "mail-text-v1",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_./-]{0,63}$",
+      "title": "Normalization Version",
+      "type": "string"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "title": "Observed At",
+      "type": "string"
+    },
+    "recipients": {
+      "items": {
+        "$ref": "#/$defs/Recipient"
+      },
+      "maxItems": 200,
+      "title": "Recipients",
+      "type": "array"
+    },
+    "recipients_complete": {
+      "default": true,
+      "title": "Recipients Complete",
+      "type": "boolean"
+    },
+    "regions": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Region"
+      },
+      "maxItems": 64,
+      "title": "Regions",
+      "type": "array"
+    },
+    "sent_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sent At"
+    },
+    "snapshot_authorized": {
+      "default": false,
+      "title": "Snapshot Authorized",
+      "type": "boolean"
+    },
+    "snapshot_expires_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Snapshot Expires At"
+    },
+    "snapshot_ref": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Snapshot Ref"
+    },
+    "source_event_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Event At"
+    },
+    "source_event_ref": {
+      "format": "uuid",
+      "title": "Source Event Ref",
+      "type": "string"
+    },
+    "source_ref": {
+      "format": "uuid",
+      "title": "Source Ref",
+      "type": "string"
+    },
+    "source_schema_version": {
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_./-]{0,63}$",
+      "title": "Source Schema Version",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "draft",
+        "sent",
+        "received",
+        "unknown"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "subject": {
+      "maxLength": 2048,
+      "title": "Subject",
+      "type": "string"
+    },
+    "tenant_id": {
+      "format": "uuid",
+      "title": "Tenant Id",
+      "type": "string"
+    },
+    "transport_bytes_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Transport Bytes Sha256"
+    },
+    "version_ref": {
+      "format": "uuid",
+      "title": "Version Ref",
+      "type": "string"
+    }
+  },
+  "required": [
+    "tenant_id",
+    "mailbox_id",
+    "source_ref",
+    "source_event_ref",
+    "source_schema_version",
+    "namespace",
+    "immutable_id",
+    "version_ref",
+    "copy_role",
+    "state",
+    "observed_at",
+    "subject",
+    "body",
+    "recipients"
+  ],
+  "title": "MessageObservation",
+  "type": "object"
+}

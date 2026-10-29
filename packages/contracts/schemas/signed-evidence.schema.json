@@ -1,0 +1,497 @@
+{
+  "$defs": {
+    "ContentEdit": {
+      "additionalProperties": false,
+      "properties": {
+        "after_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "After Sha256",
+          "type": "string"
+        },
+        "before_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Before Sha256",
+          "type": "string"
+        },
+        "kind": {
+          "const": "content_edit",
+          "default": "content_edit",
+          "title": "Kind",
+          "type": "string"
+        },
+        "method": {
+          "enum": [
+            "authenticated_unchanged_span",
+            "changed_output",
+            "unsupported"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "parent_inclusion_ref": {
+          "format": "uuid",
+          "title": "Parent Inclusion Ref",
+          "type": "string"
+        },
+        "region_end": {
+          "exclusiveMinimum": 0,
+          "title": "Region End",
+          "type": "integer"
+        },
+        "region_start": {
+          "minimum": 0,
+          "title": "Region Start",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "parent_inclusion_ref",
+        "method",
+        "before_sha256",
+        "after_sha256",
+        "region_start",
+        "region_end"
+      ],
+      "title": "ContentEdit",
+      "type": "object"
+    },
+    "ContentInclusion": {
+      "additionalProperties": false,
+      "properties": {
+        "generation_ref": {
+          "format": "uuid",
+          "title": "Generation Ref",
+          "type": "string"
+        },
+        "kind": {
+          "const": "content_inclusion",
+          "default": "content_inclusion",
+          "title": "Kind",
+          "type": "string"
+        },
+        "method": {
+          "enum": [
+            "authenticated_transfer_lineage",
+            "exact_output_match",
+            "fuzzy_similarity",
+            "unsupported"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "output_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Output Sha256",
+          "type": "string"
+        },
+        "region_end": {
+          "exclusiveMinimum": 0,
+          "title": "Region End",
+          "type": "integer"
+        },
+        "region_start": {
+          "minimum": 0,
+          "title": "Region Start",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "generation_ref",
+        "method",
+        "region_start",
+        "region_end",
+        "output_sha256"
+      ],
+      "title": "ContentInclusion",
+      "type": "object"
+    },
+    "CopyMapping": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "copy_mapping",
+          "default": "copy_mapping",
+          "title": "Kind",
+          "type": "string"
+        },
+        "mapping_basis": {
+          "enum": [
+            "authenticated_source_mapping",
+            "similarity_only"
+          ],
+          "title": "Mapping Basis",
+          "type": "string"
+        },
+        "other_message_ref": {
+          "format": "uuid",
+          "title": "Other Message Ref",
+          "type": "string"
+        },
+        "other_version_ref": {
+          "format": "uuid",
+          "title": "Other Version Ref",
+          "type": "string"
+        },
+        "relation": {
+          "enum": [
+            "delivery_copy",
+            "documented_id_translation",
+            "archive_move",
+            "forward_context"
+          ],
+          "title": "Relation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "other_message_ref",
+        "other_version_ref",
+        "relation",
+        "mapping_basis"
+      ],
+      "title": "CopyMapping",
+      "type": "object"
+    },
+    "EvidenceRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "canonicalization_version": {
+          "const": "evidence-json-v1",
+          "default": "evidence-json-v1",
+          "title": "Canonicalization Version",
+          "type": "string"
+        },
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "expires_at": {
+          "format": "date-time",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "fact": {
+          "discriminator": {
+            "mapping": {
+              "content_edit": "#/$defs/ContentEdit",
+              "content_inclusion": "#/$defs/ContentInclusion",
+              "copy_mapping": "#/$defs/CopyMapping",
+              "generation": "#/$defs/Generation",
+              "send_execution": "#/$defs/SendExecution"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SendExecution"
+            },
+            {
+              "$ref": "#/$defs/Generation"
+            },
+            {
+              "$ref": "#/$defs/ContentInclusion"
+            },
+            {
+              "$ref": "#/$defs/ContentEdit"
+            },
+            {
+              "$ref": "#/$defs/CopyMapping"
+            }
+          ],
+          "title": "Fact"
+        },
+        "issued_at": {
+          "format": "date-time",
+          "title": "Issued At",
+          "type": "string"
+        },
+        "issuer_ref": {
+          "format": "uuid",
+          "title": "Issuer Ref",
+          "type": "string"
+        },
+        "mailbox_id": {
+          "format": "uuid",
+          "title": "Mailbox Id",
+          "type": "string"
+        },
+        "message_ref": {
+          "format": "uuid",
+          "title": "Message Ref",
+          "type": "string"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_request_ref": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Request Ref"
+        },
+        "source_schema_version": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_./-]{0,63}$",
+          "title": "Source Schema Version",
+          "type": "string"
+        },
+        "tenant_id": {
+          "format": "uuid",
+          "title": "Tenant Id",
+          "type": "string"
+        },
+        "version_ref": {
+          "format": "uuid",
+          "title": "Version Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "issuer_ref",
+        "event_id",
+        "tenant_id",
+        "mailbox_id",
+        "message_ref",
+        "version_ref",
+        "occurred_at",
+        "issued_at",
+        "expires_at",
+        "source_schema_version",
+        "fact"
+      ],
+      "title": "EvidenceRecord",
+      "type": "object"
+    },
+    "Generation": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "generation",
+          "default": "generation",
+          "title": "Kind",
+          "type": "string"
+        },
+        "model_ref": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_./-]{0,63}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Ref"
+        },
+        "operation": {
+          "enum": [
+            "draft_generation",
+            "substantial_rewrite",
+            "translation_into_english",
+            "basic_correction"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "origin": {
+          "enum": [
+            "new_generated_output",
+            "echoed_human_input",
+            "shared_template",
+            "unknown"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "output_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Output Sha256",
+          "type": "string"
+        },
+        "provider_ref": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_./-]{0,63}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider Ref"
+        }
+      },
+      "required": [
+        "output_sha256",
+        "origin",
+        "operation"
+      ],
+      "title": "Generation",
+      "type": "object"
+    },
+    "Identifier": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "mailbox_immutable",
+            "internet_message_id"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 2048,
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "title": "Identifier",
+      "type": "object"
+    },
+    "SendExecution": {
+      "additionalProperties": false,
+      "properties": {
+        "actor": {
+          "enum": [
+            "ai_agent",
+            "human",
+            "non_ai_application",
+            "unknown"
+          ],
+          "title": "Actor",
+          "type": "string"
+        },
+        "actor_ref": {
+          "format": "uuid",
+          "title": "Actor Ref",
+          "type": "string"
+        },
+        "application_ref": {
+          "format": "uuid",
+          "title": "Application Ref",
+          "type": "string"
+        },
+        "execution_ref": {
+          "format": "uuid",
+          "title": "Execution Ref",
+          "type": "string"
+        },
+        "identifier": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Identifier"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "kind": {
+          "const": "send_execution",
+          "default": "send_execution",
+          "title": "Kind",
+          "type": "string"
+        },
+        "link_method": {
+          "enum": [
+            "exact_identifier",
+            "candidate",
+            "unsupported"
+          ],
+          "title": "Link Method",
+          "type": "string"
+        },
+        "mechanism": {
+          "enum": [
+            "agent",
+            "human_interaction_observed",
+            "conventional_automation",
+            "unknown"
+          ],
+          "title": "Mechanism",
+          "type": "string"
+        },
+        "outcome": {
+          "enum": [
+            "attempted",
+            "accepted",
+            "completed",
+            "failed"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "workflow_version": {
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_./-]{0,63}$",
+          "title": "Workflow Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "outcome",
+        "actor",
+        "execution_ref",
+        "actor_ref",
+        "application_ref",
+        "workflow_version",
+        "mechanism",
+        "link_method"
+      ],
+      "title": "SendExecution",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "algorithm": {
+      "const": "Ed25519",
+      "default": "Ed25519",
+      "title": "Algorithm",
+      "type": "string"
+    },
+    "key_ref": {
+      "format": "uuid",
+      "title": "Key Ref",
+      "type": "string"
+    },
+    "record": {
+      "$ref": "#/$defs/EvidenceRecord"
+    },
+    "signature": {
+      "pattern": "^[A-Za-z0-9+/]{86}==$",
+      "title": "Signature",
+      "type": "string"
+    }
+  },
+  "required": [
+    "key_ref",
+    "record",
+    "signature"
+  ],
+  "title": "SignedEvidence",
+  "type": "object"
+}

@@ -67,3 +67,21 @@ The owner subsequently authorized enabling Microsoft Graph activity logging, che
 The new workspace uses public Azure TLS endpoints with Entra authorization;
 operator-IP storage firewalls do not apply to it. No private endpoint deployment is
 claimed for this minimal-cost addition. Live source delivery is still pending.
+
+## Evidence ledger addition
+
+The local migration adds `agenttrace_ledger`, a separate SQL runtime identity. Its
+explicit mailbox-scope ACL allows reading the enrolled evidence and appending
+receipts, conflicts and input revisions. It has no modification, deletion, schema
+ownership or trust-enrollment grant. The collector can append enrolled observations;
+the content identity cannot access ledger tables. Existing API/attribution identities
+receive scoped metadata-column reads only. Application grants, RLS, triggers and
+expiry checks are tested using actual local SQL logins.
+
+The separate loopback evidence API retains existing Entra audience/client/role
+validation and server-owned message entitlements. A source application also needs
+an exact issuer/client/subject enrollment, allowed fact kind and valid signature.
+Delegated investigator roles can append server-computed reassessment inputs; they
+cannot enroll a signer through the API. Tenant fingerprint/encryption keys remain in
+protected local files. No Azure or Microsoft 365 role/permission changes are made.
+See [the ledger trust contract](evidence-schema.md) and [operations](runbooks/evidence-ledger.md).

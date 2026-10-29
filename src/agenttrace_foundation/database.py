@@ -48,7 +48,7 @@ class Database:
 
     def migrate(self) -> None:
         with self.connect() as connection:
-            for name in ("schema.sql", "ingestion.sql"):
+            for name in ("schema.sql", "ingestion.sql", "ledger.sql"):
                 source = files("agenttrace_foundation").joinpath("migrations/" + name).read_text()
                 connection.execute(source, prepare=False)
 

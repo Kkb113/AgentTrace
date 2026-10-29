@@ -9,7 +9,7 @@ from psycopg.rows import DictRow
 
 from .database import Database
 
-WORKLOADS = ("api", "attribution", "content", "collector")
+WORKLOADS = ("api", "attribution", "content", "collector", "ledger")
 
 
 def configure_local_roles(database: Database, secret_directory: Path) -> None:
@@ -145,6 +145,68 @@ def configure_local_roles(database: Database, secret_directory: Path) -> None:
             "GRANT INSERT,UPDATE ON component_health TO agenttrace_attribution,agenttrace_content"
         )
         _configure_ingestion_access(connection)
+        configure_ledger_access(connection)
+
+
+def configure_ledger_access(connection: Connection[DictRow]) -> None:
+    """Apply in the current schema as migration owner; never accept runtime role names."""
+    connection.execute("GRANT SELECT ON ledger_schema TO agenttrace_ledger")
+    connection.execute("ALTER TABLE ledger_acl ENABLE ROW LEVEL SECURITY")
+    connection.execute("DROP POLICY IF EXISTS ledger_own_acl ON ledger_acl")
+    connection.execute(
+        "CREATE POLICY ledger_own_acl ON ledger_acl FOR SELECT USING(db_role=current_user)"
+    )
+    connection.execute(
+        "GRANT SELECT ON ledger_acl TO agenttrace_ledger,agenttrace_collector,agenttrace_api,agenttrace_attribution"
+    )
+    tables = (
+        "ledger_scopes",
+        "ledger_issuers",
+        "ledger_keys",
+        "ledger_observers",
+        "ledger_revocations",
+        "ledger_messages",
+        "ledger_receipts",
+        "ledger_conflicts",
+        "ledger_inputs",
+    )
+    for table in tables:
+        connection.execute(
+            sql.SQL("ALTER TABLE {} ENABLE ROW LEVEL SECURITY").format(sql.Identifier(table))
+        )
+        connection.execute(
+            sql.SQL("DROP POLICY IF EXISTS ledger_scope_access ON {}").format(sql.Identifier(table))
+        )
+        expiry = (
+            " AND expires_at>now()"
+            if table in {"ledger_messages", "ledger_receipts", "ledger_conflicts", "ledger_inputs"}
+            else ""
+        )
+        connection.execute(
+            sql.SQL(
+                "CREATE POLICY ledger_scope_access ON {} USING(EXISTS(SELECT 1 FROM ledger_acl a WHERE a.scope_ref={}.scope_ref AND a.db_role=current_user){})"
+            ).format(sql.Identifier(table), sql.Identifier(table), sql.SQL(expiry))
+        )
+        connection.execute(
+            sql.SQL(
+                "REVOKE ALL ON {} FROM agenttrace_ledger,agenttrace_collector,agenttrace_api,agenttrace_attribution,agenttrace_content"
+            ).format(sql.Identifier(table))
+        )
+        connection.execute(
+            sql.SQL("GRANT SELECT ON {} TO agenttrace_ledger").format(sql.Identifier(table))
+        )
+    connection.execute("GRANT SELECT ON ledger_scopes TO agenttrace_collector")
+    connection.execute("GRANT SELECT ON ledger_observers TO agenttrace_collector")
+    connection.execute("GRANT SELECT,INSERT ON ledger_messages TO agenttrace_collector")
+    connection.execute(
+        "GRANT INSERT ON ledger_receipts,ledger_conflicts,ledger_inputs TO agenttrace_ledger"
+    )
+    connection.execute(
+        "GRANT SELECT(scope_ref,message_ref,version_ref,source_ref,source_event_ref,source_schema_version,copy_role,message_state,observed_at,expires_at) ON ledger_messages TO agenttrace_api,agenttrace_attribution"
+    )
+    connection.execute(
+        "GRANT SELECT(input_ref,scope_ref,message_ref,version_ref,schema_version,rule_version,revision,prior_input_ref,recorded_at,expires_at) ON ledger_inputs TO agenttrace_api,agenttrace_attribution"
+    )
 
 
 def _configure_ingestion_access(connection: Connection[DictRow]) -> None:

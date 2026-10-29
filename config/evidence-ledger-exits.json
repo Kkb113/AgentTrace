@@ -1,0 +1,65 @@
+{
+  "review_version": "1.0.0",
+  "scope": "Evidence ledger and independent correlation; synthetic local validation, not detector accuracy or production deployment",
+  "exits": [
+    {
+      "id": "exact_and_candidate_links_distinct",
+      "required_tests": [
+        "test_exact_send_candidates_restart_and_independent_history",
+        "test_accepted_failed_and_candidate_actions_never_become_exact",
+        "test_identical_bodies_subjects_and_duplicate_message_ids_do_not_merge_copies",
+        "test_signed_copy_and_archive_mappings_never_propagate_send_or_content",
+        "test_cross_mailbox_mapping_requires_dual_matching_issuer_enrollment",
+        "test_tied_versions_and_contradictory_completed_actions_remain_uncertain"
+      ]
+    },
+    {
+      "id": "signature_replay_and_trust_validation",
+      "required_tests": [
+        "test_signature_binds_key_record_scope_and_expiry",
+        "test_altered_replay_is_persisted_as_conflict_without_rewriting_history",
+        "test_wrong_source_principal_and_revoked_keys_fail_closed",
+        "test_key_rotation_does_not_resurrect_revoked_evidence_and_axes_remain_separate",
+        "test_concurrent_replays_and_input_revisions_are_serialized",
+        "test_issuer_kind_and_observer_schema_enrollment_are_enforced"
+      ]
+    },
+    {
+      "id": "canonicalization_and_transport_limits",
+      "required_tests": [
+        "test_canonical_transport_and_recipient_semantics_are_explicit",
+        "test_tenant_keyed_fingerprints_cannot_be_matched_globally",
+        "test_canonical_evidence_normalizes_timezone_and_dictionary_order",
+        "test_invalid_region_offsets_never_establish_content_lineage",
+        "test_absent_body_or_recipients_cannot_acquire_a_complete_payload_fingerprint"
+      ]
+    },
+    {
+      "id": "traceable_versioned_persisted_inputs",
+      "required_tests": [
+        "test_signed_submission_traceable_inputs_and_restart_history_end_to_end",
+        "test_committed_ingestion_extraction_and_ledger_have_an_exact_version_chain",
+        "test_loopback_http_with_real_runtime_identity_survives_server_restart",
+        "test_effective_sql_logins_cannot_rewrite_enroll_read_raw_or_cross_mailbox",
+        "test_append_triggers_and_scope_bindings_hold_even_for_owner_mistakes",
+        "test_privileged_message_and_history_metadata_tampering_is_detected",
+        "test_separate_anchor_detects_privileged_rollback_and_allows_append"
+      ]
+    },
+    {
+      "id": "independent_lineages_and_bounded_replay",
+      "required_tests": [
+        "test_generation_and_inclusion_are_required_independently_of_send",
+        "test_echoes_templates_basic_correction_and_similarity_are_not_verified_origin",
+        "test_generation_reuse_requires_new_scoped_inclusion_and_no_cross_mailbox_lookup",
+        "test_unchanged_span_edit_lineage_is_separate_from_changed_output_and_old_version",
+        "test_issuer_revocation_requires_reassessment_without_rewriting_old_inputs",
+        "test_retention_expiry_is_checked_before_raw_evidence_is_opened",
+        "test_snapshot_reference_is_not_a_claim_that_bytes_or_model_replay_are_available",
+        "test_expired_raw_and_decision_records_are_physically_purged_by_operator_only",
+        "test_ambiguous_extraction_does_not_acquire_authored_provenance",
+        "test_unavailable_content_does_not_block_independent_exact_action_evidence"
+      ]
+    }
+  ]
+}

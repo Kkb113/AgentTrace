@@ -38,3 +38,23 @@ It has an explicitly accepted account-specific trusted-services exception and an
 operator-only container read grant. The test stops that temporary export afterward.
 Its raw metadata must not be described as synthetic-only or become product evidence
 without the reviewed minimization, source qualification and authorization controls.
+
+## Evidence ledger addition
+
+An operator-enrolled observer supplies a current source/version-bound observation.
+The ingestion bridge verifies committed identifiers, content digest, extraction and
+scope against an already-authorized transient snapshot. It does not fetch a body or
+change mail. Plain text is discarded after tenant-keyed matching material is formed;
+complete payload matching stays unavailable when recipients/content are incomplete.
+
+The separate authenticated evidence API accepts only scope-bound signed records from
+an enrolled application identity. Its restricted SQL role appends encrypted receipts
+and input revisions and rechecks current trust/expiry while reconstructing a view.
+Agent execution, generation/inclusion, edits and copy mappings remain distinct.
+Source private signing keys stay with their source; tests generate fictional keys.
+
+Seven-day raw evidence and thirty-day input metadata have independent access expiry
+and operator cleanup. Metadata bindings, signatures, append-only grants/triggers and
+independently held anchors address different integrity risks. They do not claim WORM
+storage or recovery of deleted model inputs. See [the schema](evidence-schema.md)
+and [retention/correlation rules](correlation-rules.md).
