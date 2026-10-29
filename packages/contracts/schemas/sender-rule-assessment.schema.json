@@ -1,0 +1,91 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "agent_execution": {
+      "enum": [
+        "unavailable",
+        "verified_enrolled_send",
+        "conflicting",
+        "not_established"
+      ],
+      "title": "Agent Execution",
+      "type": "string"
+    },
+    "category": {
+      "default": "Unknown",
+      "enum": [
+        "Unknown",
+        "Human-capable",
+        "AI Agent"
+      ],
+      "title": "Category",
+      "type": "string"
+    },
+    "evidence_refs": {
+      "default": [],
+      "items": {
+        "pattern": "^[A-Za-z0-9_.:/+=-]{1,2048}$",
+        "type": "string"
+      },
+      "title": "Evidence Refs",
+      "type": "array"
+    },
+    "human_candidate": {
+      "title": "Human Candidate",
+      "type": "boolean"
+    },
+    "human_support": {
+      "const": "supported_client_compatibility",
+      "default": "supported_client_compatibility",
+      "title": "Human Support",
+      "type": "string"
+    },
+    "inspection": {
+      "enum": [
+        "complete",
+        "incomplete",
+        "conflicting"
+      ],
+      "title": "Inspection",
+      "type": "string"
+    },
+    "reason_codes": {
+      "items": {
+        "pattern": "^[a-z][a-z0-9_]{0,99}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "receipt_link": {
+      "enum": [
+        "unqualified",
+        "missing",
+        "conflicting",
+        "corroborated_indicators"
+      ],
+      "title": "Receipt Link",
+      "type": "string"
+    },
+    "rule_version": {
+      "default": "sender-rules/unknown/v1",
+      "enum": [
+        "sender-rules/unknown/v1",
+        "sender-rules/human-capable/v1",
+        "sender-rules/claude-corroborated/v1"
+      ],
+      "title": "Rule Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "inspection",
+    "human_candidate",
+    "agent_execution",
+    "receipt_link",
+    "reason_codes"
+  ],
+  "title": "RuleAssessment",
+  "type": "object"
+}

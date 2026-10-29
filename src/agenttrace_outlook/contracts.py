@@ -11,7 +11,7 @@ from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validato
 Opaque = Annotated[str, Field(pattern=r"^[A-Za-z0-9_.:/+=-]{1,2048}$")]
 Code = Annotated[str, Field(pattern=r"^[a-z][a-z0-9_]{0,99}$")]
 Sha256 = Annotated[str, Field(pattern=r"^[a-f0-9]{64}$")]
-Category = Literal["AI Agent", "Human", "Unknown"]
+Category = Literal["AI Agent", "Human-capable", "Human", "Unknown"]
 
 
 class Record(BaseModel):

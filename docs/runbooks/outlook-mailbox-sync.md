@@ -1,6 +1,6 @@
 # Read-only Outlook mailbox synchronization
 
-The standalone runner now supports durable Graph collection for one designated receiving mailbox. It still produces only Unknown previews: positive AI/Human qualification and Outlook category application remain later milestones. No Graph activity-log prerequisite, application server, dashboard, new Azure resource or category permission was introduced.
+The standalone runner now supports durable Graph collection for one designated receiving mailbox. The [sender-rule extension](sender-detection-rules.md) now adds corroborated POC AI and Human-capable previews; actual Outlook category application remains a later milestone. No Graph activity-log prerequisite, application server, dashboard, new Azure resource or category permission was introduced.
 
 ## Start safely
 

@@ -144,6 +144,30 @@ class MailReader:
             headers={"Prefer": 'IdType="ImmutableId"'},
         )
 
+    def message_copies(self, message_id: str, cursor: str | None = None) -> dict[str, Any]:
+        if not isinstance(message_id, str) or not 1 <= len(message_id) <= 2048:
+            raise SourceError("invalid_correlation_identifier")
+        fields = "id,parentFolderId,isDraft,internetMessageId,sentDateTime"
+        filter_value = "internetMessageId eq '" + message_id.replace("'", "''") + "'"
+        url = cursor or self._base + "/messages?" + urlencode(
+            {"$filter": filter_value, "$select": fields, "$top": "100"}
+        )
+        parsed = urlsplit(url)
+        query = parse_qs(parsed.query, keep_blank_values=True)
+        if (
+            len(url) > 32768
+            or parsed.scheme != "https"
+            or parsed.netloc != "graph.microsoft.com"
+            or parsed.path != urlsplit(self._base).path + "/messages"
+            or parsed.fragment
+            or set(query) - {"$filter", "$select", "$top", "$skiptoken", "$skip"}
+            or any(len(v) != 1 for v in query.values())
+            or ("$filter" in query and query["$filter"] != [filter_value])
+            or ("$select" in query and query["$select"] != [fields])
+        ):
+            raise SourceError("unsafe_message_correlation_cursor")
+        return self._get(url)
+
 
 def certificate_reader(config: RuntimeConfig) -> MailReader:
     if config.reader_identity is None:

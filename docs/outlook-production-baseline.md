@@ -1,5 +1,8 @@
 # Outlook production baseline review
 
+Current POC policy revision: [Human-capable and corroborated indicators](adr/human-capable-classification.md). This supersedes earlier Human/controller and independent received-item-proof definitions for this POC; historical evidence below retains its original scope.
+
+
 Status: Phase 0 complete, four of four exits evidenced. Production monitor and category writes remain disabled. This review covers the new ten-phase Outlook-native plan, not the earlier application roadmap.
 
 ## Frozen contract and ownership

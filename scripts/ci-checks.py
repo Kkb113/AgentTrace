@@ -160,6 +160,7 @@ def main() -> int:
         [PYTHON, "scripts/export-contracts.py", "--check"],
         [PYTHON, "scripts/verify-outlook-baseline.py"],
         [PYTHON, "scripts/export-outlook-contracts.py", "--check"],
+        [PYTHON, "scripts/verify-sender-policy.py"],
         [PYTHON, "scripts/check-outlook-boundaries.py"],
         [
             PYTHON,

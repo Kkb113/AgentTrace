@@ -1,0 +1,98 @@
+{
+  "executed_at": "2026-10-29T19:27:03.295208+00:00",
+  "milestone": "Outlook-native sender-evidence rules",
+  "policy_version": "corroborated-poc-human-capable/v1",
+  "policy_acceptance": "Owner explicitly selected Human-capable normal-browser compatibility and the corroborated-indicator Claude POC rule in this chat on 30 October 2026",
+  "python_version": "3.12.14",
+  "sqlite_version": "3.53.1",
+  "validation_basis": "Clean selected-index export and isolated pinned environment; unrelated evaluation and client-workbook changes excluded",
+  "validated_source_sha256": "13edcb3ef9a0a8b50dce8ce33312bfd2147615fd558a7c6e39e672652a896763",
+  "source_files_hashed": 242,
+  "source_hash_scope": "Sorted tracked src/, packages/, scripts/, tests/, config/ plus pyproject.toml, uv.lock and requirements files. SHA256 stream: UTF-8 path + NUL + ASCII byte length + NUL + LF-normalized bytes. Documentation and generated validation records excluded.",
+  "gates": {
+    "quality": "passed",
+    "security": "passed",
+    "infrastructure": "passed",
+    "guard_controls": "passed",
+    "integration_end_to_end": "passed",
+    "live_authenticated_claude_and_manual": "passed",
+    "standalone_cli_without_old_services": "passed"
+  },
+  "unit_primary_tests_passed": 416,
+  "unit_subtests_passed": 97,
+  "unit_skipped": 1,
+  "new_sender_rule_tests_passed": 60,
+  "integration_tests_passed": 123,
+  "junit_counts_including_subtests": {
+    "unit": {
+      "tests": 514,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "integration": {
+      "tests": 123,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "platform_limit": "One Windows symlink-creation test needs privileges; Linux CI runs it. Other alias/crash tests pass locally.",
+  "exit_criteria": [
+    {
+      "id": "authenticated_enrolled_agent_route",
+      "status": "passed",
+      "evidence": "Fresh real Claude send and prior real synthetic replay using authenticated audit, publisher and provider-copy reads"
+    },
+    {
+      "id": "declaration_api_and_missing_evidence_unknown",
+      "status": "passed",
+      "evidence": "MCP alone, generic Gmail API, drafts/reads/failures, incomplete headers/query, wrong actor/scope and absent correlation context controls"
+    },
+    {
+      "id": "human_capable_compatibility",
+      "status": "passed",
+      "evidence": "Real manual Outlook control and authored equal-observable human/browser-agent cases; compatible path does not establish a physical human"
+    },
+    {
+      "id": "outage_conflict_revocation_fail_closed",
+      "status": "passed",
+      "evidence": "Freshness/version fences, enrollment pinning, publisher failures/revocation/malformed shapes, conflicting audit, current-evidence transaction guard, rollback and idempotent reassessment"
+    },
+    {
+      "id": "observable_copy_attack_rejection_and_residual_acceptance",
+      "status": "passed",
+      "evidence": "Observable copy collision rejects; explicitly accepted unobservable full replacement remains a demonstrated counterexample, not a correctly rejected negative"
+    }
+  ],
+  "exit_criteria_met": 5,
+  "exit_criteria_total": 5,
+  "live_evidence": "docs/evidence/sender-rule-live-validation.json",
+  "review": "docs/sender-rule-qualification.md",
+  "operations": "docs/runbooks/sender-detection-rules.md",
+  "source_privacy": "Exact selected synthetic audit records and matching-copy metadata stay private; no body/attachment requested; public records contain redacted facts and capture digests only",
+  "review_method": "Implementation self-review and automated regressions; no independent human or model code review claimed",
+  "registered_positive_rules": [
+    "sender-rules/claude-corroborated/v1",
+    "sender-rules/human-capable/v1"
+  ],
+  "qualified_ai_coverage": "Enrolled own-mailbox Claude Microsoft 365 MCP route only; exact marker plus authenticated consistent Send, current publisher and unique provider-copy context",
+  "mail_mutations_by_agenttrace": 0,
+  "permissions_added": 0,
+  "azure_resources_created": 0,
+  "category_writes_enabled": false,
+  "statistical_accuracy_qualified": false,
+  "independent_forensic_identity_claimed": false,
+  "physical_human_identity_claimed": false,
+  "archived_demo_unchanged": true,
+  "unrelated_work_preserved": true,
+  "qualification_claim": "Engineering and semantic qualification under the explicitly revised POC policy, not statistical accuracy, universal agent detection or full production release",
+  "open_release_gates": [
+    "Phase 4 independent AI precision/recall and representative negatives/holdout",
+    "Observed delayed audit delivery; no immediate-detection SLA",
+    "External sender/Gmail/generic automation coverage beyond the enrolled source",
+    "Accepted copied-ID full-replacement false-positive risk",
+    "Outlook category credentials, ownership, safe writes and color display",
+    "Unattended registry identity, supervision, certificate lifecycle, physical retention and tested encrypted backups"
+  ]
+}

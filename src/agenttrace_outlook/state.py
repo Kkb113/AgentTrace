@@ -18,6 +18,8 @@ from .contracts import Decision, Observation
 from .eligibility import require_annotation_eligible
 from .errors import OutlookError
 from .locking import ProcessLock
+from .rule_schema import RULE_SCHEMA
+from .sender_rules import AGENT_RULE, HUMAN_CAPABLE_RULE, evaluate
 from .sync_schema import SYNC_SCHEMA
 
 BASE_SCHEMA = (
@@ -32,7 +34,18 @@ BASE_SCHEMA = (
 )
 BASE_DIGEST = hashlib.sha256("\n".join(BASE_SCHEMA).encode()).hexdigest()
 
-SCHEMA = (*BASE_SCHEMA, *SYNC_SCHEMA)
+SYNC_DIGEST = hashlib.sha256("\n".join((*BASE_SCHEMA, *SYNC_SCHEMA)).encode()).hexdigest()
+RULE_SCHEMA_VERSION = (*BASE_SCHEMA, *SYNC_SCHEMA, *RULE_SCHEMA)
+RULE_DIGEST = hashlib.sha256("\n".join(RULE_SCHEMA_VERSION).encode()).hexdigest()
+NATIVE_OUTBOX = "CREATE TABLE outbox (decision_id INTEGER PRIMARY KEY REFERENCES decisions(id), status TEXT NOT NULL CHECK(status IN ('preview','pending','superseded','failed')), category TEXT NOT NULL CHECK(category IN ('AI Agent','Human','Human-capable','Unknown')))"
+SCHEMA = (
+    *(
+        statement
+        for statement in RULE_SCHEMA_VERSION
+        if not statement.startswith("CREATE TABLE outbox ")
+    ),
+    NATIVE_OUTBOX,
+)
 SCHEMA_DIGEST = hashlib.sha256("\n".join(SCHEMA).encode()).hexdigest()
 
 
@@ -134,7 +147,7 @@ class StateStore:
     def _migrate_and_bind(self) -> None:
         with self.transaction() as db:
             version = int(db.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {0, 1, 2}:
+            if version not in {0, 1, 2, 3, 4}:
                 raise OutlookError("unsupported_state_schema")
             if version == 0:
                 if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' LIMIT 1").fetchone():
@@ -149,7 +162,15 @@ class StateStore:
                 }
                 db.executemany("INSERT INTO metadata VALUES (?,?)", values.items())
             metadata = dict(db.execute("SELECT key,value FROM metadata"))
-            expected = BASE_DIGEST if version in {0, 1} else SCHEMA_DIGEST
+            expected = (
+                BASE_DIGEST
+                if version in {0, 1}
+                else SYNC_DIGEST
+                if version == 2
+                else RULE_DIGEST
+                if version == 3
+                else SCHEMA_DIGEST
+            )
             if (
                 metadata.get("schema_digest") != expected
                 or metadata.get("scope") != self.config.scope.model_dump_json()
@@ -161,7 +182,15 @@ class StateStore:
                     "SELECT sql FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' AND sql IS NOT NULL ORDER BY rowid"
                 )
             ]
-            if actual != list(BASE_SCHEMA if version in {0, 1} else SCHEMA):
+            if actual != list(
+                BASE_SCHEMA
+                if version in {0, 1}
+                else (*BASE_SCHEMA, *SYNC_SCHEMA)
+                if version == 2
+                else RULE_SCHEMA_VERSION
+                if version == 3
+                else SCHEMA
+            ):
                 raise OutlookError("state_schema_modified")
             if version in {0, 1}:
                 for statement in SYNC_SCHEMA:
@@ -170,6 +199,22 @@ class StateStore:
                     "UPDATE metadata SET value=? WHERE key='schema_digest'", (SCHEMA_DIGEST,)
                 )
                 db.execute("PRAGMA user_version=2")
+            if version in {0, 1, 2}:
+                for statement in RULE_SCHEMA:
+                    db.execute(statement)
+                db.execute(
+                    "UPDATE metadata SET value=? WHERE key='schema_digest'", (SCHEMA_DIGEST,)
+                )
+                db.execute("PRAGMA user_version=3")
+            if version in {0, 1, 2, 3}:
+                db.execute("ALTER TABLE outbox RENAME TO legacy_outbox")
+                db.execute(NATIVE_OUTBOX)
+                db.execute("INSERT INTO outbox SELECT * FROM legacy_outbox")
+                db.execute("DROP TABLE legacy_outbox")
+                db.execute(
+                    "UPDATE metadata SET value=? WHERE key='schema_digest'", (SCHEMA_DIGEST,)
+                )
+                db.execute("PRAGMA user_version=4")
 
     def heartbeat(self) -> None:
         with self.transaction(lease=self.lease) as db:
@@ -256,7 +301,9 @@ class StateStore:
             ).fetchall()
             return [(int(row[0]), Observation.model_validate_json(row[1])) for row in rows]
 
-    def record_decision(self, observation_id: int, decision: Decision) -> int:
+    def record_decision(
+        self, observation_id: int, decision: Decision, *, assessment_json: str | None = None
+    ) -> int:
         require_annotation_eligible(decision, self.config.scope, self.clock())
         with self.transaction(lease=self.lease) as db:
             row = db.execute(
@@ -278,8 +325,52 @@ class StateStore:
                     "SELECT payload FROM observations WHERE id=?", (observation_id,)
                 ).fetchone()[0]
             )
+            if decision.category in {"Human-capable", "AI Agent"}:
+                snapshot_row = db.execute(
+                    "SELECT payload,expires FROM snapshots WHERE message_id=?",
+                    (decision.message_id,),
+                ).fetchone()
+                source_row = db.execute(
+                    "SELECT payload FROM rule_sources WHERE observation_id=?", (observation_id,)
+                ).fetchone()
+                expected = evaluate(
+                    observation,
+                    json.loads(snapshot_row[0])
+                    if snapshot_row and snapshot_row[1] > self.clock().timestamp()
+                    else None,
+                    json.loads(source_row[0]) if source_row else None,
+                    self.clock(),
+                )
+                if (
+                    expected.category != decision.category
+                    or decision.rule_version
+                    != (HUMAN_CAPABLE_RULE if decision.category == "Human-capable" else AGENT_RULE)
+                    or decision.reason_codes != expected.reason_codes
+                    or decision.evidence_refs
+                    != (*expected.evidence_refs, "snapshot-sha256:" + observation.source_digest)
+                ):
+                    raise OutlookError("sender_decision_not_supported_by_current_evidence")
             if decision.expires_at > observation.observed_at + timedelta(days=30):
                 raise OutlookError("decision_retention_exceeds_baseline")
+            if assessment_json is not None:
+                db.execute(
+                    "INSERT INTO rule_assessments VALUES (?,?,?) ON CONFLICT(observation_id) DO UPDATE SET payload=excluded.payload,assessed=excluded.assessed",
+                    (observation_id, assessment_json, self.clock().timestamp()),
+                )
+            prior = db.execute(
+                "SELECT payload FROM decisions WHERE message_id=? ORDER BY version DESC LIMIT 1",
+                (decision.message_id,),
+            ).fetchone()
+            if prior:
+                left, right = json.loads(prior[0]), decision.model_dump(mode="json")
+                for value in (left, right):
+                    value.pop("decided_at", None)
+                if left == right:
+                    db.execute(
+                        "UPDATE work SET status='completed',error_code=NULL WHERE observation_id=?",
+                        (observation_id,),
+                    )
+                    return int(row[4])
             version = int(row[4]) + 1
             db.execute(
                 "UPDATE outbox SET status='superseded' WHERE decision_id IN (SELECT id FROM decisions WHERE message_id=?) AND status IN ('preview','pending','failed')",
@@ -339,7 +430,7 @@ class StateStore:
     def summary(self) -> dict[str, int | str]:
         with self.transaction(lease=self.lease) as db:
             result: dict[str, int | str] = {
-                "schema_version": 2,
+                "schema_version": 4,
                 "journal_mode": "wal",
                 "runtime_stage": "mailbox_sync_dry_run"
                 if self.config.sync_enabled
