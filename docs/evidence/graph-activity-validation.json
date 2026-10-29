@@ -1,9 +1,9 @@
 {
-  "executed_at": "2026-10-28T21:54:42.182495+00:00",
+  "executed_at": "2026-10-29T03:50:35.033470+00:00",
   "all_five_local_gates_pass": true,
   "primary_test_counts": {
     "unit": 216,
-    "integration": 64
+    "integration": 65
   },
   "required_regressions": {
     "test_transform_is_narrow_and_drops_sensitive_fields_before_storage": true,
@@ -31,7 +31,7 @@
     },
     {
       "path": "src/agenttrace_ingestion/graph_activity.py",
-      "sha256": "9b344685582d2d4f80efceea8d8f01768837f7d35be38cdc36fb0b3394ff047e"
+      "sha256": "9c370f034411816337043a650abe1415d349d9071c885897827f5eb582d21b1b"
     },
     {
       "path": "src/agenttrace_foundation/workload_identity.py",
@@ -67,7 +67,7 @@
     },
     {
       "path": "scripts/verify-graph-activity.py",
-      "sha256": "b0d081c20a1a981b6eddf66b089365336bb5a6892dc9c434a0d385450a5a2a8e"
+      "sha256": "f7b5faadc084a2f8ba9808d4e684545a184e8a4ccfd4f9a1c79afeef4f72998f"
     },
     {
       "path": "scripts/validate-infrastructure.py",
@@ -79,7 +79,7 @@
     },
     {
       "path": "tests/integration/test_graph_activity_collection.py",
-      "sha256": "fd2cf426d7bd4ba23961bf568b3cb04c29399aa3ac71974ba770a2698d31f051"
+      "sha256": "de4bd20ea36702b3f14f7a81653cd3b75db096c72fc476bdf03f2c34f8879d2d"
     }
   ],
   "file_hash_normalization": "Git LF text bytes",

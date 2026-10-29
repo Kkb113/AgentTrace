@@ -5,6 +5,14 @@ is pending. The source must not be represented as end-to-end validated until
 `graph-activity-live-validation.json` records the fresh request traces and durable
 ingestion. Empty results remain pending rather than proof of human sending.
 
+The post-restart live queries still returned no source rows. No configuration,
+license, role, table-retention or ingestion-cap mismatch has been identified; this
+does not establish a root cause for the absent delivery. Entra's specific setup
+guidance allows up to three days for a new diagnostic stream to start appearing,
+which differs from the usual thirty-minute/two-hour event delivery timing after
+activation. The runbook records that distinction and the source stays pending.
+[Microsoft's Entra startup guidance](https://learn.microsoft.com/en-us/entra/identity/monitoring-health/howto-configure-diagnostic-settings#basic-process).
+
 The actual preflight confirmed existing tenant P1/P2 service plans, the operator's
 assigned P1 entitlement and active Global Administrator role. The new dedicated
 East US pay-as-you-go workspace and transformation rule are in `kb-agentdemo`.
@@ -24,10 +32,13 @@ earlier batches remain visible when fresh probes are generated. An empty non-tar
 table is distinguished from an explicit access denial. Source export remains
 tenant-wide before downstream minimization.
 
-Local validation passed all five gates: 216 unit/security tests, 52 subtests and 64
+Local validation passed all five gates: 216 unit/security tests, 52 subtests and 65
 integration/end-to-end tests. The added tests cover send-versus-draft/read/move
 semantics, failure statuses, URI redaction, delayed arrivals, deduplication, empty
 initial delivery, throttling, malformed/partial results and transaction rollback.
+Initial and subsequent collection replay seven days to accommodate multi-day
+activation delays within the raw-retention boundary; the regression suite exercises
+both short delays and arrivals older than three days.
 First enrollment retires and fences the legacy unconfigured checkpoint. Repeat
 enrollment preserves the active watermark, lease and retry time. The deployment
 guard preserves the DCR attachment on repeat setup and refuses changes to unrelated

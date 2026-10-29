@@ -69,14 +69,19 @@ evidence account and Key Vault retain their existing firewall controls.
 
 ## Collection and interpretation
 
-The collector overlaps the previous event-time watermark by 24 hours and waits five
+The collector overlaps the previous event-time watermark by seven days and waits five
 minutes behind current time. Microsoft commonly delivers logs within about thirty
-minutes, with less common delays up to two hours; the overlap is intended to recover
-delayed arrivals. Initial diagnostic routing can take about ninety minutes to start;
-do not repeatedly reconfigure a healthy destination during that startup interval.
-If no data arrives after twenty-four hours, follow Microsoft's routing troubleshooting
-guidance and preserve the observed gap. [Diagnostic startup and troubleshooting](https://learn.microsoft.com/en-us/azure/azure-monitor/data-collection/diagnostic-settings#expected-latency-after-creating-a-diagnostic-setting).
-It is a finite replay
+minutes, with less common delays up to two hours. This normal event latency is
+different from initial activation: Entra's specific setup guidance allows up to
+three days for a newly configured diagnostic stream to start appearing. The generic
+Azure Monitor ninety-minute startup guidance must not be treated as a guarantee
+for this Entra source. Do not repeatedly reset an otherwise verified destination
+during startup. Preserve the pending interval, then follow routing troubleshooting
+or involve Azure support if activation remains absent. [Entra startup guidance](https://learn.microsoft.com/en-us/entra/identity/monitoring-health/howto-configure-diagnostic-settings#basic-process),
+[routing troubleshooting](https://learn.microsoft.com/en-us/azure/azure-monitor/data-collection/diagnostic-settings#expected-latency-after-creating-a-diagnostic-setting).
+
+Initial and later queries cover that same seven-day raw-retention horizon, so
+multi-day startup delivery can still be replayed. The overlap is a finite replay
 horizon, not a guarantee that every arbitrarily late event is collected. Current
 means the bounded query window was observed successfully, not that all provider
 events have arrived. Initial empty delivery stays `catching_up` with a pending reason.

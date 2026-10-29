@@ -1,3 +1,4 @@
+import re
 from datetime import timedelta
 from uuid import uuid4
 
@@ -6,6 +7,7 @@ import pytest
 from agenttrace_ingestion.activity_runtime import enroll_activity_source
 from agenttrace_ingestion.contracts import IngestionError, utc_now
 from agenttrace_ingestion.graph_activity import GraphActivityCollector
+from agenttrace_ingestion.mailbox import instant
 from agenttrace_ingestion.store import IngestionStore
 from tests.ingestion_support import CLIENT, MAILBOX, TENANT, cipher, enrollment
 
@@ -60,9 +62,10 @@ def ready(database):
         connection.execute("UPDATE ingest_checkpoints SET next_attempt=now()")
 
 
-def test_delayed_arrivals_overlap_deduplicate_and_remove_uri_queries(database):
+@pytest.mark.parametrize("delay_days", [0, 3])
+def test_delayed_arrivals_overlap_deduplicate_and_remove_uri_queries(database, delay_days):
     store, source, collector, other = setup(database, [])
-    timestamp = utc_now() - timedelta(minutes=50)
+    timestamp = utc_now() - timedelta(days=delay_days, minutes=50)
     source.rows = [
         [
             timestamp.isoformat(),
@@ -76,7 +79,9 @@ def test_delayed_arrivals_overlap_deduplicate_and_remove_uri_queries(database):
     assert collector.collect() == 1
     ready(database)
     assert collector.collect() == 0
-    assert timestamp.isoformat().split("T")[0] in source.queries[-1]
+    for query in source.queries:
+        start, end = re.findall(r"datetime\(([^)]+)\)", query)
+        assert instant(start) <= timestamp <= instant(end)
     with database.connect() as connection:
         event = connection.execute("SELECT * FROM ingest_audit_events").fetchone()
         checkpoint = connection.execute("SELECT * FROM ingest_checkpoints").fetchone()

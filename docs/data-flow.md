@@ -23,3 +23,8 @@ Graph basic notifications now enter through a dedicated East US Event Grid/Stand
 ## Graph activity source addition
 
 The tenant diagnostic category now routes Graph API-request logs to a dedicated East US workspace in kb-agentdemo. A workspace transformation keeps only enrolled pilot/collector application contexts and drops query strings and unused fields before storage. The certificate-based audit identity reads only the conditioned Graph table, then persists minimized encrypted source records with independent event/ingestion times. This is API evidence for later correlation, not proof of an AI actor or of generated wording. See [the Graph source review](graph-activity-logging.md).
+
+The new logging workspace uses public Azure TLS ingestion/query endpoints with
+Entra authorization. It does not inherit storage's operator-IP firewall; private
+endpoints are outside this minimal-cost POC. Source delivery remains pending until
+the live trace and durable-ingestion checks pass.

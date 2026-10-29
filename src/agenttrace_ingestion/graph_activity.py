@@ -43,11 +43,9 @@ class GraphActivityCollector:
             return 0
         try:
             end = utc_now() - timedelta(minutes=5)  # Do not treat fresh log latency as absence.
-            start = (
-                lease.watermark - timedelta(hours=24)
-                if lease.watermark
-                else end - timedelta(hours=1)
-            )
+            # Entra's first diagnostic activation can take three days. Replay the
+            # seven-day raw-retention horizon on both initial and later windows.
+            start = (lease.watermark or end) - timedelta(days=7)
             clients = ",".join("'" + str(c) + "'" for c in sorted(self.clients, key=str))
             query = (
                 "MicrosoftGraphActivityLogs | where TimeGenerated between (datetime("

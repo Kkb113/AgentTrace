@@ -293,6 +293,9 @@ def main():
         "pay_as_you_go_without_commitment": workspace["properties"]["sku"]["name"] == "PerGB2018",
         "daily_ingestion_safeguard": workspace["properties"]["workspaceCapping"]["dailyQuotaGb"]
         == 0.1,
+        "workspace_ready_for_ingestion": workspace["properties"]["provisioningState"] == "Succeeded"
+        and workspace["properties"]["workspaceCapping"]["dataIngestionStatus"] == "RespectQuota"
+        and workspace["properties"].get("publicNetworkAccessForIngestion") == "Enabled",
         "seven_day_graph_table_retention": table["properties"]["plan"] == "Analytics"
         and table["properties"]["retentionInDays"] == 7
         and table["properties"]["totalRetentionInDays"] == 7,

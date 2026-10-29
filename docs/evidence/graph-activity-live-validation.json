@@ -1,5 +1,5 @@
 {
-  "executed_at": "2026-10-28T21:35:09.043693+00:00",
+  "executed_at": "2026-10-29T03:49:36.624862+00:00",
   "kind": "actual_live_calls_and_source_records",
   "checks": {
     "existing_tenant_premium_entitlement": true,
@@ -7,6 +7,7 @@
     "dedicated_eastus_workspace_in_requested_group": true,
     "pay_as_you_go_without_commitment": true,
     "daily_ingestion_safeguard": true,
+    "workspace_ready_for_ingestion": true,
     "seven_day_graph_table_retention": true,
     "transformation_attached_before_source": true,
     "only_graph_diagnostic_category_enabled": true,
@@ -27,12 +28,12 @@
   "all_passed": false,
   "observed_rows": 0,
   "observed_noncollector_send_requests": 0,
-  "minutes_since_enable": 55.69,
+  "minutes_since_enable": 430.15,
   "mail_write_operations_by_agenttrace": 0,
   "ai_agent_execution_proven_by_api_usage": false,
   "past_uncollected_history_recoverable": false,
   "cross_table_runtime_outcome": "filtered_or_empty",
   "cross_table_limit": "An empty result alone does not prove denied access; the conditional role is independently read back.",
   "verified_probe_batch": "active_pending",
-  "earlier_expected_probe_requests_not_observed": 4
+  "earlier_expected_probe_requests_not_observed": 8
 }
