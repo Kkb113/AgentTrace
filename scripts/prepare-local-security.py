@@ -23,7 +23,7 @@ def prepare() -> None:
     roles.mkdir(parents=True, exist_ok=True)
     directory.chmod(0o700)
     roles.chmod(0o700)
-    for name in ["api", "attribution", "content", "collector"]:
+    for name in ["api", "attribution", "content", "collector", "ledger"]:
         path = roles / (name + "-password")
         if not path.exists():
             with path.open("x", encoding="utf-8") as output:

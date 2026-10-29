@@ -18,3 +18,43 @@ Role/credential revocation, certificate overlap rotation, signing-key version re
 ## Accepted notification transport addition
 
 Graph basic notifications now enter through a dedicated East US Event Grid/Standard LRS metadata zone, then the local encrypted durable inbox and separate analysis dispatch. The owner accepted a trusted-services exception and destination-account delivery roles only on this new notification account after live validation rejected narrower scopes. The existing raw-evidence store and Key Vault remain unchanged. No new mailbox send/write grant exists. See [the ingestion design](mail-ingestion.md) and [acceptance](evidence/notification-transport-acceptance.json).
+
+
+## Graph activity source addition
+
+The tenant diagnostic category now routes Graph API-request logs to a dedicated East US workspace in kb-agentdemo. A workspace transformation keeps only enrolled pilot/collector application contexts and drops query strings and unused fields before storage. The certificate-based audit identity reads only the conditioned Graph table, then persists minimized encrypted source records with independent event/ingestion times. This is API evidence for later correlation, not proof of an AI actor or of generated wording. See [the Graph source review](graph-activity-logging.md).
+
+The new logging workspace uses public Azure TLS ingestion/query endpoints with
+Entra authorization. It does not inherit storage's operator-IP firewall; private
+endpoints are outside this minimal-cost POC. Source delivery remains pending until
+the live trace and durable-ingestion checks pass.
+
+The recovery test adds a separate synthetic canary table/DCR and redacted DCR error
+stream, each with seven-day retention. Canary publishing is operator-only at that
+DCR. The [accepted archive diagnostic](graph-route-isolation-proposal.md) temporarily
+routes tenant-wide raw Graph metadata to a separate restricted Standard LRS account
+to isolate delivery faults; it bypasses the product's pre-storage transformation.
+It has an explicitly accepted account-specific trusted-services exception and an
+operator-only container read grant. The test stops that temporary export afterward.
+Its raw metadata must not be described as synthetic-only or become product evidence
+without the reviewed minimization, source qualification and authorization controls.
+
+## Evidence ledger addition
+
+An operator-enrolled observer supplies a current source/version-bound observation.
+The ingestion bridge verifies committed identifiers, content digest, extraction and
+scope against an already-authorized transient snapshot. It does not fetch a body or
+change mail. Plain text is discarded after tenant-keyed matching material is formed;
+complete payload matching stays unavailable when recipients/content are incomplete.
+
+The separate authenticated evidence API accepts only scope-bound signed records from
+an enrolled application identity. Its restricted SQL role appends encrypted receipts
+and input revisions and rechecks current trust/expiry while reconstructing a view.
+Agent execution, generation/inclusion, edits and copy mappings remain distinct.
+Source private signing keys stay with their source; tests generate fictional keys.
+
+Seven-day raw evidence and thirty-day input metadata have independent access expiry
+and operator cleanup. Metadata bindings, signatures, append-only grants/triggers and
+independently held anchors address different integrity risks. They do not claim WORM
+storage or recovery of deleted model inputs. See [the schema](evidence-schema.md)
+and [retention/correlation rules](correlation-rules.md).

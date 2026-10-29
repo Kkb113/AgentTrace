@@ -1,0 +1,139 @@
+{
+  "executed_at": "2026-10-29T05:36:18.211111+00:00",
+  "all_five_local_gates_pass": true,
+  "primary_test_counts": {
+    "unit": 238,
+    "integration": 65
+  },
+  "additional_unit_subtests": 52,
+  "required_regressions": {
+    "test_transform_is_narrow_and_drops_sensitive_fields_before_storage": true,
+    "test_unbounded_or_inconsistent_source_scopes_are_rejected": true,
+    "test_supported_send_api_calls_are_only_send_observations": true,
+    "test_drafts_edits_reads_failures_and_other_resources_are_not_send_events": true,
+    "test_uri_minimization_removes_queries_and_fragments_without_changing_object_path": true,
+    "test_untrusted_activity_uris_are_rejected": true,
+    "test_delayed_arrivals_overlap_deduplicate_and_remove_uri_queries": true,
+    "test_empty_initial_delivery_is_pending_and_not_negative_agent_evidence": true,
+    "test_failed_windows_never_advance_checkpoints_or_partially_commit": true,
+    "test_only_noncollector_successful_send_api_operations_are_correlation_candidates": true,
+    "test_first_enrollment_retires_legacy_checkpoint_and_fences_its_worker": true,
+    "test_repeat_enrollment_preserves_active_watermark_lease_and_retry_time": true,
+    "test_missing_ingestion_measurements_remain_unknown": true,
+    "test_actual_zero_and_nonzero_samples_are_distinguished_from_absence": true,
+    "test_malformed_measurements_never_become_healthy_zero": true,
+    "test_error_samples_override_an_apparently_working_stream": true,
+    "test_invalid_aggregate_responses_never_become_zero_records": true,
+    "test_valid_aggregate_counts_preserve_zero_and_positive_values": true,
+    "test_error_logging_never_projects_raw_error_text_or_identifiers": true,
+    "test_route_refresh_only_changes_the_selected_category_enabled_flag": true,
+    "test_route_refresh_preserves_provider_expanded_disabled_categories": true,
+    "test_route_refresh_refuses_broader_or_different_diagnostic_routes": true
+  },
+  "live_validation_passed": false,
+  "files": [
+    {
+      "path": "src/agenttrace_ingestion/activity_policy.py",
+      "sha256": "be91876337bb01fccda29e98588473dc9f2e302d88f2d90b90dc0a0488af119d"
+    },
+    {
+      "path": "src/agenttrace_ingestion/activity_diagnostics.py",
+      "sha256": "fd4ab7449abff491ef7b2c3e17154799706d2e31b6cbdb08f0ecc48b8190d5c9"
+    },
+    {
+      "path": "src/agenttrace_ingestion/activity_runtime.py",
+      "sha256": "5cb2a77e56d381203e0746fc53627fa3edc87d230ae2f4b97b68158f2e8cd9aa"
+    },
+    {
+      "path": "src/agenttrace_ingestion/graph_activity.py",
+      "sha256": "9c370f034411816337043a650abe1415d349d9071c885897827f5eb582d21b1b"
+    },
+    {
+      "path": "src/agenttrace_foundation/workload_identity.py",
+      "sha256": "484b917eb2f1edab1fdc463e04850df5b37ec36810407b29348531a81f13d9d4"
+    },
+    {
+      "path": "infra/bicep/graph-activity-logging.bicep",
+      "sha256": "301a4ff3a4a532433d8e40b88f9fd509d5957bba62f8881b2b0c56562a192d60"
+    },
+    {
+      "path": "infra/bicep/graph-route-canary.bicep",
+      "sha256": "ed2dd06e06a1baf701aaf574e7741e38a42bb3de379b8d1719b332cb974b3dad"
+    },
+    {
+      "path": "infra/bicep/graph-archive-diagnostic.bicep",
+      "sha256": "b58866b152ec3af16ddb444005466619ac38849299115c3af32180b44c03b991"
+    },
+    {
+      "path": "scripts/build-graph-support-pack.py",
+      "sha256": "760a4bdb4bdce743d9e665ad60228301be2399caedcf3396e79091c612e7ca3e"
+    },
+    {
+      "path": "scripts/collect-audit-evidence.py",
+      "sha256": "308529a25088e685725d1765d84a9b7ccaf5d243e50ccf11470eb3505e229703"
+    },
+    {
+      "path": "scripts/collect-graph-activity.py",
+      "sha256": "ba9fe5eb004be4ab1b49535f82d8a062a61b02e1054224fbf1ce7a4e898a6ddd"
+    },
+    {
+      "path": "scripts/configure-graph-activity.py",
+      "sha256": "e79a865d2c0cbe45c6278e3e16a0538f608a917834f08f6afb63218637836c03"
+    },
+    {
+      "path": "scripts/diagnose-graph-activity.py",
+      "sha256": "05e1accdf810509bf9d27686b9d3b5c1f7ffc9df79e262c26873e59ce6546964"
+    },
+    {
+      "path": "scripts/inspect-graph-activity.py",
+      "sha256": "2473b7bd4c364b5882399a943a6a92bb2b2a16e5927440d17196ae44e2a6bb6d"
+    },
+    {
+      "path": "scripts/prepare-graph-activity.py",
+      "sha256": "6dc649bbce8458c40f276dfa495b4d2101ae6c4023a60807db04fa8bf490cf29"
+    },
+    {
+      "path": "scripts/probe-graph-activity.py",
+      "sha256": "daffd3541196ffaab8bf9f973d29b3c51f7e2d79410bfa9c390e763f0a1fa2d1"
+    },
+    {
+      "path": "scripts/refresh-graph-diagnostic-route.py",
+      "sha256": "3999fb5078ae29847bbe97691cc082ef8a1a0d3780ddc3bcfbfe411ce32470bc"
+    },
+    {
+      "path": "scripts/test-graph-route.py",
+      "sha256": "a60a4e6fd2c847f15b23530cc5f6877b2785940ff38cc83c357654617c728e95"
+    },
+    {
+      "path": "scripts/test-graph-archive.py",
+      "sha256": "98c7c569e0abc46e077f798b34a051580363c860998d2b8463c181387ea0f62f"
+    },
+    {
+      "path": "scripts/verify-graph-activity.py",
+      "sha256": "6f193fd34bb7f2fbfefc25bc3601f6be03765dcf759791480d7eb8dc3b9a13d7"
+    },
+    {
+      "path": "scripts/verify-agent-audit-fallback.py",
+      "sha256": "577b49643fe59e73fd8bdd6ab3fb981c011371a1c24e0b91bb303ba6a57e4e2a"
+    },
+    {
+      "path": "scripts/validate-infrastructure.py",
+      "sha256": "36672862cc6e72c6b6c1b49d1bf129de25a5c92b20e91495a1a9fe4f0687ecc0"
+    },
+    {
+      "path": "tests/unit/test_graph_activity_policy.py",
+      "sha256": "fcb014fe488beeacf3017edf24d721866a144b814374c5a70ba28ea8f4ca0d2d"
+    },
+    {
+      "path": "tests/unit/test_activity_diagnostics.py",
+      "sha256": "cfb5933e741409b5db864bc440855e259d61ad7a92d3fa0e4cce58db4a90bd09"
+    },
+    {
+      "path": "tests/integration/test_graph_activity_collection.py",
+      "sha256": "de4bd20ea36702b3f14f7a81653cd3b75db096c72fc476bdf03f2c34f8879d2d"
+    }
+  ],
+  "file_hash_normalization": "Git LF text bytes",
+  "scope": "Graph API-request evidence only; no API-only AI verdict, mailbox write or content scoring",
+  "all_passed": false
+}

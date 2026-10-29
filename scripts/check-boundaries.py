@@ -9,6 +9,7 @@ from agenttrace_contracts import DetectionFindings
 from agenttrace_foundation.api import create_app
 from agenttrace_foundation.artifacts import ArtifactComponent
 from agenttrace_ingestion.api import create_app as create_ingestion_app
+from agenttrace_ledger.api import create_app as create_ledger_app
 
 ROOT = Path(__file__).resolve().parents[1]
 FORBIDDEN_MODULES = {
@@ -36,6 +37,7 @@ def main() -> int:
         *(ROOT / "packages").rglob("*.py"),
         *(ROOT / "src/agenttrace_foundation").rglob("*.py"),
         *(ROOT / "src/agenttrace_ingestion").rglob("*.py"),
+        *(ROOT / "src/agenttrace_ledger").rglob("*.py"),
     ]:
         for node in ast.walk(ast.parse(path.read_text())):
             if isinstance(node, ast.Import):
@@ -62,6 +64,15 @@ def main() -> int:
         "/v1/ingestion/sources/{source_ref}": {"get"},
     }
     catalog = json.loads((ROOT / "config/artifact-catalog.json").read_text())
+    ledger = create_ledger_app(None).openapi()
+    assert {path: set(methods) for path, methods in ledger["paths"].items()} == {
+        "/health/live": {"get"},
+        "/health/ready": {"get"},
+        "/v1/evidence/receipts": {"post"},
+        "/v1/evidence/messages/{message_ref}/versions/{version_ref}": {"get"},
+        "/v1/evidence/messages/{message_ref}/versions/{version_ref}/inputs": {"post"},
+        "/v1/evidence/messages/{message_ref}/history": {"get"},
+    }
     for entry in catalog["components"]:
         ArtifactComponent.model_validate(entry)
     print("Detection-only routes, packages and artifact contracts passed")

@@ -56,6 +56,7 @@ class CertificateTokenProvider:
             "https://graph.microsoft.com",
             "https://storage.azure.com",
             "https://vault.azure.net",
+            "https://api.loganalytics.io",
             "api://" + self._client,
         }
         if resource not in allowed and not re.fullmatch(r"api://[0-9a-fA-F-]{36}", resource):

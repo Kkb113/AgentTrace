@@ -1,5 +1,10 @@
 # Mail ingestion implementation review
 
+This is the original ingestion-milestone snapshot. Graph activity logging was
+subsequently authorized and configured; see [the current source review](graph-activity-logging.md)
+and its separate live evidence. References below to an absent destination describe
+the earlier baseline, not the later configuration.
+
 The reliable-ingestion milestone is implemented for the approved synthetic Outlook
 scope. It delivers durable notification intake, scoped reconciliation, recoverable
 checkpoints, explicit source gaps, independent versioned analysis work, offline text

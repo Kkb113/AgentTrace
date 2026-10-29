@@ -1,0 +1,13 @@
+{
+  "executed_at": "2026-10-29T05:24:14.991675+00:00",
+  "scope_acceptance_recorded": true,
+  "storage_controls_verified": true,
+  "archive_route_enabled": true,
+  "exact_control_request_ids_observed": 0,
+  "bounded_objects_examined": 0,
+  "archive_source_delivery_proven": false,
+  "email_mutations": 0,
+  "temporary_archive_export_stopped": true,
+  "other_tenant_settings_preserved": true,
+  "completed_at": "2026-10-29T05:34:44.079001+00:00"
+}

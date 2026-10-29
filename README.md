@@ -2,6 +2,18 @@
 
 AgentTrace detects two independent things in Outlook/Exchange Online email: whether an AI agent executed the send, and whether the body contains AI-generated content. Accurate agent attribution with low false positives is the priority. Content scoring is a separate best-effort capability.
 
+Graph API activity delivery is under investigation. The independent workspace
+canary passed; it does not qualify the Graph publisher. See the
+[recovery findings and next steps](docs/graph-routing-recovery.md). Authenticated
+Exchange Send audit correlation remains an independent supported evidence path.
+
+The scoped [evidence ledger](docs/evidence-schema.md) now adds authenticated signed
+receipt submission, exact/candidate correlation, independent action/content lineage,
+revocation and append-only input history. See [the review and exit evidence](docs/evidence-ledger-review.md)
+and [operations](docs/runbooks/evidence-ledger.md). It introduces no email execution
+or content-generation feature; final detection policy and accuracy qualification
+remain later work.
+
 This checkout contains the typed product foundation, a secured local synthetic PostgreSQL/API/worker stack, scoped Microsoft 365 access, a minimal Azure access sandbox, reliable versioned mailbox/audit ingestion, offline text extraction and reproducible CI/security/infrastructure gates. The dashboard/add-in UI and production rollout remain later work. Statistical content models are not installed. Read [the implementation plan](implementation.md), [the secure-access review](docs/secure-access-report.md) and [the feasibility report](docs/feasibility-report.md) before interpreting access tests or authored fixtures as detector qualification.
 
 ## Run locally
@@ -24,7 +36,7 @@ The integration gate generates local development keys, starts only the named syn
 
 Phase 1 exit evidence is recorded in [the foundation review](docs/repository-foundation.md). Active pull-request checks use GitHub Actions per the owner's selection after Azure project creation was denied. Equivalent [Azure Pipelines YAML](ci/azure-pipelines.yml) calls the same gates. Compile-only CI needs no Azure identity or secret. The optional WIF what-if template is reserved for a separately authorized protected connection. [CI decision](docs/adr/ci-and-release.md).
 
-The API validates tenant, issuer, audience, signature, lifetime, client, role and server-owned message entitlements. The local stack uses fictional signing keys; a separate live probe verifies actual Entra-issued API tokens. The [access runbook](docs/runbooks/secure-access.md) covers the accepted certificate identities, exact-mailbox Exchange RBAC, isolated audit reader, Azure data roles and operator-only setup. Cloud/live probes never run in untrusted PR CI. The model-absent content worker remains in standby and does not acknowledge content jobs. The separate ingestion collector supports bounded continuous collection and native Event Grid delivery. Its message observations never enter the authored-example detector. Statistical scoring, evidence qualification and UI implementation remain later milestones. See [the ingestion design](docs/mail-ingestion.md) and [operations runbook](docs/runbooks/mail-ingestion.md).
+The API validates tenant, issuer, audience, signature, lifetime, client, role and server-owned message entitlements. The local stack uses fictional signing keys; a separate live probe verifies actual Entra-issued API tokens. The [access runbook](docs/runbooks/secure-access.md) covers the accepted certificate identities, exact-mailbox Exchange RBAC, isolated audit reader, Azure data roles and operator-only setup. Cloud/live probes never run in untrusted PR CI. The model-absent content worker remains in standby and does not acknowledge content jobs. The separate ingestion collector supports bounded continuous collection and native Event Grid delivery. Its message observations never enter the authored-example detector. Statistical scoring, evidence qualification and UI implementation remain later milestones. See [the ingestion design](docs/mail-ingestion.md), [operations runbook](docs/runbooks/mail-ingestion.md), and the subsequently configured [Graph activity source](docs/graph-activity-logging.md).
 
 To replay the reviewed public example:
 

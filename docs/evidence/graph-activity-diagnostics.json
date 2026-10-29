@@ -1,0 +1,55 @@
+{
+  "executed_at": "2026-10-29T05:25:38.893907+00:00",
+  "graph_rows": 0,
+  "graph_table_protection_level": "not_reported",
+  "workspace_data_authorization_mode": "not_reported",
+  "delivery_observation": "no_graph_records_and_no_received_metric_samples",
+  "metrics": [
+    {
+      "name": "RowsReceived_Count",
+      "sample_count": 0,
+      "total": null
+    },
+    {
+      "name": "RowsDropped_Count",
+      "sample_count": 0,
+      "total": null
+    },
+    {
+      "name": "UncompressedBytesIn",
+      "sample_count": 0,
+      "total": null
+    },
+    {
+      "name": "UncompressedBytesOut",
+      "sample_count": 0,
+      "total": null
+    },
+    {
+      "name": "TransformationErrors_Count",
+      "sample_count": 0,
+      "total": null
+    }
+  ],
+  "metric_queries_unavailable": 0,
+  "error_minimization_passes_actual_azure_kql_test": true,
+  "dcr_error_log_rows": 0,
+  "unexpected_error_text_rows": 0,
+  "workforce_tenant_matches_config": true,
+  "dcr_log_errors_category_available": true,
+  "read_only_directory_controls": [
+    {
+      "label": "directory_organization_permission_control",
+      "http_status": 403,
+      "expected_http_status": 403
+    },
+    {
+      "label": "directory_user_permission_control",
+      "http_status": 403,
+      "expected_http_status": 403
+    }
+  ],
+  "root_cause_established": false,
+  "email_mutations": 0,
+  "agent_send_verdict": "not_established_by_this_diagnostic"
+}

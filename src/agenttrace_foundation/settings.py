@@ -25,6 +25,7 @@ class Settings:
             "agenttrace_attribution",
             "agenttrace_content",
             "agenttrace_collector",
+            "agenttrace_ledger",
         }:
             raise ValueError("unexpected_local_database_identity")
 

@@ -49,3 +49,39 @@ raw-evidence account and Key Vault retain their no-bypass firewalls. No tenant m
 write/send role or broader mailbox read role was added. See
 [the review and amendment](notification-transport-proposal.md) and
 [owner acceptance](evidence/notification-transport-acceptance.json).
+
+## Graph activity source addition
+
+Delivery troubleshooting also enables redacted `LogErrors` diagnostics on the
+dedicated transformation DCR. A synthetic direct-ingestion canary has an operator
+User grant of Monitoring Metrics Publisher at its own DCR only; no product identity
+or Microsoft 365 grant changes. The owner separately accepted the temporary
+[raw-metadata archive exception](graph-route-isolation-proposal.md): one dedicated
+Standard LRS account, its trusted-services firewall exception, and an operator-only
+Blob Data Reader grant on the single Graph archive container. Seven-day retention
+applies. This exception can expose tenant-wide raw request metadata and is not a
+claim that the standing product collector has broader approved data scope.
+
+The owner subsequently authorized enabling Microsoft Graph activity logging, checking licensing/permissions, minimizing cost, and testing the source end to end. A dedicated pay-as-you-go East US workspace/DCR in kb-agentdemo keeps a filtered seven-day Graph table. The existing audit collector receives only a workspace-scoped Log Analytics Data Reader assignment conditioned on that table. This adds no Microsoft 365 mailbox/send/write permissions. Tenant-wide source export is minimized downstream and remains broader than a mailbox authorization boundary. Shared workspaces and existing evidence firewalls stay unchanged. See [the design and cost controls](graph-activity-logging.md).
+
+The new workspace uses public Azure TLS endpoints with Entra authorization;
+operator-IP storage firewalls do not apply to it. No private endpoint deployment is
+claimed for this minimal-cost addition. Live source delivery is still pending.
+
+## Evidence ledger addition
+
+The local migration adds `agenttrace_ledger`, a separate SQL runtime identity. Its
+explicit mailbox-scope ACL allows reading the enrolled evidence and appending
+receipts, conflicts and input revisions. It has no modification, deletion, schema
+ownership or trust-enrollment grant. The collector can append enrolled observations;
+the content identity cannot access ledger tables. Existing API/attribution identities
+receive scoped metadata-column reads only. Application grants, RLS, triggers and
+expiry checks are tested using actual local SQL logins.
+
+The separate loopback evidence API retains existing Entra audience/client/role
+validation and server-owned message entitlements. A source application also needs
+an exact issuer/client/subject enrollment, allowed fact kind and valid signature.
+Delegated investigator roles can append server-computed reassessment inputs; they
+cannot enroll a signer through the API. Tenant fingerprint/encryption keys remain in
+protected local files. No Azure or Microsoft 365 role/permission changes are made.
+See [the ledger trust contract](evidence-schema.md) and [operations](runbooks/evidence-ledger.md).
