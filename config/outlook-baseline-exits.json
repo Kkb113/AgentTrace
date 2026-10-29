@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "milestone": "outlook_native_production_baseline",
+  "exits": [
+    {
+      "id": "scope_and_contract_recorded",
+      "met": true,
+      "evidence": [
+        "config/outlook-production-baseline.json",
+        "packages/contracts/schemas/outlook-production-baseline.schema.json",
+        "docs/outlook-production-baseline.md"
+      ]
+    },
+    {
+      "id": "demo_excluded_from_production",
+      "met": true,
+      "evidence": [
+        "config/outlook-demo-baseline.json",
+        "tests/test_outlook_baseline.py"
+      ]
+    },
+    {
+      "id": "human_policy_feasibility_and_blockers_recorded",
+      "met": true,
+      "evidence": [
+        "docs/outlook-production-baseline.md",
+        "docs/evidence/outlook-baseline-live-validation.json"
+      ]
+    },
+    {
+      "id": "minimal_next_work_and_access_dependencies_recorded",
+      "met": true,
+      "evidence": [
+        "implementation.md",
+        "docs/adr/outlook-native-categorization.md",
+        "docs/outlook-production-baseline.md"
+      ]
+    }
+  ],
+  "test_report": "docs/evidence/outlook-production-baseline-validation.json",
+  "scope_limit": "Completes the baseline only. Runtime, source/accuracy qualification, write access and category application remain later work."
+}

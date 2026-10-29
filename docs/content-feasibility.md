@@ -1,5 +1,7 @@
 # Bounded content-detection experiment
 
+**Superseded on 29 October 2026:** The active release detects send executors only. This experiment is historical and is not required or authorized as new work under the revised roadmap. See [the current plan](../implementation.md).
+
 Protocol version 1.0, 28 October 2026. Status: defined; model comparison not yet run, consistent with the initial feasibility stage. Primary agent evidence work has priority.
 
 Allocate at most ten engineer-days and forty CPU-hours initially, with zero GPU hours and zero paid detector/API calls. This is an engineering allocation in the accepted plan, not a booked staffing contract or a claim that datasets already exist. Use existing local CPU capacity first; cloud-equivalent cost is modeled in `azure-cost-baseline.md`. At the limit, publish results and classify the scorer as qualified or experimental. Content recall does not block independently qualified agent detection.

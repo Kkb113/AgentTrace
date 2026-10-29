@@ -158,6 +158,16 @@ def main() -> int:
         [PYTHON, "-m", "mypy"],
         [PYTHON, "scripts/export-locks.py", "--check"],
         [PYTHON, "scripts/export-contracts.py", "--check"],
+        [PYTHON, "scripts/verify-outlook-baseline.py"],
+        [
+            PYTHON,
+            "-m",
+            "mypy",
+            "--strict",
+            "--follow-imports",
+            "normal",
+            "src/agenttrace_feasibility/outlook_baseline.py",
+        ],
         [PYTHON, "scripts/check-boundaries.py"],
         [PYTHON, "scripts/verify-language-artifacts.py"],
         [

@@ -1,5 +1,7 @@
 # English content policy and labeling rubric
 
+**Superseded on 29 October 2026:** AI-generated-text detection is removed from the active release. This document preserves the previous policy for historical evidence only. Do not implement new scoring/labeling obligations from it. See [the sender-only scope](scope.md).
+
 Version 1.0, accepted policy recorded from the user's explicit instructions. Classify the sending mechanism and text origin separately.
 
 | Example history | Agent-send ground truth | In-scope content ground truth |

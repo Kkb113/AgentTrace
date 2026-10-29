@@ -1,34 +1,45 @@
-# AgentTrace POC scope
+# AgentTrace Outlook-native scope
 
-Baseline date: 28 October 2026. Machine-readable choices are in `config/poc-baseline.json`.
+Current revision: 29 October 2026. The owner's latest change replaces the standalone application roadmap with a production-quality Python monitor and native Outlook color categories. [Decision record](adr/outlook-native-categorization.md), [current implementation plan](../implementation.md).
 
-The project owner accepted an industry-neutral, synthetic-data-only POC in Azure East US, retaining raw synthetic evidence for seven days and detection decisions for thirty days. No client-specific regulatory certification, production-data processing, or legal retention rule is assumed. The project owner is the decision owner; the signed-in test operator has an administrator role, but that does not grant the future AgentTrace application mailbox permissions.
+## Product
 
-The primary question is **whether an AI agent executed the email send**. External human approval does not change that target. AI drafting, recipient-side reading, API use, an application name, or AI-looking wording alone cannot establish it. The independent secondary question is **whether the body contains generated drafts or substantial AI rewriting/translation**. Untracked manual copy/paste is in scope for the later statistical experiment. Basic spelling and grammar corrections are distinct.
+Determine who executed each observed email's completed send action. Apply **AI Agent** (red), **Human** (green) or **Unknown** (yellow) as an Outlook category. Per the owner's latest clarification, Human may be inferred after complete inspection finds no MCP/API/other automation indicators, regardless of content authorship. This is a policy inference, not proof of the executor. Unknown includes incomplete/unavailable inspections, pending/conflicting/unsupported evidence and known non-AI automation. The Human rule still requires accuracy qualification against untagged/browser agents.
 
-Initial clients are Outlook on the web and new Outlook for Windows with Exchange Online. Begin with the project owner's designated test mailbox; its actual address and tenant/subscription identifiers remain in ignored local configuration. Internal inbound/outbound and external inbound mail are in scope when observable. Start sizing at one mailbox and 100 messages/day; these are test assumptions, not measured demand or a capacity promise.
+An agent send remains an agent send after external human approval. Manual sending of AI-written text is a human-send scenario when that action is established. Writing origin, draft creation and recipient-side agent reads do not determine the executor. AI-generated-content detection is excluded.
 
-The externally operated Claude/Microsoft 365 connection supplies the first live positive test. AgentTrace never runs Claude, prepares an outbound draft, sends a test message, or manages its approval. The test owner performs those external operations. Only the marked synthetic message is exported for the feasibility exercise.
+Outlook itself provides the visible experience; the script also offers terminal/operational diagnostics. No separate frontend, public backend API, custom Outlook icon/add-in, Gmail-receiving connector or AI model is required.
 
-Exactly two finding objects are exposed: `agent_send_attribution` and `content_assessment`. Each includes status, a nullable flag, reason codes, and evidence references. Unknown is null, not false. Evidence, coverage and model qualification are supporting fields. Analyst review concerns findings, not permission to send.
+## Initial coverage
 
-Non-goals include agent execution, authoring, approvals, scheduling, routing, quarantine, blocking, mailbox modification, voice, attachments/OCR, arbitrary endpoint monitoring, and non-English statistical content classification. Unobservable external agents remain an explicit coverage gap.
+One designated Exchange Online mailbox, with incoming Gmail → Outlook and Outlook → Outlook messages in enrolled receiving folders. New-arrival activation/backfill boundaries are explicit. Gmail-recipient routes are deferred, not claimed as supported by connecting Outlook.
 
-## Data boundaries
+Mail from any sender domain can be inspected where authorized, but arbitrary external send executors may remain unobservable. Receiver access does not grant another tenant's audit or Gmail/Claude tool history.
 
-Use synthetic text and self-addressed tests only. Keep received EML, actual IDs, source transcripts, and raw tenant responses under `work/private/`; they are excluded from Git. Commit only reviewed aliases, public pricing, test contracts, and sanitized reports. Delete private raw captures at seven days using a reviewed, exact-file cleanup process; decisions expire after thirty days. Retention is the accepted operational policy; this feasibility CLI is not a hosted retention service. Static fictional contract examples have no customer content and may remain as repository test assets.
+## Detection and evidence
 
-Inference stays inside the approved customer boundary. No public detector upload, model training on pilot mail, clipboard monitoring, or broad prompt logging is authorized. The later content study may use permitted public datasets and separately obtained synthetic examples. Changing region, real-data scope, retention, permission scope, or performance claims requires a recorded baseline revision.
+Retain the working terminal demo as a demo. Its explicitly requested binary header heuristic must not become the production policy. The new entry point is separate, with qualified decisions and Unknown by default.
 
-## Decision register
+The Office365 MCP declaration and Gmail HTTPREST trace remain visible evidence hints. They require a qualified trust/execution/message-link rule before supporting a production AI Agent category. Human uses the owner's inferred-manual rule after complete inspection; ordinary authentication or a user session alone does not prove the executor. Failed/missing inspection must remain Unknown.
 
-| Decision | Basis | State |
-| --- | --- | --- |
-| Two independent findings; agent first | Repeated explicit user instructions and accepted implementation plan | Accepted |
-| Synthetic-only, industry-neutral, East US, 7/30-day retention | Explicit answer to baseline question on 28 October | Accepted |
-| Claude as external test sender | Explicit user instruction replacing Dot; user reports execution and provides tool results | Selected; integration evidence being assessed |
-| English drafts/rewrites/translations; grammar separate | Earlier explicit policy answers | Accepted |
-| Primary G gates and secondary C criteria | Accepted plan at commit `92723da`; frozen details in `acceptance.md` | Baseline recorded; release results unmeasured |
-| New threat-model and residual-risk review | Project owner explicitly accepted the concrete scope/threat/acceptance pack in chat on 28 October | Accepted; technical evidence gaps remain open |
-| Read-only mailbox/audit application access | Actual approved-reader calls, not inferred from administrator title | Effective marked-message reads and Exchange audit search demonstrated |
-| Temporary feasibility reader and operator-only delegated consent | Explicit owner authorization after review of `access-remediation.md` | Created and verified; live validation completed; grant and dedicated identity retired after explicit owner approval |
+The enrolled Claude/Microsoft Exchange Send audit path has one demonstrated authenticated route. Its trust scope and received-copy correlation limits remain explicit. General Human attribution, quantitative production accuracy and Graph activity-log delivery remain unqualified. Do not mark them complete from the demo.
+
+## Permitted mailbox annotation
+
+Mail reading and audit collection stay separate from a dedicated category writer. The only requested mailbox mutation is the categories collection on exact allowlisted messages. Preserve unrelated categories, use validated concurrency protection, verify writes and retain an exact owned-label rollback record.
+
+Graph Mail.ReadWrite is broader than category updates; effective mailbox scope and strict categories-only code guards are required. Provision master categories manually or with separately approved temporary setup permissions. This documentation creates no permission, category or live annotation.
+
+Do not compose, draft, send, reply, forward, schedule, manage approvals, operate agents, route/block/quarantine, alter subject/body/read state or change unrelated mailbox settings. Category annotation is a detection output, not an email execution platform.
+
+## Data and hosting
+
+Preserve the synthetic-only qualification/write-test baseline, East US where Azure is used, seven-day raw evidence and thirty-day decision metadata. The owner separately authorized mailbox-wide incoming metadata for the live diagnostic; unattended deployment needs its precise data/access/annotation-lifetime configuration recorded before enablement. No real-customer body collection, model training, public detector uploads or clipboard surveillance.
+
+Keep private messages, headers, account IDs, source transcripts, credentials and reviewer records outside Git. Use minimum fields, sanitized logs, encrypted host storage and protected backups. A suitable always-on Windows host with supervised execution is the initial low-cost deployment; Outlook can be closed while the host remains available. New Azure resources, if justified later, use only kb-agentdemo and explicit subscription selection.
+
+## Status and history
+
+Earlier Phases 0–4 passed their historical Microsoft/dual-target criteria; their reports are unchanged. The new ten-phase sequence is a replanned production-monitor roadmap, not inherited completion. Existing v1 dual-target APIs and unfinished evaluation work remain legacy components; migrate/reuse only what this small monitor needs.
+
+The demo currently runs and has targeted test evidence. The new production runner, Human evidence qualification, category permissions/writer, unattended deployment and production accuracy gates are open. No application UI is pending within this scope.

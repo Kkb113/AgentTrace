@@ -1,5 +1,9 @@
 # Secure-access permission matrix
 
+**Current production-monitor proposal:** The owner now requests native Outlook categories. The new [plan](../implementation.md) adds a separate exact-mailbox category writer using Mail.ReadWrite and one-time category setup; those grants are not present or authorized as existing permissions in this historical matrix. Readers remain read-only. No live write has been enabled by the planning revision. See [the exact boundary](adr/outlook-native-categorization.md).
+
+**Baseline history:** These accepted Microsoft/Azure grants do not include Gmail access or category writes. The [Outlook-native revision](adr/outlook-native-categorization.md) defers Gmail receiving and introduces only a future separate category writer. New write/source permissions require concrete configuration rather than inference from this historical matrix.
+
 Review state: accepted on 28 October 2026. The user explicitly replied, "Accept as project owner, Microsoft 365 administrator and security owner" to the concrete matrix and data flow, including broader Exchange audit exposure. Implementation and effective tests are recorded separately in the secure-access report; acceptance alone is not technical proof.
 
 ## Selected deployment and scope

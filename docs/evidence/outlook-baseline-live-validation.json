@@ -1,0 +1,60 @@
+{
+  "executed_at": "2026-10-29T15:51:18.639138+00:00",
+  "evidence_expires_at": "2026-11-04T20:44:50+00:00",
+  "capture_basis": "fresh_authenticated_graph_and_existing_audit_query_reads",
+  "cases": [
+    {
+      "case_ref": "gmail_manual_control",
+      "owner_reported_actor": "human",
+      "truth_basis": "owner_prepared_report_not_independent_accuracy_label",
+      "demo_label": "Sent by Human",
+      "demo_qualification": "experimental_header_heuristic",
+      "conservative_header_only_result": "Unable to determine",
+      "legacy_authenticated_audit_recheck": "not_applicable"
+    },
+    {
+      "case_ref": "gmail_claude_control",
+      "owner_reported_actor": "ai_agent",
+      "truth_basis": "owner_prepared_report_not_independent_accuracy_label",
+      "demo_label": "Sent by AI Agent",
+      "demo_qualification": "experimental_header_heuristic",
+      "conservative_header_only_result": "Unable to determine",
+      "legacy_authenticated_audit_recheck": "not_applicable"
+    },
+    {
+      "case_ref": "outlook_claude_control",
+      "owner_reported_actor": "ai_agent",
+      "truth_basis": "owner_prepared_report_not_independent_accuracy_label",
+      "demo_label": "Sent by AI Agent",
+      "demo_qualification": "experimental_header_heuristic",
+      "conservative_header_only_result": "Unable to determine",
+      "legacy_authenticated_audit_recheck": "Sent by AI Agent"
+    }
+  ],
+  "folder_inventory_complete": true,
+  "visible_folder_count": 9,
+  "receiving_folder_count": 6,
+  "control_mailbox_access_denied": true,
+  "entra_graph_app_roles": {
+    "mail-collector": [],
+    "audit-collector": [
+      "AuditLogsQuery-Exchange.Read.All"
+    ]
+  },
+  "effective_rights_limit": "App roles are not a complete Exchange RBAC inventory; prior scoped assignment evidence is historical. No category write probe attempted.",
+  "human_rule": "policy_feasible_accuracy_qualification_pending",
+  "production_received_copy_qualification": "pending_separate_attack_and_link_tests",
+  "mail_mutations": 0,
+  "new_permissions": 0,
+  "new_azure_resources": 0,
+  "raw_capture_hashes": {
+    "message-0": "6f8a61773e102fd25954418751e9472fb294a4888e3126768f26cf0d62ef0f5b",
+    "message-1": "e0bf9be9405acd1e8e7417c64d1dd4b3a0068ed30d3cc837834db5399dcdf1ba",
+    "message-2": "737c989349544bb8ceca0e8333b5ceef1739adfb3443c402c5aa1a6296948445",
+    "audit-query": "c604ffbcd74842ce5334ff7a2961854dbcf00fb6f1657d52cfa5222c5af52919",
+    "folder-inventory": "b86d35ee9b3501fafc28054341658279a2dac15f2c4a778eaebf8803fd1ee927",
+    "mail-collector-app-grants": "629b63841f0f3e1f6befdfeac129266c6367423ae0cdf55c24c64acf52d29b6b",
+    "audit-collector-app-grants": "f7930e7a1a6622670afc6e370493ab0d17828aa6639974a63b67623bc9363e6d"
+  },
+  "qualification_limit": "Feasibility only; not production accuracy, human-source qualification or category-write enablement."
+}

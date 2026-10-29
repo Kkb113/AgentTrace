@@ -1,0 +1,45 @@
+{
+  "executed_at": "2026-10-29T16:07:41.639085+00:00",
+  "milestone": "Outlook-native production baseline",
+  "python_version": "3.12.14",
+  "validation_basis": "Clean selected-index export; unfinished evaluation work excluded",
+  "gates": {
+    "quality": "passed",
+    "security": "passed",
+    "infrastructure": "passed",
+    "guard_controls": "passed",
+    "integration_end_to_end": "passed"
+  },
+  "unit_primary_tests_passed": 283,
+  "unit_subtests_passed": 97,
+  "integration_tests_passed": 123,
+  "junit_counts_including_subtests": {
+    "unit": {
+      "tests": 380,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "integration": {
+      "tests": 123,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "validated_source_sha256": "519b2e81e610622ee197c3e28e41c5bd38537eab8f0d4fbe3a46b39897ce3643",
+  "baseline_sha256": "d00435acd88905c183b77ecb5844051139d6888219a1db17a2ab773f2dc4704e",
+  "demo_source_archive_verified": true,
+  "live_evidence": "docs/evidence/outlook-baseline-live-validation.json",
+  "integration_setup": "Existing fixed project name with a separate new synthetic database volume. Initial credential/project-name setup failures were diagnosed and corrected; original volume retained. All 123 tests passed after correction.",
+  "mail_mutations": 0,
+  "new_permissions": 0,
+  "azure_resources_created": 0,
+  "exit_criteria_met": 4,
+  "exit_criteria_total": 4,
+  "production_runner_implemented": false,
+  "category_writes_enabled": false,
+  "human_policy": "Inferred manual after complete observable inspection without automation indicators; accuracy qualification pending",
+  "qualification_claim": "Phase 0 feasibility and requirements only; not production accuracy or annotation readiness.",
+  "source_hash_scope": "Selected source/config/schema files before post-validation metadata; excludes the generated outlook-baseline-exits.json checklist."
+}
