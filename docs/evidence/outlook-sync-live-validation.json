@@ -1,0 +1,63 @@
+{
+  "executed_at": "2026-10-29T17:39:34.127491+00:00",
+  "scenario": "Owner-prepared synthetic Gmail received copy, moved manually through receiving folders",
+  "stages": [
+    {
+      "stage": "inbox",
+      "captured_at": "2026-10-29T17:22:51.922815+00:00",
+      "private_capture_sha256": "c1757b82c01ae2089c930118896faab610373a0c7e1e69a6f64eb87c41f78d3d",
+      "decision_versions": 1,
+      "observation_revision": 1
+    },
+    {
+      "stage": "rules",
+      "captured_at": "2026-10-29T17:24:55.911431+00:00",
+      "private_capture_sha256": "b245beabf62f06861f6190890421dd3590e2ded4a0d32160be3d341f604fef75",
+      "decision_versions": 1,
+      "observation_revision": 1
+    },
+    {
+      "stage": "junk",
+      "captured_at": "2026-10-29T17:26:57.719436+00:00",
+      "private_capture_sha256": "0f9573d183cc9be755f65a7fdfd7bdba8f65c60de62ac9032d69af037a5971d6",
+      "decision_versions": 1,
+      "observation_revision": 1
+    },
+    {
+      "stage": "returned",
+      "captured_at": "2026-10-29T17:37:49.077999+00:00",
+      "private_capture_sha256": "531edc1fd5e8a7825def81b66c64a51f68a825f9c75128429cd312c51a65b7ba",
+      "decision_versions": 1,
+      "observation_revision": 1
+    }
+  ],
+  "same_immutable_id_across_stages": true,
+  "single_observation_and_decision_preserved": true,
+  "mailbox_configuration_mutations": 0,
+  "mail_mutations_by_collector": 0,
+  "new_permissions": 0,
+  "azure_resources_created": 0,
+  "final_sync_summary": {
+    "sync_cutoff_utc": "2026-10-29T15:17:39.126405+00:00",
+    "folders_receiving": 5,
+    "folders_excluded": 4,
+    "sync_jobs_due": 5,
+    "sync_jobs_blocked": 0,
+    "sync_jobs_dead_letter": 0,
+    "sync_gaps": 0,
+    "sync_items": 109,
+    "sync_pending_items": 0,
+    "sync_eligible_items": 1,
+    "discovery_jobs_pending": 0,
+    "sync_retry_waiting": 0,
+    "sync_ready_jobs": 0,
+    "oldest_pending_age_seconds": 0,
+    "sync_health": "current"
+  },
+  "privacy": "Provider identifiers and selected source metadata are retained only in ignored private proof files; no bodies were requested.",
+  "limits": [
+    "Manual custom-folder move; no actual mailbox rule created",
+    "One controlled live copy; not an accuracy dataset",
+    "Category echo, recovery faults and population scale tested with deterministic source responses"
+  ]
+}

@@ -18,8 +18,9 @@ from .contracts import Decision, Observation
 from .eligibility import require_annotation_eligible
 from .errors import OutlookError
 from .locking import ProcessLock
+from .sync_schema import SYNC_SCHEMA
 
-SCHEMA = (
+BASE_SCHEMA = (
     "CREATE TABLE metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL)",
     "CREATE TABLE lease (id INTEGER PRIMARY KEY CHECK(id=1), owner TEXT NOT NULL, generation INTEGER NOT NULL, expires REAL NOT NULL)",
     "CREATE TABLE observations (id INTEGER PRIMARY KEY, message_id TEXT NOT NULL, source_version TEXT NOT NULL, input_hash TEXT NOT NULL, payload TEXT NOT NULL, expires REAL NOT NULL, UNIQUE(message_id,source_version))",
@@ -29,6 +30,9 @@ SCHEMA = (
     "CREATE TABLE outbox (decision_id INTEGER PRIMARY KEY REFERENCES decisions(id), status TEXT NOT NULL CHECK(status IN ('preview','pending','superseded','failed')), category TEXT NOT NULL CHECK(category IN ('AI Agent','Human','Unknown')))",
     "CREATE INDEX work_due ON work(status,next_attempt)",
 )
+BASE_DIGEST = hashlib.sha256("\n".join(BASE_SCHEMA).encode()).hexdigest()
+
+SCHEMA = (*BASE_SCHEMA, *SYNC_SCHEMA)
 SCHEMA_DIGEST = hashlib.sha256("\n".join(SCHEMA).encode()).hexdigest()
 
 
@@ -130,23 +134,24 @@ class StateStore:
     def _migrate_and_bind(self) -> None:
         with self.transaction() as db:
             version = int(db.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {0, 1}:
+            if version not in {0, 1, 2}:
                 raise OutlookError("unsupported_state_schema")
             if version == 0:
                 if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' LIMIT 1").fetchone():
                     raise OutlookError("unrecognized_state_schema")
-                for statement in SCHEMA:
+                for statement in BASE_SCHEMA:
                     db.execute(statement)
                 db.execute("PRAGMA user_version=1")
                 values = {
-                    "schema_digest": SCHEMA_DIGEST,
+                    "schema_digest": BASE_DIGEST,
                     "scope": self.config.scope.model_dump_json(),
                     "activation_utc": self.clock().isoformat(),
                 }
                 db.executemany("INSERT INTO metadata VALUES (?,?)", values.items())
             metadata = dict(db.execute("SELECT key,value FROM metadata"))
+            expected = BASE_DIGEST if version in {0, 1} else SCHEMA_DIGEST
             if (
-                metadata.get("schema_digest") != SCHEMA_DIGEST
+                metadata.get("schema_digest") != expected
                 or metadata.get("scope") != self.config.scope.model_dump_json()
             ):
                 raise OutlookError("state_scope_or_schema_mismatch")
@@ -156,8 +161,15 @@ class StateStore:
                     "SELECT sql FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' AND sql IS NOT NULL ORDER BY rowid"
                 )
             ]
-            if actual != list(SCHEMA):
+            if actual != list(BASE_SCHEMA if version in {0, 1} else SCHEMA):
                 raise OutlookError("state_schema_modified")
+            if version in {0, 1}:
+                for statement in SYNC_SCHEMA:
+                    db.execute(statement)
+                db.execute(
+                    "UPDATE metadata SET value=? WHERE key='schema_digest'", (SCHEMA_DIGEST,)
+                )
+                db.execute("PRAGMA user_version=2")
 
     def heartbeat(self) -> None:
         with self.transaction(lease=self.lease) as db:
@@ -169,65 +181,69 @@ class StateStore:
     def observe(self, observations: Sequence[Observation]) -> int:
         if len(observations) > 1000:
             raise OutlookError("observation_batch_too_large")
-        accepted = 0
         with self.transaction(lease=self.lease) as db:
-            for item in observations:
-                now = self.clock()
-                if item.scope != self.config.scope:
-                    raise OutlookError("observation_scope_mismatch")
-                if (
-                    item.observed_at > now + timedelta(minutes=5)
-                    or item.observed_at + timedelta(days=7) <= now
-                ):
-                    raise OutlookError("observation_outside_validity")
-                raw = item.model_dump(mode="json")
-                raw.pop("observed_at")
-                digest = hashlib.sha256(json.dumps(raw, sort_keys=True).encode()).hexdigest()
-                previous = db.execute(
-                    "SELECT id,input_hash FROM observations WHERE message_id=? AND source_version=?",
-                    (item.message_id, item.source_version),
-                ).fetchone()
-                if previous:
-                    if previous[1] != digest:
-                        raise OutlookError("observation_version_conflict")
-                    continue
-                current = db.execute(
-                    "SELECT o.payload FROM messages m JOIN observations o ON o.id=m.current_observation WHERE m.message_id=?",
-                    (item.message_id,),
-                ).fetchone()
-                if (
-                    current
-                    and Observation.model_validate_json(current[0]).observed_at > item.observed_at
-                ):
-                    raise OutlookError("stale_observation")
-                cursor = db.execute(
-                    "INSERT INTO observations(message_id,source_version,input_hash,payload,expires) VALUES (?,?,?,?,?)",
-                    (
-                        item.message_id,
-                        item.source_version,
-                        digest,
-                        item.model_dump_json(),
-                        (item.observed_at + timedelta(days=7)).timestamp(),
-                    ),
-                )
-                observation_id = cursor.lastrowid
-                db.execute(
-                    "UPDATE work SET status='superseded' WHERE observation_id IN (SELECT id FROM observations WHERE message_id=?) AND status IN ('pending','retry')",
-                    (item.message_id,),
-                )
-                db.execute(
-                    "INSERT INTO messages(message_id,current_observation) VALUES (?,?) ON CONFLICT(message_id) DO UPDATE SET current_observation=excluded.current_observation",
-                    (item.message_id, observation_id),
-                )
-                db.execute(
-                    "UPDATE outbox SET status='superseded' WHERE decision_id IN (SELECT id FROM decisions WHERE message_id=?) AND status IN ('preview','pending','failed')",
-                    (item.message_id,),
-                )
-                db.execute(
-                    "INSERT INTO work(observation_id,status) VALUES (?,'pending')",
-                    (observation_id,),
-                )
-                accepted += 1
+            return self._observe(db, observations)
+
+    def _observe(self, db: sqlite3.Connection, observations: Sequence[Observation]) -> int:
+        """Internal: callers hold the fenced transaction, including its checkpoint."""
+        accepted = 0
+        for item in observations:
+            now = self.clock()
+            if item.scope != self.config.scope:
+                raise OutlookError("observation_scope_mismatch")
+            if (
+                item.observed_at > now + timedelta(minutes=5)
+                or item.observed_at + timedelta(days=7) <= now
+            ):
+                raise OutlookError("observation_outside_validity")
+            raw = item.model_dump(mode="json")
+            raw.pop("observed_at")
+            digest = hashlib.sha256(json.dumps(raw, sort_keys=True).encode()).hexdigest()
+            previous = db.execute(
+                "SELECT id,input_hash FROM observations WHERE message_id=? AND source_version=?",
+                (item.message_id, item.source_version),
+            ).fetchone()
+            if previous:
+                if previous[1] != digest:
+                    raise OutlookError("observation_version_conflict")
+                continue
+            current = db.execute(
+                "SELECT o.payload FROM messages m JOIN observations o ON o.id=m.current_observation WHERE m.message_id=?",
+                (item.message_id,),
+            ).fetchone()
+            if (
+                current
+                and Observation.model_validate_json(current[0]).observed_at > item.observed_at
+            ):
+                raise OutlookError("stale_observation")
+            cursor = db.execute(
+                "INSERT INTO observations(message_id,source_version,input_hash,payload,expires) VALUES (?,?,?,?,?)",
+                (
+                    item.message_id,
+                    item.source_version,
+                    digest,
+                    item.model_dump_json(),
+                    (item.observed_at + timedelta(days=7)).timestamp(),
+                ),
+            )
+            observation_id = cursor.lastrowid
+            db.execute(
+                "UPDATE work SET status='superseded' WHERE observation_id IN (SELECT id FROM observations WHERE message_id=?) AND status IN ('pending','retry')",
+                (item.message_id,),
+            )
+            db.execute(
+                "INSERT INTO messages(message_id,current_observation) VALUES (?,?) ON CONFLICT(message_id) DO UPDATE SET current_observation=excluded.current_observation",
+                (item.message_id, observation_id),
+            )
+            db.execute(
+                "UPDATE outbox SET status='superseded' WHERE decision_id IN (SELECT id FROM decisions WHERE message_id=?) AND status IN ('preview','pending','failed')",
+                (item.message_id,),
+            )
+            db.execute(
+                "INSERT INTO work(observation_id,status) VALUES (?,'pending')",
+                (observation_id,),
+            )
+            accepted += 1
         return accepted
 
     def pending(self, limit: int) -> list[tuple[int, Observation]]:
@@ -323,9 +339,11 @@ class StateStore:
     def summary(self) -> dict[str, int | str]:
         with self.transaction(lease=self.lease) as db:
             result: dict[str, int | str] = {
-                "schema_version": 1,
+                "schema_version": 2,
                 "journal_mode": "wal",
-                "runtime_stage": "foundation_only",
+                "runtime_stage": "mailbox_sync_dry_run"
+                if self.config.sync_enabled
+                else "foundation_only",
             }
             for table in ("observations", "decisions", "outbox"):
                 result[table] = int(db.execute("SELECT count(*) FROM " + table).fetchone()[0])

@@ -88,6 +88,19 @@
   },
   "additionalProperties": false,
   "properties": {
+    "backfill_since": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Backfill Since"
+    },
     "batch_size": {
       "default": 50,
       "maximum": 100,
@@ -108,6 +121,13 @@
       "const": 30,
       "default": 30,
       "title": "Decision Retention Days",
+      "type": "integer"
+    },
+    "folder_refresh_seconds": {
+      "default": 300,
+      "maximum": 3600,
+      "minimum": 60,
+      "title": "Folder Refresh Seconds",
       "type": "integer"
     },
     "lease_seconds": {
@@ -132,6 +152,13 @@
       ],
       "title": "Mode",
       "type": "string"
+    },
+    "page_size": {
+      "default": 100,
+      "maximum": 100,
+      "minimum": 1,
+      "title": "Page Size",
+      "type": "integer"
     },
     "poll_seconds": {
       "default": 10,
@@ -184,6 +211,31 @@
       "maxLength": 2048,
       "minLength": 1,
       "title": "State Directory",
+      "type": "string"
+    },
+    "sync_enabled": {
+      "default": false,
+      "title": "Sync Enabled",
+      "type": "boolean"
+    },
+    "sync_operations_per_cycle": {
+      "default": 10,
+      "maximum": 100,
+      "minimum": 1,
+      "title": "Sync Operations Per Cycle",
+      "type": "integer"
+    },
+    "sync_poll_seconds": {
+      "default": 30,
+      "maximum": 600,
+      "minimum": 10,
+      "title": "Sync Poll Seconds",
+      "type": "integer"
+    },
+    "synthetic_subject_prefix": {
+      "const": "AgentTrace synthetic test:",
+      "default": "AgentTrace synthetic test:",
+      "title": "Synthetic Subject Prefix",
       "type": "string"
     }
   },

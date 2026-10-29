@@ -29,6 +29,7 @@ class CertificateTokenProvider:
             client_credential={"client_assertion": self._assertion},
             enable_pii_log=False,
             instance_discovery=False,
+            timeout=20,
         )
 
     def _assertion(self) -> str:

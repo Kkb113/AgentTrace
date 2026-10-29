@@ -1,0 +1,90 @@
+{
+  "executed_at": "2026-10-29T17:40:28.588050+00:00",
+  "milestone": "Outlook-native reliable mailbox synchronization",
+  "python_version": "3.12.14",
+  "sqlite_version": "3.53.1",
+  "validation_basis": "Clean selected-index export, fresh pinned environment; unrelated evaluation/spreadsheet work excluded",
+  "validated_source_sha256": "d88e80f92c3d53625fd88f2b6d1715248dc28da5ef61d2bbc7997fe1baae3eb7",
+  "source_files_hashed": 233,
+  "source_hash_scope": "Sorted tracked src/, packages/, scripts/, tests/, config/ plus pyproject.toml, uv.lock and requirements files. SHA256 stream: UTF-8 path + NUL + ASCII byte length + NUL + LF-normalized bytes. Documentation and generated validation records excluded.",
+  "gates": {
+    "quality": "passed",
+    "security": "passed",
+    "infrastructure": "passed",
+    "guard_controls": "passed",
+    "integration_end_to_end": "passed",
+    "live_synthetic_move_chain": "passed"
+  },
+  "unit_primary_tests_passed": 356,
+  "unit_subtests_passed": 97,
+  "unit_skipped": 1,
+  "new_synchronization_tests_passed": 31,
+  "integration_tests_passed": 123,
+  "junit_counts_including_subtests": {
+    "unit": {
+      "tests": 454,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "integration": {
+      "tests": 123,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "platform_limit": "One Windows symlink-creation test needs privileges; Linux CI runs it. Other alias and crash tests pass locally.",
+  "scale_test": {
+    "observable_message_ids": 10023,
+    "mid_backlog_restart": true,
+    "discarded_observable_ids": 0,
+    "population": "Synthetic history metadata; not an accuracy dataset"
+  },
+  "checkpoint_crash_tests": {
+    "boundaries": [
+      "discovery page",
+      "message delta page",
+      "current-message detail"
+    ],
+    "before_commit_cases": 3,
+    "after_commit_cases": 3,
+    "integrity_checks": "passed"
+  },
+  "live_evidence": "docs/evidence/outlook-sync-live-validation.json",
+  "exit_criteria": [
+    {
+      "id": "observable_messages_or_explicit_gaps",
+      "status": "passed"
+    },
+    {
+      "id": "durable_uncapped_backlogs",
+      "status": "passed"
+    },
+    {
+      "id": "restart_move_and_replay_idempotency",
+      "status": "passed"
+    },
+    {
+      "id": "category_echo_loop_suppression",
+      "status": "passed"
+    }
+  ],
+  "exit_criteria_met": 4,
+  "exit_criteria_total": 4,
+  "mail_mutations_by_collector": 0,
+  "new_permissions": 0,
+  "azure_resources_created": 0,
+  "category_writes_enabled": false,
+  "positive_rules_enabled": false,
+  "live_collection_implemented": true,
+  "runtime_stage": "mailbox_sync_dry_run",
+  "qualification_claim": "Synchronization and recovery only. No sender accuracy, positive-rule qualification, Outlook write/display, or exactly-once forensic-event claim.",
+  "open_boundaries": [
+    "Synthetic-only header/decision enrollment",
+    "Periodic eventually-consistent folder discovery",
+    "Unobservable cursor windows remain explicit gaps",
+    "Physical purge, encrypted backup/ACL provisioning and unattended hosting remain later gates"
+  ],
+  "review": "docs/outlook-sync-review.md"
+}
