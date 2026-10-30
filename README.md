@@ -12,7 +12,7 @@ The working demo uses experimental binary header rules, including a Human fallba
 
 ## Run the existing terminal demo
 
-The [sender-only accuracy workflow](docs/runbooks/sender-accuracy.md) adds frozen-window metrics, adversarial/source tests and curator holdout controls. Its [review](docs/sender-accuracy-review.md) keeps software validation separate from the still-pending independent action dataset, curator evidence and G1/G2 qualification. No independent production accuracy claim or Outlook category write is enabled.
+Phase 4's [controlled actual-email tests](docs/runbooks/controlled-email-tests.md) pass under the [owner-approved POC revision](docs/adr/live-email-poc-validation.md): manual Outlook/Gmail cases return Human-capable and the supported Claude/Microsoft 365 case returns AI Agent. No external corpus or separate curator is required for this POC. The formal [accuracy workbench](docs/runbooks/sender-accuracy.md) remains optional for future G1/G2 qualification. No population-accuracy claim or Outlook category write is enabled.
 
 From PowerShell:
 

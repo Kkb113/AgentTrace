@@ -1,6 +1,8 @@
 # Sender accuracy and adversarial validation
 
-This is the active sender-only workflow for the Outlook rules. The older uncommitted `agenttrace_evaluation` tools target a retired detector/content design and are preserved separately. Use `scripts/validate-sender-accuracy.py`; no web application, Microsoft call, email send or category write is part of this tool.
+**Current POC path:** Follow [controlled actual-email testing](controlled-email-tests.md). The owner explicitly chose self-operated live tests; no external dataset, independent curator or large benchmark is required for this POC. The formal accuracy/curator commands below remain optional for later population-level claims. They are not the current Phase 4 exit criteria. See [the accepted revision](../adr/live-email-poc-validation.md).
+
+This is the optional statistical qualification workflow for the Outlook sender rules. The current POC uses [actual-email tests](controlled-email-tests.md). The older uncommitted `agenttrace_evaluation` tools target a retired detector/content design and are preserved separately. Use `scripts/validate-sender-accuracy.py` only for the formal workflow below; no web application, Microsoft call, email send or category write is part of that tool.
 
 ## Current readiness
 
