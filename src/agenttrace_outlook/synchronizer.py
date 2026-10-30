@@ -10,6 +10,7 @@ from typing import Any
 
 from .contracts import Observation
 from .errors import OutlookError, SourceError
+from .mail_semantics import sender_snapshot
 from .reader import MailReader
 from .state import StateStore
 from .sync_state import SyncState
@@ -232,30 +233,7 @@ class Synchronizer:
             if status != "eligible":
                 self.state.invalidate(db, identity, status)
             else:
-                headers = detail.get("internetMessageHeaders")
-                complete = (
-                    isinstance(headers, list)
-                    and bool(headers)
-                    and len(headers) <= 2000
-                    and all(
-                        isinstance(h, dict)
-                        and isinstance(h.get("name"), str)
-                        and isinstance(h.get("value"), str)
-                        for h in (headers or [])
-                    )
-                )
-                semantic = {
-                    k: detail.get(k)
-                    for k in ("receivedDateTime", "sentDateTime", "internetMessageId", "isDraft")
-                }
-                semantic["internetMessageHeaders"] = (
-                    sorted(
-                        [{"name": h["name"].lower(), "value": h["value"]} for h in (headers or [])],
-                        key=lambda h: (h["name"], h["value"]),
-                    )
-                    if complete
-                    else None
-                )
+                semantic, complete = sender_snapshot(detail)
                 digest = hashlib.sha256(json.dumps(semantic, sort_keys=True).encode()).hexdigest()
                 current = db.execute(
                     "SELECT semantic_hash,status,revision FROM sync_items WHERE message_id=?",

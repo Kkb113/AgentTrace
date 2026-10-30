@@ -127,7 +127,9 @@ def main() -> int:
                         if isinstance(body, ast.Dict)
                         else set()
                     )
-                    if path.name != "category_probe.py" or keys != {"categories"}:
+                    if path.name not in {"category_probe.py", "category_endpoint.py"} or keys != {
+                        "categories"
+                    }:
                         issues.append(
                             {
                                 "file": path.name,
@@ -140,6 +142,7 @@ def main() -> int:
                     "audit_source.py": {"GET", "POST"},
                     "category_catalog.py": {"GET", "POST"},
                     "category_probe.py": {"GET", "PATCH"},
+                    "category_endpoint.py": {"GET", "PATCH"},
                 }
                 if (
                     path.name not in allowed_methods

@@ -1,0 +1,96 @@
+{
+  "$defs": {
+    "Scope": {
+      "additionalProperties": false,
+      "properties": {
+        "mailbox_id": {
+          "format": "uuid",
+          "title": "Mailbox Id",
+          "type": "string"
+        },
+        "tenant_id": {
+          "format": "uuid",
+          "title": "Tenant Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tenant_id",
+        "mailbox_id"
+      ],
+      "title": "Scope",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "category_membership_preserved": {
+      "const": true,
+      "title": "Category Membership Preserved",
+      "type": "boolean"
+    },
+    "checked_at": {
+      "format": "date-time",
+      "title": "Checked At",
+      "type": "string"
+    },
+    "current_conditional_patch_verified": {
+      "const": true,
+      "title": "Current Conditional Patch Verified",
+      "type": "boolean"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "probe_reference_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Probe Reference Sha256",
+      "type": "string"
+    },
+    "provider_version_changed": {
+      "const": true,
+      "title": "Provider Version Changed",
+      "type": "boolean"
+    },
+    "route": {
+      "const": "graph-v1.0-message-categories-if-match/v1",
+      "default": "graph-v1.0-message-categories-if-match/v1",
+      "title": "Route",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "$ref": "#/$defs/Scope"
+    },
+    "stale_conditional_patch_rejected": {
+      "const": true,
+      "title": "Stale Conditional Patch Rejected",
+      "type": "boolean"
+    },
+    "writer_client_id": {
+      "format": "uuid",
+      "title": "Writer Client Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "scope",
+    "writer_client_id",
+    "checked_at",
+    "expires_at",
+    "probe_reference_sha256",
+    "current_conditional_patch_verified",
+    "provider_version_changed",
+    "stale_conditional_patch_rejected",
+    "category_membership_preserved"
+  ],
+  "title": "CategoryEndpointQualification",
+  "type": "object"
+}

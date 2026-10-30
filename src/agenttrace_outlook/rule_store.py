@@ -120,6 +120,22 @@ class RuleStore:
                 "UPDATE work SET status='pending' WHERE status='completed' AND observation_id IN (SELECT a.observation_id FROM rule_assessments a JOIN rule_sources s ON s.observation_id=a.observation_id JOIN messages m ON m.current_observation=a.observation_id WHERE json_extract(s.payload,'$.expires_at')<=? AND a.assessed<json_extract(s.payload,'$.expires_at'))",
                 (store.clock().timestamp(),),
             )
+            # Explanation windows also advance for unavailable/non-enrolled sources.
+            # Observation expiry is exactly observed_at + seven days; arithmetic
+            # keeps subsecond precision without parsing timestamps through SQLite.
+            initial_offset = timedelta(days=7, hours=-2).total_seconds()
+            late_offset = timedelta(days=6).total_seconds()
+            db.execute(
+                "UPDATE work SET status='pending' WHERE status='completed' AND observation_id IN (SELECT o.id FROM observations o JOIN messages m ON m.current_observation=o.id JOIN rule_assessments a ON a.observation_id=o.id WHERE (? >= o.expires-? AND a.assessed < o.expires-?) OR (? > o.expires-? AND a.assessed <= o.expires-?))",
+                (
+                    store.clock().timestamp(),
+                    initial_offset,
+                    initial_offset,
+                    store.clock().timestamp(),
+                    late_offset,
+                    late_offset,
+                ),
+            )
 
     def due(self) -> tuple[dict[str, Any], Observation, dict[str, Any]] | None:
         with self.store.transaction(lease=self.store.lease) as db:

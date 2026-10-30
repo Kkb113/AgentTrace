@@ -4,6 +4,8 @@
 
 **Baseline history:** This is the accepted 28 October dual-target Microsoft/Azure flow. The [Outlook-native revision](adr/outlook-native-categorization.md) defines the small production monitor and future scoped category-write exception. This flow is historical, not a new permission grant or implementation claim. Existing controls remain in force until explicitly migrated and tested.
 
+**Explicit write path:** The [category writer](outlook-category-writer.md) now binds a local durable intent to a current persisted decision, verifies live synthetic message evidence and owned definitions, conditionally updates only categories, then reads back the result. Its journal distinguishes pending, attributed, uncertain and reconciled writes. Rollback requires proven ownership without later edits. Source collectors remain read-only; the automatic monitor write path remains disabled.
+
 Review state: accepted on 28 October 2026 by the user acting as project owner, Microsoft 365 administrator and security owner. Technical verification is recorded separately in the secure-access exit review.
 
 1. The separate mailbox collector authenticates with its own workload certificate. Exchange authorizes only the enrolled mailbox. The adapter further restricts extraction to approved synthetic message references; it neither sends nor changes messages.

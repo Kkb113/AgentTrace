@@ -4,6 +4,8 @@
 
 **Baseline history:** These accepted Microsoft/Azure grants do not include Gmail access or category writes. The [Outlook-native revision](adr/outlook-native-categorization.md) defers Gmail receiving and introduces only a future separate category writer. New write/source permissions require concrete configuration rather than inference from this historical matrix.
 
+**Explicit pilot writer:** [Phase 6](outlook-category-writer.md) uses the same accepted writer scope for guarded synthetic category application/readback/rollback. It adds no grant, Azure resource or send capability. Automatic monitor application remains disabled.
+
 Review state: accepted on 28 October 2026. The user explicitly replied, "Accept as project owner, Microsoft 365 administrator and security owner" to the concrete matrix and data flow, including broader Exchange audit exposure. Implementation and effective tests are recorded separately in the secure-access report; acceptance alone is not technical proof.
 
 ## Selected deployment and scope
