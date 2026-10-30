@@ -1,0 +1,11 @@
+# Use the existing Python monitor for the POC
+
+On 30 October 2026 the project owner rejected the complexity of the dedicated Windows-account deployment and asked for a simple method with minimal resources. Phase 7 now uses the existing operator-run monitor and already qualified Outlook access.
+
+The implementation is `scripts/monitor-outlook-mail.py`. It runs on the current PC with the current operator's existing certificate and Azure CLI context. No new Windows account, scheduled service, publisher-reader app, tenant permission or Azure hosting is required. Detection rules remain unchanged: qualified enrolled-agent execution can produce AI Agent; normal-client compatibility can produce Human; missing/conflicting agent evidence remains Unknown. The frozen terminal demo's generic Gmail API heuristic is not substituted for production evidence.
+
+The prior uncommitted supervised-service design was archived privately and removed from the active implementation. Its elevated validation entry point was replaced with a harmless retirement notice so an old command cannot accidentally continue enrollment. The dedicated monitor task was disabled when setup stopped; two manual-only setup/diagnostic tasks and the unused local account/certificates still exist on the PC. They are not used by the simple monitor. No publisher-reader application, new Entra permission or billable Azure resource was created. Do not describe these local artifacts as deleted or the abandoned setup as successfully deployed.
+
+The existing private runtime, mailbox state, category ownership and previous successful provider qualification remain intact. Unrelated evaluation and client-workbook work is preserved. Any administrative cleanup of the abandoned local installation must target only its recorded account/SID, tasks, unregistered certificates and installation directory; it is separate from running the POC.
+
+This is an operator-run synthetic-only POC. The PC and process must stay running; authentication may need operator renewal. Unattended startup, sign-out/reboot survival and regulated-production host hardening are deferred until there is an actual deployment requirement. This scope revision does not establish population-level detection accuracy or change the known external-sender/Gmail evidence gaps.

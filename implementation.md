@@ -7,7 +7,7 @@
 - **Outlook categories:** **AI Agent** (red), **Human** (green), **Unknown** (yellow).
 - **Scope:** Sender/action detection only; no AI-written-text detection.
 - **Interface:** Outlook itself, plus a terminal and local operational reports. No standalone application, web dashboard, custom backend API, Office.js add-in or custom icon framework.
-- **Deployment:** One designated Microsoft 365 mailbox, one supervised worker on a suitable always-on Windows host initially. Outlook can be closed; the monitor host must remain available.
+- **Deployment:** One designated Microsoft 365 mailbox and one operator-started Python monitor on the existing PC, using the already tested credentials. Outlook can be closed; the PC and monitor process must remain running. No dedicated Windows account or service installation is required for this POC.
 - **Azure constraint:** No new cloud resource is required initially. Any justified new Azure resource must use kb-agentdemo, an explicit subscription and the smallest suitable configuration.
 - **Roadmap:** Ten phases, Phase 0 through Phase 9. This replaces the previous fifteen-phase application roadmap.
 - **Change record:** [Outlook-native categorization decision](docs/adr/outlook-native-categorization.md).
@@ -366,28 +366,33 @@ Executed evidence: [writer review](docs/outlook-category-writer.md), [commands/r
 
 The [three-label naming correction](docs/adr/simple-classification-labels.md) is also complete before Phase 7: current contracts/output use AI Agent, Human and Unknown; historical decisions remain intact and the retired human rule cannot authorize new writes. Outlook's owned definition and the two synthetic test tags were migrated without new permissions. Full validation and live category readback are recorded in [the naming validation](docs/evidence/simple-labels-validation.json). This does not enable unattended category application or start Phase 7.
 
-## Phase 7 — Deploy supervised low-cost operation
+## Phase 7 — Run the simple, low-cost POC monitor
 
-**Objective:** Keep the script running safely without an open terminal, logged-in Outlook session or new application stack.
+**Objective:** Run the existing detector reliably as one Python process, with a clear start/stop command and no additional hosting or identity platform.
+
+**Scope revision, 30 October 2026:** The owner explicitly requested a simpler approach. This replaces the dedicated-account/Task Scheduler deployment proposal. The abandoned setup is not an exit requirement for this POC. See [the decision record](docs/adr/simple-poc-operation.md).
 
 **Implementation work**
 
-- Configure startup supervision on a suitable existing always-on Windows host under a dedicated account; prevent overlapping tasks and restart on failure.
-- Validate certificate/profile access under that exact runtime, key rotation, token refresh/revocation, graceful stop and bounded network retry.
-- Add local health/diagnostic reports for collector lag, evidence lag, decision counts, Unknown rate, category-write backlog, disk space and failure streaks.
-- Enforce encrypted/ACL-protected state, 7/30-day retention, sanitized logs, consistent backups and tested restore. Keep broad raw captures off by default.
-- Estimate incremental cost. Consider small Azure hosting only if the available host cannot meet operation needs, with a different durable-state design where required.
+- Reuse `scripts/monitor-outlook-mail.py`, the qualified private runtime configuration, current operator credentials and existing mailbox/audit access. Keep the existing publisher verification method; request no new Entra grant.
+- Run one process until Ctrl+C. Reuse the existing SQLite checkpoints, process lock, lease, deduplication, bounded network retries and safe error handling.
+- Verify actual mailbox synchronization and a stop/restart against the same state. Preserve AI Agent / Human / Unknown evidence requirements and the known Gmail attribution limits.
+- Document the one-command launch and stored-evidence inspection. Existing explicit category-writer commands remain available; automatic category rollout stays a later validation gate.
+- Keep the synthetic-only data boundary and existing expiry checks. Dedicated accounts, startup services, OS-level encryption provisioning, service-account certificate rotation, system firewall tests and a new backup platform are outside this simplified POC phase.
+- Record incremental Azure resource cost as zero. Do not create a VM, database, publisher-reader application or other new resource.
 
-**Expected outcomes:** Reproducible deployment, supervision/retention/credential runbooks and a bounded cost baseline.
+**Expected outcomes:** A working operator-run monitor, a short runbook, actual synchronization/restart evidence and a clear cost/coverage statement.
 
-**Validation criteria:** Reboot/sign out, interrupt network, revoke/renew credentials, fill/test disk-error conditions and restore state on the designated runtime. Check no secrets or raw headers leak to logs.
+**Validation criteria:** Validate the real configuration, run the monitor against the existing mailbox, stop/restart with the same state and run the relevant synchronization/rule regressions. Reuse the existing tested network/error cases. Do not call an operator-run POC an unattended production service or claim that it survives PC shutdown/sign-out.
 
 **Exit criteria**
 
-- [ ] Worker resumes independently of Outlook/interactive terminal with durable pending work intact.
-- [ ] Runtime identity, restart/lease, certificate rotation and restore are demonstrated.
-- [ ] Retention/log protection and resource bounds pass checks.
-- [ ] Hosting assumptions/costs are recorded; no unapproved Azure resource or premium infrastructure is introduced.
+- [x] One documented command starts the monitor using the existing operator configuration; Outlook itself is not required to be open.
+- [x] Actual mailbox synchronization and restart against the same durable state pass without duplicate message observations or unsafe writes.
+- [x] Existing rule/error regressions pass; source gaps remain explicit and no generic API shortcut is introduced.
+- [x] No additional Windows setup, Azure resource or Entra permission is required; operating assumptions and incremental cost are documented.
+
+Validation is recorded in [the simple POC operation report](docs/evidence/simple-poc-operation-validation.json): live collection reached current state, Ctrl+C stopped the Python monitor, restart preserved the two observations, and 201 targeted regressions passed (one Windows privilege skip). This completes only the owner-revised POC scope, not the retired unattended-service requirements.
 
 ## Phase 8 — Verify the complete Outlook experience
 
