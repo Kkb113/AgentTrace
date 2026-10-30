@@ -139,7 +139,7 @@ def test_browser_agent_and_manual_pasted_text_share_compatible_policy_class() ->
     for ground_truth in ("human_original", "manual_ai_text", "browser_agent"):
         assert (
             replay(item, enrollment(), item.observation.observed_at + timedelta(hours=2)).category
-            == "Human-capable"
+            == "Human"
         )
 
 

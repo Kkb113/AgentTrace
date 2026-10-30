@@ -1,8 +1,8 @@
 # AgentTrace
 
-AgentTrace is becoming an Outlook-native sender detector: a small supervised Python monitor that applies **AI Agent** (red), **Human-capable** (green) or **Unknown** (yellow) categories. No standalone application, custom API, add-in or AI-text detector is required.
+AgentTrace is becoming an Outlook-native sender detector: a small supervised Python monitor that applies **AI Agent** (red), **Human** (green) or **Unknown** (yellow) categories. No standalone application, custom API, add-in or AI-text detector is required.
 
-The current [owner-approved POC policy](docs/adr/human-capable-classification.md) uses Human-capable for a complete normal-client-compatible inspection, whether a person or an agent controls the browser. AI Agent requires the narrow corroborated MCP/audit rule. Missing/conflicting evidence remains Unknown; neither label claims forensic controller identity.
+The current [three-label policy](docs/adr/simple-classification-labels.md) uses Human for a complete normal-client-compatible inspection, whether a person or an agent controls the browser. AI Agent requires the narrow corroborated MCP/audit rule. Missing/conflicting evidence remains Unknown; neither label claims forensic controller identity. The obsolete Human-capable name and test-added Red category tags have been removed from the active Outlook classification setup; personal category definitions are preserved.
 
 ## Current delivery
 
@@ -12,9 +12,9 @@ The working demo uses experimental binary header rules, including a Human fallba
 
 ## Run the existing terminal demo
 
-Phase 5's [scoped category setup](docs/outlook-category-access.md) established the one-mailbox writer and owned colors. Phase 6 adds [explicit apply, readback, retry and conservative rollback](docs/outlook-category-writer.md), with durable decision-bound intents and qualified conditional updates. Actual synthetic Unknown/AI Agent/Human-capable writes, concurrency and preservation were tested. Continuous automatic application remains disabled for the later operational/pilot gates. [Writer commands](docs/runbooks/outlook-category-writer.md).
+Phase 5's [scoped category setup](docs/outlook-category-access.md) established the one-mailbox writer and owned colors. Phase 6 adds [explicit apply, readback, retry and conservative rollback](docs/outlook-category-writer.md), with durable decision-bound intents and qualified conditional updates. Actual synthetic Unknown/AI Agent/Human writes, concurrency and preservation were tested. Continuous automatic application remains disabled for the later operational/pilot gates. [Writer commands](docs/runbooks/outlook-category-writer.md).
 
-Phase 4's [controlled actual-email tests](docs/runbooks/controlled-email-tests.md) pass under the [owner-approved POC revision](docs/adr/live-email-poc-validation.md): manual Outlook/Gmail cases return Human-capable and the supported Claude/Microsoft 365 case returns AI Agent. No external corpus or separate curator is required for this POC. The formal [accuracy workbench](docs/runbooks/sender-accuracy.md) remains optional for future G1/G2 qualification. These tests make no population-accuracy claim; the existing terminal demo only reads mail. Scoped pilot category commands are documented above.
+Phase 4's [controlled actual-email tests](docs/runbooks/controlled-email-tests.md) pass under the [owner-approved POC revision](docs/adr/live-email-poc-validation.md): manual Outlook/Gmail cases return Human and the supported Claude/Microsoft 365 case returns AI Agent. No external corpus or separate curator is required for this POC. The formal [accuracy workbench](docs/runbooks/sender-accuracy.md) remains optional for future G1/G2 qualification. These tests make no population-accuracy claim; the existing terminal demo only reads mail. Scoped pilot category commands are documented above.
 
 From PowerShell:
 

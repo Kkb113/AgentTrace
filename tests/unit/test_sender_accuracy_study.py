@@ -212,7 +212,7 @@ def test_unavailable_header_inspection_keeps_reviewed_agent_in_recall_denominato
     )
     actual = report["windows"]["initial"]["all_paths"]
     assert actual["eligible_messages"] == 1 and actual["recall"] == 0
-    assert actual["positive_misses_including_unknown_and_human_capable"] == 1
+    assert actual["positive_misses_including_unknown_and_human_label"] == 1
 
 
 def test_dataset_schema_roundtrip_is_strict(tmp_path: Path) -> None:

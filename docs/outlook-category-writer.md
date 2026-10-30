@@ -1,6 +1,8 @@
 # Scoped Outlook category writer
 
-Phase 6 implements explicit synthetic-pilot apply, verify, retry and rollback commands. The existing reader and detector remain separate. The native labels are **AI Agent** (red), **Human-capable** (green) and **Unknown** (yellow), with the meanings already approved in the sender policy. No sending capability, content detector, application UI, permission expansion or new Azure resource was added.
+The [current naming revision](adr/simple-classification-labels.md) uses AI Agent, Human and Unknown. Earlier evidence files retain the names observed when those tests ran. The two Red category preservation-control tags were subsequently removed by exact-message conditional cleanup; their personal master category was preserved.
+
+Phase 6 implements explicit synthetic-pilot apply, verify, retry and rollback commands. The existing reader and detector remain separate. The native labels are **AI Agent** (red), **Human** (green) and **Unknown** (yellow), with the meanings already approved in the sender policy. No sending capability, content detector, application UI, permission expansion or new Azure resource was added.
 
 ## Write boundary
 
@@ -42,7 +44,7 @@ Rollback is terminal for that intent; repeated apply/rollback does not recreate 
 
 ## Executed evidence and review
 
-The [executed record](evidence/category-writer-validation.json) maps all five exits to software and live evidence. Actual synthetic tests verified Unknown with the audit connector absent in an isolated copy of real header state, authenticated Claude AI Agent, and manual Human-capable application. The normal runtime's audit records were preserved. The real endpoint rejected a concurrent-edit stale PATCH; retry retained the unrelated category. Attributed rollback removed only the added label, later-edit rollback was blocked, duplicate apply left the provider version unchanged, and category-only synchronization produced no extra decisions. Headers and read state were unchanged. Unrelated-category control edits were confined to two synthetic messages and deliberately preserved.
+The [executed record](evidence/category-writer-validation.json) maps all five exits to software and live evidence. Actual synthetic tests verified Unknown with the audit connector absent in an isolated copy of real header state, authenticated Claude AI Agent, and manual Human application. The normal runtime's audit records were preserved. The real endpoint rejected a concurrent-edit stale PATCH; retry retained the unrelated category. Attributed rollback removed only the added label, later-edit rollback was blocked, duplicate apply left the provider version unchanged, and category-only synchronization produced no extra decisions. Headers and read state were unchanged. The two synthetic preservation controls were retained during that acceptance, then removed in the later owner-requested naming cleanup recorded above.
 
 Continuous testing caught a stale-explanation scheduling gap: non-enrolled senders were not reassessed when the two-hour and twenty-four-hour evidence-window explanations changed. The writer correctly refused the stale decision. The scheduler now reassesses each crossed boundary once, without a message edit or relaxed eligibility checks. Regression tests cover this fix, conflicts, missing/deleted/moved messages, crashes before/after writes, ambiguous timeouts, response/readback interruption, Unknown, drift, scope, retry limits and later user changes.
 

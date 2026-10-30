@@ -16,8 +16,8 @@
           "type": "string"
         },
         "human": {
-          "const": "Human-capable",
-          "default": "Human-capable",
+          "const": "Human",
+          "default": "Human",
           "title": "Human",
           "type": "string"
         },

@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "policy_version": "corroborated-poc-human-capable/v1",
-  "labels": {"agent": "AI Agent", "compatible_client": "Human-capable", "unresolved": "Unknown"},
-  "human_capable_means": "Complete supported-field inspection with no observed automation indicators; includes human-controlled and agent-controlled normal clients",
+  "policy_version": "corroborated-poc-human/v2",
+  "labels": {"agent": "AI Agent", "compatible_client": "Human", "unresolved": "Unknown"},
+  "human_label_means": "Complete supported-field inspection with no observed automation indicators; includes human-controlled and agent-controlled normal clients",
   "human_identity_proof_claimed": false,
   "agent_rule": "sender-rules/claude-corroborated/v1",
   "agent_coverage": "Enrolled own-mailbox Claude Microsoft 365 MCP declaration corroborated by authenticated Send audit, current publisher, matching message context and unique provider copies",
@@ -12,5 +12,5 @@
   "failed_or_incomplete_inspection": "Unknown",
   "category_writes_enabled": false,
   "statistical_accuracy_qualified": false,
-  "owner_policy_revision": "Human-capable browser/client policy and corroborated-indicator POC AI rule explicitly approved in this chat on 30 October 2026"
+  "owner_policy_revision": "Human browser/client policy and corroborated-indicator POC AI rule explicitly approved in this chat on 30 October 2026"
 }

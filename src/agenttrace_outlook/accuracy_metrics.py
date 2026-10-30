@@ -76,7 +76,7 @@ def metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "cross_class_independence_claimed": False,
         "cluster_true_positives": tp,
         "cluster_false_positives": fp,
-        "positive_misses_including_unknown_and_human_capable": positives - tp,
+        "positive_misses_including_unknown_and_human_label": positives - tp,
         "recall": tp / positives if positives else None,
         "recall_exact_95_interval": interval(tp, positives),
         "false_positive_rate": fp / negatives if negatives else None,
@@ -85,10 +85,10 @@ def metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "message_precision": message_tp / len(calls) if calls else None,
         "unknown_messages": sum(r["category"] == "Unknown" for r in eligible),
         "unknown_fraction": sum(r["category"] == "Unknown" for r in eligible) / n if n else None,
-        "human_capable_nonhuman_messages": sum(
-            r["category"] == "Human-capable" and r["actor"] != "human" for r in eligible
+        "human_label_nonhuman_messages": sum(
+            r["category"] == "Human" and r["actor"] != "human" for r in eligible
         ),
-        "human_capable_is_controller_proof": False,
+        "human_label_is_controller_proof": False,
         "quarantined_or_pilot_messages": len(rows) - n,
         "quarantined_agent_labels": sum(
             not r["accuracy_eligible"] and r["actor"] == "ai_agent" for r in rows

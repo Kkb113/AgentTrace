@@ -15,7 +15,7 @@
       "default": "Unknown",
       "enum": [
         "Unknown",
-        "Human-capable",
+        "Human",
         "AI Agent"
       ],
       "title": "Category",
@@ -72,6 +72,7 @@
       "default": "sender-rules/unknown/v1",
       "enum": [
         "sender-rules/unknown/v1",
+        "sender-rules/human/v2",
         "sender-rules/human-capable/v1",
         "sender-rules/claude-corroborated/v1"
       ],

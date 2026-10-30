@@ -9,10 +9,10 @@ from pydantic import AwareDatetime, Field, field_validator, model_validator
 from .config import ReaderIdentity
 from .contracts import Opaque, Record, Scope
 
-Label = Literal["AI Agent", "Human-capable", "Unknown"]
+Label = Literal["AI Agent", "Human", "Unknown"]
 PRESETS: dict[Label, str] = {
     "AI Agent": "preset0",
-    "Human-capable": "preset4",
+    "Human": "preset4",
     "Unknown": "preset3",
 }
 
@@ -63,13 +63,16 @@ class OwnedCategory(Record):
     label: Label
     category: MasterCategory
     created_at: AwareDatetime
-    setup_client_id: UUID
+    setup_client_id: UUID | None = None
     creation_receipt_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    owner_action_receipt_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
 
     @model_validator(mode="after")
     def expected_definition(self) -> "OwnedCategory":
         if self.category.display_name != self.label or self.category.color != PRESETS[self.label]:
             raise ValueError("owned_category_definition_mismatch")
+        if self.setup_client_id is None and self.owner_action_receipt_sha256 is None:
+            raise ValueError("category_ownership_provenance_required")
         return self
 
 

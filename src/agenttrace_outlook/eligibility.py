@@ -4,7 +4,7 @@ from datetime import datetime
 
 from .contracts import Decision, Scope
 from .errors import OutlookError
-from .sender_rules import AGENT_RULE, HUMAN_CAPABLE_RULE
+from .sender_rules import AGENT_RULE, HUMAN_RULE
 
 UNKNOWN_RULE = "foundation/unknown/v1"
 SENDER_UNKNOWN_RULE = "sender-rules/unknown/v1"
@@ -18,8 +18,8 @@ def require_annotation_eligible(decision: Decision, scope: Scope, now: datetime)
     if not decision.decided_at <= now < decision.expires_at:
         raise OutlookError("decision_outside_validity")
     if (
-        decision.category == "Human-capable"
-        and decision.rule_version == HUMAN_CAPABLE_RULE
+        decision.category == "Human"
+        and decision.rule_version == HUMAN_RULE
         and decision.qualification == "qualified"
         and any(ref.startswith("snapshot-sha256:") for ref in decision.evidence_refs)
     ):

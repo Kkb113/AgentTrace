@@ -53,7 +53,7 @@ qualification batch within these deadlines; importing does not restart retention
 G1: one-sided 95% exact upper FPR <=0.1% over the enabled AI-rule union, including
 ordinary automation. 3,000 independent zero-error negatives is one sufficient case.
 G2: >=99% observed supported-path recall over >=1,000 independent agent positives.
-Unknown/pending/Human-capable known agents count as misses. All-path recall and
+Unknown/pending/Human known agents count as misses. All-path recall and
 the frozen two-hour / twenty-four-hour results must be reported separately.
 Underpowered pilots and authored examples cannot qualify production accuracy.
 """

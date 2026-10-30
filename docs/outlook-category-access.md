@@ -1,5 +1,7 @@
 # Outlook category access and ownership
 
+The later [three-label migration](adr/simple-classification-labels.md) replaced the owned Human-capable definition with Human through Outlook's owner UI and recorded the new ID/provenance without additional application permissions. Historical provisioning evidence retains the original name and ID; the current ownership registry uses Human.
+
 Phase 5 prepares the native Outlook labels without enabling automatic classification writes. The owner accepted the [concrete proposal](category-access-proposal.md) before registration/grant use. The existing mailbox and audit collectors retain their credentials and read-only mail permissions. No Azure resource or paid service was added.
 
 ## Effective access
@@ -18,10 +20,10 @@ Mail.ReadWrite allows more operations than changing categories. MailboxSettings.
 | Owned definition | Outlook color | Provider preset |
 | --- | --- | --- |
 | AI Agent | Red | preset0 |
-| Human-capable | Green | preset4 |
+| Human | Green | preset4 |
 | Unknown | Yellow | preset3 |
 
-Names and colors follow the [Outlook category model](https://learn.microsoft.com/en-us/graph/api/resources/outlookcategory?view=graph-rest-1.0). Human-capable retains the accepted normal-client-compatible meaning, including browser-controlled agents; category setup does not improve or widen the detector's AI coverage.
+Names and colors follow the [Outlook category model](https://learn.microsoft.com/en-us/graph/api/resources/outlookcategory?view=graph-rest-1.0). Human retains the accepted normal-client-compatible meaning, including browser-controlled agents; category setup does not improve or widen the detector's AI coverage.
 
 The private atomic ownership registry pins each provider ID, exact name/color, mailbox, writer, setup identity, creation time and normalized response digest. The digest is an operator-held integrity receipt, not an independent Microsoft signature. Name equality alone never grants ownership. Setup preflights all name collisions, including case/whitespace/Unicode variants, before creating anything. Existing unowned categories are never adopted, recolored or deleted. Confirmed partial creation can resume from its receipts; an ambiguous POST with no receipt requires operator reconciliation, not automatic adoption. ID replacement, renaming, deletion, color drift or ambiguous names block verification and preview.
 

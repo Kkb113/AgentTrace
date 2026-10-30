@@ -20,7 +20,7 @@ from .eligibility import require_annotation_eligible
 from .errors import OutlookError
 from .locking import ProcessLock
 from .rule_schema import RULE_SCHEMA
-from .sender_rules import AGENT_RULE, HUMAN_CAPABLE_RULE, evaluate
+from .sender_rules import AGENT_RULE, HUMAN_RULE, evaluate
 from .sync_schema import SYNC_SCHEMA
 
 BASE_SCHEMA = (
@@ -339,7 +339,7 @@ class StateStore:
                     "SELECT payload FROM observations WHERE id=?", (observation_id,)
                 ).fetchone()[0]
             )
-            if decision.category in {"Human-capable", "AI Agent"}:
+            if decision.category in {"Human", "AI Agent"}:
                 snapshot_row = db.execute(
                     "SELECT payload,expires FROM snapshots WHERE message_id=?",
                     (decision.message_id,),
@@ -358,7 +358,7 @@ class StateStore:
                 if (
                     expected.category != decision.category
                     or decision.rule_version
-                    != (HUMAN_CAPABLE_RULE if decision.category == "Human-capable" else AGENT_RULE)
+                    != (HUMAN_RULE if decision.category == "Human" else AGENT_RULE)
                     or decision.reason_codes != expected.reason_codes
                     or decision.evidence_refs
                     != (*expected.evidence_refs, "snapshot-sha256:" + observation.source_digest)

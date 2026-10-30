@@ -35,24 +35,24 @@ def test_invalid_counts_cannot_create_a_bound(k, n) -> None:
         upper_bound(k, n)
 
 
-def test_unknown_and_human_capable_agents_are_recall_misses() -> None:
+def test_unknown_and_human_label_agents_are_recall_misses() -> None:
     result = metrics(
         [
             row("ai_agent", "AI Agent", "a"),
             row("ai_agent", "Unknown", "b"),
-            row("ai_agent", "Human-capable", "c"),
+            row("ai_agent", "Human", "c"),
         ]
     )
     assert result["recall"] == pytest.approx(1 / 3)
-    assert result["positive_misses_including_unknown_and_human_capable"] == 2
-    assert result["human_capable_nonhuman_messages"] == 1
-    assert result["human_capable_is_controller_proof"] is False
+    assert result["positive_misses_including_unknown_and_human_label"] == 2
+    assert result["human_label_nonhuman_messages"] == 1
+    assert result["human_label_is_controller_proof"] is False
 
 
 def test_ordinary_automation_and_unknown_negatives_remain_in_g1() -> None:
     result = metrics(
         [
-            row("human", "Human-capable", "a"),
+            row("human", "Human", "a"),
             row("non_ai_automation", "AI Agent", "b"),
             row("non_ai_automation", "Unknown", "c"),
         ]
@@ -66,7 +66,7 @@ def test_duplicates_collapse_and_crossed_actor_templates_keep_both_denominators(
         [row("ai_agent", "AI Agent", "same")] * 100
         + [
             row("ai_agent", "Unknown", "same"),
-            row("human", "Human-capable", "same"),
+            row("human", "Human", "same"),
             row("non_ai_automation", "AI Agent", "same"),
         ]
     )
@@ -81,7 +81,7 @@ def test_authored_or_unresolved_cases_never_inflate_independent_counts() -> None
 
 
 def test_powered_generated_count_math_is_not_a_dataset_qualification() -> None:
-    rows = [row("human", "Human-capable", str(i)) for i in range(3000)]
+    rows = [row("human", "Human", str(i)) for i in range(3000)]
     rows += [
         row("ai_agent", "AI Agent" if i < 990 else "Unknown", "positive" + str(i))
         for i in range(1000)

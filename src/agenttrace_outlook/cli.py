@@ -19,7 +19,7 @@ from .errors import OutlookError
 from .reader import certificate_reader
 from .rule_store import RuleStore
 from .runner import run_once
-from .sender_rules import sha
+from .sender_rules import RuleAssessment, sha
 from .source_collector import SenderCollector
 from .state import StateStore
 from .synchronizer import Synchronizer
@@ -99,7 +99,9 @@ def main(argv: list[str] | None = None) -> int:
                     ).fetchall()
                     for row in rows:
                         emit(
-                            "rule_assessment", message_ref_sha256=sha(row[0]), **json.loads(row[1])
+                            "rule_assessment",
+                            message_ref_sha256=sha(row[0]),
+                            **RuleAssessment.model_validate_json(row[1]).model_dump(mode="json"),
                         )
                 return 0
             sync = Synchronizer(store, certificate_reader(config)) if config.sync_enabled else None
@@ -121,7 +123,7 @@ def main(argv: list[str] | None = None) -> int:
                 "ready",
                 mode="dry_run",
                 mailbox_collection="read_only_delta" if sync else "disabled",
-                actor_rules="corroborated_poc_ai_and_human_capable",
+                actor_rules="corroborated_poc_ai_and_human_label",
                 category_writes=False,
             )
             while True:
