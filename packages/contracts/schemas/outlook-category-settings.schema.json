@@ -1,0 +1,97 @@
+{
+  "$defs": {
+    "ReaderIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "certificate_thumbprint": {
+          "pattern": "^[a-fA-F0-9]{40}$",
+          "title": "Certificate Thumbprint",
+          "type": "string"
+        },
+        "client_id": {
+          "format": "uuid",
+          "title": "Client Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "client_id",
+        "certificate_thumbprint"
+      ],
+      "title": "ReaderIdentity",
+      "type": "object"
+    },
+    "Scope": {
+      "additionalProperties": false,
+      "properties": {
+        "mailbox_id": {
+          "format": "uuid",
+          "title": "Mailbox Id",
+          "type": "string"
+        },
+        "tenant_id": {
+          "format": "uuid",
+          "title": "Tenant Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tenant_id",
+        "mailbox_id"
+      ],
+      "title": "Scope",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "automatic_application_enabled": {
+      "const": false,
+      "default": false,
+      "title": "Automatic Application Enabled",
+      "type": "boolean"
+    },
+    "control_mailbox_id": {
+      "format": "uuid",
+      "title": "Control Mailbox Id",
+      "type": "string"
+    },
+    "ownership_directory": {
+      "maxLength": 2048,
+      "minLength": 1,
+      "title": "Ownership Directory",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "$ref": "#/$defs/Scope"
+    },
+    "setup_identity": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ReaderIdentity"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "writer_identity": {
+      "$ref": "#/$defs/ReaderIdentity"
+    }
+  },
+  "required": [
+    "scope",
+    "control_mailbox_id",
+    "writer_identity",
+    "ownership_directory"
+  ],
+  "title": "CategorySettings",
+  "type": "object"
+}

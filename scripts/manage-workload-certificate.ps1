@@ -8,10 +8,11 @@ function ConvertTo-Base64Url([byte[]]$Value) {
 try {
     $request = [Console]::In.ReadToEnd() | ConvertFrom-Json
     if ($Operation -eq 'Create') {
-        if ($request.alias -notin @('mail-collector', 'audit-collector', 'attribution', 'content', 'api', 'access-test')) {
+        if ($request.alias -notin @('mail-collector', 'audit-collector', 'attribution', 'content', 'api', 'access-test', 'category-writer', 'category-setup')) {
             throw 'unknown_workload'
         }
-        $certificate = New-SelfSignedCertificate -Subject "CN=AgentTrace Sandbox $($request.alias)" -FriendlyName "AgentTrace Sandbox $($request.alias)" -CertStoreLocation Cert:\CurrentUser\My -Provider 'Microsoft Software Key Storage Provider' -KeyAlgorithm RSA -KeyLength 3072 -HashAlgorithm SHA256 -KeyUsage DigitalSignature -KeyExportPolicy NonExportable -NotAfter (Get-Date).AddDays(90)
+        $days = if ($request.alias -eq 'category-setup') { 1 } elseif ($request.alias -eq 'category-writer') { 30 } else { 90 }
+        $certificate = New-SelfSignedCertificate -Subject "CN=AgentTrace Sandbox $($request.alias)" -FriendlyName "AgentTrace Sandbox $($request.alias)" -CertStoreLocation Cert:\CurrentUser\My -Provider 'Microsoft Software Key Storage Provider' -KeyAlgorithm RSA -KeyLength 3072 -HashAlgorithm SHA256 -KeyUsage DigitalSignature -KeyExportPolicy NonExportable -NotAfter (Get-Date).AddDays($days)
         @{
             thumbprint = $certificate.Thumbprint
             certificate = [Convert]::ToBase64String($certificate.RawData)

@@ -37,6 +37,7 @@ ALLOWED_IMPORTS = {
     "hmac",
     "secrets",
     "cryptography",
+    "unicodedata",
     "agenttrace_foundation.workload_identity",
     "agenttrace_foundation.authorization",
     "agenttrace_ingestion.transport",
@@ -86,7 +87,14 @@ def main() -> int:
                         if isinstance(body, ast.Dict)
                         else set()
                     )
-                    if (
+                    category_creation = (
+                        path.name == "category_catalog.py"
+                        and len(node.args) == 2
+                        and isinstance(node.args[1], ast.Attribute)
+                        and node.args[1].attr == "base"
+                        and keys == {"displayName", "color"}
+                    )
+                    if not category_creation and (
                         path.name != "audit_source.py"
                         or len(node.args) < 2
                         or not isinstance(node.args[1], ast.Name)
@@ -109,11 +117,35 @@ def main() -> int:
                             }
                         )
                 if (
-                    path.name not in {"reader.py", "audit_source.py"}
+                    node.args
+                    and isinstance(node.args[0], ast.Constant)
+                    and node.args[0].value == "PATCH"
+                ):
+                    body = next((kw.value for kw in node.keywords if kw.arg == "body"), None)
+                    keys = (
+                        {key.value for key in body.keys if isinstance(key, ast.Constant)}
+                        if isinstance(body, ast.Dict)
+                        else set()
+                    )
+                    if path.name != "category_probe.py" or keys != {"categories"}:
+                        issues.append(
+                            {
+                                "file": path.name,
+                                "code": "unsafe_category_patch",
+                                "line": node.lineno,
+                            }
+                        )
+                allowed_methods = {
+                    "reader.py": {"GET"},
+                    "audit_source.py": {"GET", "POST"},
+                    "category_catalog.py": {"GET", "POST"},
+                    "category_probe.py": {"GET", "PATCH"},
+                }
+                if (
+                    path.name not in allowed_methods
                     or not node.args
                     or not isinstance(node.args[0], ast.Constant)
-                    or node.args[0].value
-                    not in ({"GET", "POST"} if path.name == "audit_source.py" else {"GET"})
+                    or node.args[0].value not in allowed_methods.get(path.name, set())
                 ):
                     issues.append(
                         {

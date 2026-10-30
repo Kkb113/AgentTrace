@@ -1,5 +1,7 @@
 # Secure sandbox data flow
 
+**Current category extension:** The accepted [category access proposal](category-access-proposal.md) adds a separate one-mailbox writer that reads master definitions and synthetic current category metadata for a private dry-run report. A separate temporary setup identity created three master definitions and was retired. An authorized unchanged-array PATCH and negative probes verified access without assigning a detection label. Existing read collectors/source correlation stay separate; automatic decision-to-category application is still disabled. See [ownership, permission and retirement evidence](outlook-category-access.md).
+
 **Baseline history:** This is the accepted 28 October dual-target Microsoft/Azure flow. The [Outlook-native revision](adr/outlook-native-categorization.md) defines the small production monitor and future scoped category-write exception. This flow is historical, not a new permission grant or implementation claim. Existing controls remain in force until explicitly migrated and tested.
 
 Review state: accepted on 28 October 2026 by the user acting as project owner, Microsoft 365 administrator and security owner. Technical verification is recorded separately in the secure-access exit review.

@@ -1,0 +1,138 @@
+{
+  "$defs": {
+    "MasterCategory": {
+      "additionalProperties": false,
+      "properties": {
+        "color": {
+          "pattern": "^preset(?:[0-9]|1[0-9]|2[0-4])$|^none$",
+          "title": "Color",
+          "type": "string"
+        },
+        "display_name": {
+          "maxLength": 255,
+          "minLength": 1,
+          "title": "Display Name",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[A-Za-z0-9_.:/+=-]{1,2048}$",
+          "title": "Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "display_name",
+        "color"
+      ],
+      "title": "MasterCategory",
+      "type": "object"
+    },
+    "OwnedCategory": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "$ref": "#/$defs/MasterCategory"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "creation_receipt_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Creation Receipt Sha256",
+          "type": "string"
+        },
+        "label": {
+          "enum": [
+            "AI Agent",
+            "Human-capable",
+            "Unknown"
+          ],
+          "title": "Label",
+          "type": "string"
+        },
+        "setup_client_id": {
+          "format": "uuid",
+          "title": "Setup Client Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "category",
+        "created_at",
+        "setup_client_id",
+        "creation_receipt_sha256"
+      ],
+      "title": "OwnedCategory",
+      "type": "object"
+    },
+    "Scope": {
+      "additionalProperties": false,
+      "properties": {
+        "mailbox_id": {
+          "format": "uuid",
+          "title": "Mailbox Id",
+          "type": "string"
+        },
+        "tenant_id": {
+          "format": "uuid",
+          "title": "Tenant Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tenant_id",
+        "mailbox_id"
+      ],
+      "title": "Scope",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "automatic_application_enabled": {
+      "const": false,
+      "default": false,
+      "title": "Automatic Application Enabled",
+      "type": "boolean"
+    },
+    "categories": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/OwnedCategory"
+      },
+      "maxItems": 3,
+      "title": "Categories",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "$ref": "#/$defs/Scope"
+    },
+    "writer_client_id": {
+      "format": "uuid",
+      "title": "Writer Client Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "scope",
+    "writer_client_id",
+    "created_at"
+  ],
+  "title": "CategoryOwnership",
+  "type": "object"
+}
