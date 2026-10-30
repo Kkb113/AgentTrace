@@ -1,5 +1,53 @@
 {
   "$defs": {
+    "AgentProvider": {
+      "additionalProperties": false,
+      "properties": {
+        "client_id": {
+          "format": "uuid",
+          "title": "Client Id",
+          "type": "string"
+        },
+        "declaration": {
+          "enum": [
+            "mcp_office365",
+            "authenticated_application"
+          ],
+          "title": "Declaration",
+          "type": "string"
+        },
+        "provider_key": {
+          "pattern": "^[a-z][a-z0-9_]{0,99}$",
+          "title": "Provider Key",
+          "type": "string"
+        },
+        "publisher_id": {
+          "pattern": "^[A-Za-z0-9_.-]{1,100}$",
+          "title": "Publisher Id",
+          "type": "string"
+        },
+        "publisher_owner_tenant": {
+          "format": "uuid",
+          "title": "Publisher Owner Tenant",
+          "type": "string"
+        },
+        "send_evidence": {
+          "const": "exchange_send",
+          "default": "exchange_send",
+          "title": "Send Evidence",
+          "type": "string"
+        }
+      },
+      "required": [
+        "provider_key",
+        "client_id",
+        "publisher_id",
+        "publisher_owner_tenant",
+        "declaration"
+      ],
+      "title": "AgentProvider",
+      "type": "object"
+    },
     "CategoryMapping": {
       "additionalProperties": false,
       "properties": {
@@ -88,6 +136,15 @@
     "SenderSource": {
       "additionalProperties": false,
       "properties": {
+        "agent_providers": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AgentProvider"
+          },
+          "maxItems": 20,
+          "title": "Agent Providers",
+          "type": "array"
+        },
         "audit_identity": {
           "$ref": "#/$defs/ReaderIdentity"
         },

@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from .accuracy_contracts import DetectorPacket, Enrollment, Frame
+from .agent_providers import provider_for_send
 from .sender_rules import (
     CLAUDE_APP,
     RuleAssessment,
@@ -34,7 +35,13 @@ def replay(packet: DetectorPacket, enrollment: Enrollment | None, at: datetime) 
         # Reject subject/body/category/review fields rather than accidentally using them.
         return evaluate(packet.observation, None, None, at)
     source = _source(packet, frame, enrollment) if frame else None
-    return evaluate(packet.observation, snapshot, source, at)
+    return evaluate(
+        packet.observation,
+        snapshot,
+        source,
+        at,
+        providers=enrollment.agent_providers if enrollment else (),
+    )
 
 
 def _source(
@@ -82,12 +89,21 @@ def _source(
             result["reason"] = "replay_query_incomplete_or_out_of_scope"
             return result
         publisher = capture.publisher
+        provider = provider_for_send(
+            list(capture.records), snapshot["internetMessageId"], enrollment.agent_providers
+        )
+        client_id = str(provider.client_id) if provider else CLAUDE_APP
         current = (
-            publisher.get("appId") == CLAUDE_APP
+            publisher.get("appId") == client_id
             and publisher.get("accountEnabled") is True
-            and publisher.get("appOwnerOrganizationId") == enrollment.publisher_owner_tenant
+            and publisher.get("appOwnerOrganizationId")
+            == (
+                str(provider.publisher_owner_tenant)
+                if provider
+                else enrollment.publisher_owner_tenant
+            )
             and publisher.get("verifiedPublisher", {}).get("verifiedPublisherId")
-            == enrollment.publisher_id
+            == (provider.publisher_id if provider else enrollment.publisher_id)
         )
         status, reason, refs = qualify_exchange_send(
             list(capture.records),
@@ -97,6 +113,7 @@ def _source(
             message_id=snapshot["internetMessageId"],
             sent_at=sent,
             publisher_current=current,
+            client_id=client_id,
         )
         good = bool(capture.sent_folder_id) and corroborated_copy_context(
             packet.observation, snapshot, list(capture.copies), str(capture.sent_folder_id)
@@ -108,6 +125,12 @@ def _source(
             reason=reason,
             evidence_refs=[*refs, "publisher-sha256:" + sha(publisher)],
         )
+        if provider:
+            result.update(
+                provider_fingerprint=provider.fingerprint,
+                provider_client_id=client_id,
+                evidence_refs=[*result["evidence_refs"], provider.evidence_ref],
+            )
         if good and status == "verified_enrolled_send":
             result.update(receipt_context="corroborated_scope_messageid_time")
         return result

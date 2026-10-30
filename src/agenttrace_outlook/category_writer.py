@@ -88,7 +88,12 @@ class CategoryWriter:
         )
         if snapshot is None:
             raise OutlookError("category_snapshot_unavailable")
-        expected = evaluate(observation, snapshot, source, self.store.clock())
+        providers = (
+            self.store.config.sender_source.agent_providers
+            if self.store.config.sender_source
+            else ()
+        )
+        expected = evaluate(observation, snapshot, source, self.store.clock(), providers=providers)
         refs = (
             (*expected.evidence_refs, "snapshot-sha256:" + observation.source_digest)
             if expected.category != "Unknown"
@@ -111,6 +116,7 @@ class CategoryWriter:
                 source,
                 message,
                 self.store.clock(),
+                providers=providers,
             )
             if sha(sender_snapshot(message)[0]) != observation.source_digest:
                 raise OutlookError("category_live_evidence_changed")

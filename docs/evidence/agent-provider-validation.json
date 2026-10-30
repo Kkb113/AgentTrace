@@ -1,0 +1,170 @@
+{
+  "schema_version": "1.0",
+  "executed_at": "2026-10-30T06:00:55.728138+00:00",
+  "milestone": "Explicit agent-provider enrollment and ChatGPT Outlook send qualification",
+  "status": "qualified_for_tested_outlook_route",
+  "validated_source_sha256": "039f731d02b40a48b065420333755e83dbdbe282a5518efe56a76072f574c2e2",
+  "source_files_hashed": 285,
+  "source_hash_scope": "Sorted tracked src/, packages/, scripts/, tests/, config/ plus pyproject.toml, uv.lock and requirements files. UTF-8 path + NUL + ASCII LF-normalized byte length + NUL + bytes; docs/evidence excluded.",
+  "validation_basis": "Isolated selected-index checkout, pinned Python 3.12.14; unrelated evaluation and workbook work excluded",
+  "policy_version": "corroborated-poc-human/v3",
+  "provider_rule": "sender-rules/provider-corroborated/v1",
+  "gates": {
+    "quality": "passed",
+    "security": "passed",
+    "infrastructure": "passed",
+    "guard_controls": "passed",
+    "integration_end_to_end": "passed",
+    "live_provider_collector_and_decision": "passed",
+    "live_category_apply_readback_and_repeat_noop": "passed",
+    "live_existing_claude_and_manual_controls": "passed"
+  },
+  "unit_primary_tests_passed": 605,
+  "unit_subtests_passed": 97,
+  "unit_skipped": 1,
+  "new_provider_regressions": 26,
+  "integration_tests_passed": 123,
+  "junit_counts_including_subtests": {
+    "unit": {
+      "tests": 703,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "integration": {
+      "tests": 123,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "platform_limit": "Windows symlink privilege case skipped locally; Linux CI executes it. No desktop UI automation was used or resumed.",
+  "live_chatgpt_outlook": {
+    "test_reference": "AT-CHATGPT-OUTLOOK-01",
+    "result": "AI Agent",
+    "no_ai_declaration_in_received_headers": true,
+    "successful_send_audit_records": 1,
+    "outer_and_nested_application_ids_match": true,
+    "current_publisher": "OpenAI, L.L.C.",
+    "exact_application_publisher_and_owner_pins_verified": true,
+    "unique_sent_received_copy_pair_verified": true,
+    "tenant_mailbox_message_time_checks_passed": true,
+    "normal_collector_persisted_decision": true,
+    "actual_category_applied_and_read_back": true,
+    "initial_search_completed_without_records": true,
+    "later_search_found_the_send": true,
+    "instant_detection_claimed": false
+  },
+  "live_chatgpt_gmail": {
+    "test_reference": "AT-CHATGPT-GMAIL-01",
+    "ground_truth": "Owner-reported ChatGPT Gmail tool send",
+    "actual_result": "Unknown",
+    "observed_hint": "generic_api_submission",
+    "authenticated_sender_agent_execution_available": false,
+    "qualified_for_agent_attribution": false,
+    "category_applied_and_read_back": "Unknown",
+    "legacy_terminal_ai_label_was_heuristic": true
+  },
+  "prior_route_controls": {
+    "actual_cases": 3,
+    "results": [
+      {
+        "scenario": "operator_reported_manual_gmail_to_outlook_send",
+        "expected": "Human",
+        "actual": "Human",
+        "passed": true,
+        "private_evidence_sha256": "bc5a5bba95d37bcdea1b4836dd94594e3fccbac43d6ddee984e9a9f20aa5083a"
+      },
+      {
+        "scenario": "operator_reported_manual_outlook_send",
+        "expected": "Human",
+        "actual": "Human",
+        "passed": true,
+        "private_evidence_sha256": "c1ee27457a72988028ce40d0df8b309853a9ac73f0b64c7b4d623a737128bcb1"
+      },
+      {
+        "scenario": "operator_reported_claude_outlook_send",
+        "expected": "AI Agent",
+        "actual": "AI Agent",
+        "passed": true,
+        "private_evidence_sha256": "10e1592b12493dd623c3a29a616f0116762bf60f645599d6e523133d1e73ef1b"
+      }
+    ],
+    "observed_false_agent_flags_in_two_manual_cases": 0
+  },
+  "live_category_validation": {
+    "executed_at": "2026-10-30T05:56:48.269328+00:00",
+    "results": [
+      {
+        "message_ref_sha256": "3df50dd1a900abf2013a9524fb2271d83fc0a64baa00ea23352f2095fba5a071",
+        "classification": "AI Agent",
+        "category_readback": [
+          "AI Agent"
+        ],
+        "write_status": "applied",
+        "readback_verified": true,
+        "evidence_current": true,
+        "headers_and_read_state_preserved": true,
+        "repeat_apply_noop": true
+      },
+      {
+        "message_ref_sha256": "ea462ce362ef426327eb9576b8d0c523b1e8e3a7cd4dea551557d49c6dfe6ee4",
+        "classification": "Unknown",
+        "category_readback": [
+          "Unknown"
+        ],
+        "write_status": "applied",
+        "readback_verified": true,
+        "evidence_current": true,
+        "headers_and_read_state_preserved": true,
+        "repeat_apply_noop": true
+      }
+    ],
+    "mail_sent": 0,
+    "ordinary_messages_modified": 0,
+    "automatic_application_enabled": false
+  },
+  "evidence_boundaries": {
+    "send_transcript_used_as_detector_feature": false,
+    "subjects_or_existing_categories_used_as_actor_features": false,
+    "application_display_name_used_as_trust_signal": false,
+    "generic_api_used_as_agent_identity": false,
+    "profile_pins_required_by_decision_preview_and_writer": true,
+    "changed_bound_enrollment_rejected": true,
+    "empty_profile_list_preserves_legacy_enrollment_hash": true,
+    "new_dedicated_dry_run_state_used": true,
+    "previous_runtime_configuration_and_history_retained": true
+  },
+  "private_proof_sha256": {
+    "messages.private.json": "fb913e35011e127994f5dc7010df4f73a50c718caf77901e2d8850e71aa62656",
+    "verified-publisher.private.json": "2ae6b929e705ae837b52039cd2bc69a95081c303e470720c7ac744bc5f54509d",
+    "initial-query.private.json": "a47347e918d4c96e18cb0d09cfeca5e509a9c0ee1fc827663de7c047a866b617",
+    "initial-query-status.private.json": "76efeb7b93f2ccdeedd4953d27cd360b2f3517bf4950ee1343c1d41a8696b857",
+    "initial-records.private.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "queries.private.json": "bbbd2bd9fa74133493e1797446279feb92328ea1efa0651d582ca0fec2a4d05a",
+    "query-status.private.json": "ef05b3bc67de1119ba69b075663e8ff825824771899f36fb2bc20e9cb11fbd98",
+    "audit-records.private.json": "5c54246cd9fa5449fd1681da8bb36f022d990aa9a41cebcbb187269be4c612bb",
+    "live-qualification.private.json": "481919dc890a407d5bdf92bdc05d774dc5a5d5faa485b8d5e3d7a0a61cb17ed0",
+    "category-validation.private.json": "188f3f6a86e8bd2858cefd9bac571bd2a1472e305f83afc60a070ebc36069793"
+  },
+  "mail_send_calls": 0,
+  "ordinary_messages_modified": 0,
+  "new_permissions": 0,
+  "azure_resources_created": 0,
+  "incremental_azure_resource_cost": 0,
+  "background_worker_started": false,
+  "automatic_application_enabled": false,
+  "phase_7_started": false,
+  "population_accuracy_qualified": false,
+  "independent_forensic_received_identity_claimed": false,
+  "limitations": [
+    "ChatGPT Gmail remains an unsupported agent-attribution route in the production detector; generic API evidence is insufficient",
+    "Other applications require their own dedicated-agent send capability and live source qualification before enrollment",
+    "Headerless identification depends on delayed Exchange Send audit availability and current operator publisher access",
+    "Only the enrolled own-mailbox Outlook route was tested; no universal external sender or cross-platform guarantee",
+    "Human retains the accepted normal-client/browser compatibility meaning",
+    "Unobservable replacement preserving every checked correlation field remains an accepted POC risk",
+    "Unattended operation and automatic category rollout remain later phase gates"
+  ],
+  "review": "docs/agent-provider-qualification.md"
+}

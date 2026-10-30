@@ -20,7 +20,7 @@ from .eligibility import require_annotation_eligible
 from .errors import OutlookError
 from .locking import ProcessLock
 from .rule_schema import RULE_SCHEMA
-from .sender_rules import AGENT_RULE, HUMAN_RULE, evaluate
+from .sender_rules import evaluate
 from .sync_schema import SYNC_SCHEMA
 
 BASE_SCHEMA = (
@@ -354,11 +354,13 @@ class StateStore:
                     else None,
                     json.loads(source_row[0]) if source_row else None,
                     self.clock(),
+                    providers=self.config.sender_source.agent_providers
+                    if self.config.sender_source
+                    else (),
                 )
                 if (
                     expected.category != decision.category
-                    or decision.rule_version
-                    != (HUMAN_RULE if decision.category == "Human" else AGENT_RULE)
+                    or decision.rule_version != expected.rule_version
                     or decision.reason_codes != expected.reason_codes
                     or decision.evidence_refs
                     != (*expected.evidence_refs, "snapshot-sha256:" + observation.source_digest)

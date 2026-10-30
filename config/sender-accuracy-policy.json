@@ -1,7 +1,10 @@
 {
   "schema_version": "1.0",
-  "policy_version": "corroborated-poc-human/v2",
-  "enabled_positive_agent_rules": ["sender-rules/claude-corroborated/v1"],
+  "policy_version": "corroborated-poc-human/v3",
+  "enabled_positive_agent_rules": [
+    "sender-rules/claude-corroborated/v1",
+    "sender-rules/provider-corroborated/v1"
+  ],
   "compatible_client_rule": "sender-rules/human/v2",
   "initial_window_seconds": 7200,
   "late_window_seconds": 86400,

@@ -10,6 +10,7 @@ from pydantic import AwareDatetime, Field, ValidationError, field_validator, mod
 
 from agenttrace_feasibility.validation import InputError, canonical_bytes, load_json
 
+from .agent_providers import AgentProvider
 from .contracts import Record, Scope
 from .errors import OutlookError
 
@@ -41,6 +42,18 @@ class SenderSource(Record):
     publisher_id: str = Field(pattern=r"^[A-Za-z0-9_.-]{1,100}$")
     publisher_owner_tenant: UUID
     refresh_seconds: int = Field(default=300, ge=300, le=900)
+    agent_providers: tuple[AgentProvider, ...] = Field(default=(), max_length=20)
+
+    @model_validator(mode="after")
+    def unique_providers(self) -> SenderSource:
+        # The existing Claude route retains its original pins and semantics.
+        from .sender_rules import CLAUDE_APP
+
+        ids = [str(p.client_id) for p in self.agent_providers]
+        keys = [p.provider_key for p in self.agent_providers]
+        if len(ids) != len(set(ids)) or len(keys) != len(set(keys)) or CLAUDE_APP in ids:
+            raise ValueError("duplicate_or_reserved_agent_provider")
+        return self
 
 
 class RuntimeConfig(Record):

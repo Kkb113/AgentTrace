@@ -16,6 +16,7 @@ from agenttrace_foundation.workload_identity import CertificateTokenProvider
 from agenttrace_ingestion.contracts import IngestionError
 from agenttrace_ingestion.transport import MicrosoftTransport
 
+from .agent_providers import AgentProvider
 from .config import RuntimeConfig
 from .errors import OutlookError, SourceError
 from .sender_rules import CLAUDE_APP
@@ -115,11 +116,16 @@ def certificate_audit(config: RuntimeConfig) -> AuditReader:
     )
 
 
-def publisher_snapshot(config: RuntimeConfig) -> dict[str, Any]:
+def publisher_snapshot(
+    config: RuntimeConfig, provider: AgentProvider | None = None
+) -> dict[str, Any]:
     """Read the exact enrolled SP with the existing interactive operator identity."""
     source = config.sender_source
     if source is None:
         raise SourceError("sender_source_not_configured")
+    client_id = str(provider.client_id) if provider else CLAUDE_APP
+    owner_tenant = provider.publisher_owner_tenant if provider else source.publisher_owner_tenant
+    publisher_id = provider.publisher_id if provider else source.publisher_id
     command = [
         *azure_cli_prefix(),
         "account",
@@ -141,7 +147,7 @@ def publisher_snapshot(config: RuntimeConfig) -> dict[str, Any]:
             raise SourceError("publisher_operator_scope_mismatch")
         url = "https://graph.microsoft.com/v1.0/servicePrincipals?" + urlencode(
             {
-                "$filter": "appId eq '" + CLAUDE_APP + "'",
+                "$filter": "appId eq '" + client_id + "'",
                 "$select": "appId,appOwnerOrganizationId,accountEnabled,verifiedPublisher",
             }
         )
@@ -176,10 +182,10 @@ def publisher_snapshot(config: RuntimeConfig) -> dict[str, Any]:
         if not isinstance(row, dict) or not isinstance(row.get("verifiedPublisher"), dict):
             raise SourceError("publisher_registry_shape_invalid")
         if (
-            row.get("appId") != CLAUDE_APP
+            row.get("appId") != client_id
             or row.get("accountEnabled") is not True
-            or row.get("appOwnerOrganizationId") != str(source.publisher_owner_tenant)
-            or row.get("verifiedPublisher", {}).get("verifiedPublisherId") != source.publisher_id
+            or row.get("appOwnerOrganizationId") != str(owner_tenant)
+            or row.get("verifiedPublisher", {}).get("verifiedPublisherId") != publisher_id
         ):
             raise SourceError("publisher_pin_mismatch_or_revoked")
         answer: dict[str, Any] = row
