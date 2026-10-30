@@ -311,9 +311,9 @@ def test_provider_replay_uses_same_pinned_rule_and_rejects_revocation() -> None:
     )
 
 
-def test_pending_enrolled_application_is_unknown_until_audit_completes() -> None:
+def test_pending_audit_does_not_override_clean_human_compatibility_policy() -> None:
     packet = {**evidence(), "status": "pending", "reason": "audit_search_pending"}
     result = evaluate(observation(), snapshot(), packet, NOW, providers=(profile(),))
-    assert (
-        result.category == "Unknown" and "enrolled_application_audit_pending" in result.reason_codes
-    )
+    assert result.category == "Human"
+    assert result.agent_execution == "not_established"
+    assert "compatible_path_does_not_establish_controller" in result.reason_codes

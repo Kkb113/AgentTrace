@@ -19,6 +19,7 @@ from .mail_semantics import sender_snapshot
 from .rule_store import RuleStore
 from .sender_rules import evaluate, sha
 from .state import StateStore
+from .sync_state import SyncState
 
 TERMINAL = {
     "applied",
@@ -93,7 +94,15 @@ class CategoryWriter:
             if self.store.config.sender_source
             else ()
         )
-        expected = evaluate(observation, snapshot, source, self.store.clock(), providers=providers)
+        expected = evaluate(
+            observation,
+            snapshot,
+            source,
+            self.store.clock(),
+            providers=providers,
+            allow_known_mcp_marker=self.store.config.known_mcp_marker_poc_enabled,
+            allow_gmail_api_poc=self.store.config.gmail_api_agent_poc_enabled,
+        )
         refs = (
             (*expected.evidence_refs, "snapshot-sha256:" + observation.source_digest)
             if expected.category != "Unknown"
@@ -117,6 +126,8 @@ class CategoryWriter:
                 message,
                 self.store.clock(),
                 providers=providers,
+                allow_known_mcp_marker=self.store.config.known_mcp_marker_poc_enabled,
+                allow_gmail_api_poc=self.store.config.gmail_api_agent_poc_enabled,
             )
             if sha(sender_snapshot(message)[0]) != observation.source_digest:
                 raise OutlookError("category_live_evidence_changed")
@@ -139,18 +150,27 @@ class CategoryWriter:
         verify_ownership(self.registry, self.catalog_inventory)
         with self.store.transaction(lease=self.store.lease) as db:
             rows = db.execute(
-                "SELECT d.id,d.message_id,d.payload FROM decisions d JOIN messages m ON m.message_id=d.message_id AND m.decision_version=d.version WHERE (? IS NULL OR d.message_id=?) AND (? IS NOT NULL OR NOT EXISTS(SELECT 1 FROM category_intents i WHERE i.decision_id=d.id)) ORDER BY d.id LIMIT ?",
+                "SELECT d.id,d.message_id,d.payload FROM decisions d JOIN messages m ON m.message_id=d.message_id AND m.decision_version=d.version WHERE (? IS NULL OR d.message_id=?) AND (? IS NOT NULL OR (EXISTS(SELECT 1 FROM sync_items s WHERE s.message_id=d.message_id AND s.status='eligible') AND NOT EXISTS(SELECT 1 FROM category_intents i WHERE i.decision_id=d.id))) ORDER BY d.id LIMIT ?",
                 (message_id, message_id, message_id, self.store.config.batch_size),
             ).fetchall()
             result = []
             for row in rows:
-                require_annotation_eligible(
-                    Decision.model_validate_json(row[2]), self.registry.scope, self.store.clock()
-                )
+                error_code = None
+                try:
+                    require_annotation_eligible(
+                        Decision.model_validate_json(row[2]),
+                        self.registry.scope,
+                        self.store.clock(),
+                    )
+                except OutlookError as error:
+                    if message_id is not None:
+                        raise
+                    # A stale decision must not starve other messages or be selected forever.
+                    error_code = error.code
                 now = self.store.clock().timestamp()
                 db.execute(
-                    "INSERT OR IGNORE INTO category_intents(decision_id,message_id,status,created,updated) VALUES (?,?,'pending',?,?)",
-                    (row[0], row[1], now, now),
+                    "INSERT OR IGNORE INTO category_intents(decision_id,message_id,status,error_code,created,updated) VALUES (?,?,?,?,?,?)",
+                    (row[0], row[1], "blocked" if error_code else "pending", error_code, now, now),
                 )
                 result.append(
                     int(
@@ -343,15 +363,22 @@ class CategoryWriter:
             code = getattr(error, "code", "category_authentication_unavailable")
             current_row = self.row(identity)
             if current_row["status"] in {"prepared", "uncertain"}:
-                self._status(identity, "uncertain", code, delay=2)
-            elif (
-                getattr(error, "retryable", False)
-                and row["attempts"] < self.store.config.max_attempts
-            ):
+                self._status(
+                    identity,
+                    "uncertain",
+                    code,
+                    delay=max(2, getattr(error, "retry_after", None) or 2),
+                )
+            elif code == "category_live_evidence_changed":
+                # Refresh the exact message and obtain a new decision instead
+                # of leaving a recoverable metadata race permanently unlabelled.
+                sync_state = SyncState(self.store)
                 with self.store.transaction(lease=self.store.lease) as db:
-                    db.execute(
-                        "UPDATE category_intents SET attempts=attempts+1 WHERE id=?", (identity,)
-                    )
+                    sync_state.hydrate(db, row["message_id"])
+                self._status(identity, "superseded", code)
+            elif getattr(error, "retryable", False):
+                # A transient GET/auth-transport failure has not consumed a
+                # mutation attempt. Keep its durable intent and honor backoff.
                 self._status(
                     identity, row["status"], code, delay=getattr(error, "retry_after", None) or 2
                 )
@@ -430,8 +457,15 @@ class CategoryWriter:
         return {
             "intent_id": identity,
             "message_ref_sha256": sha(row["message_id"]),
+            "classification": Decision.model_validate_json(row["decision"]).category,
+            "rule_version": Decision.model_validate_json(row["decision"]).rule_version,
             "status": row["status"],
             "attempts": row["attempts"],
+            "decision_to_status_seconds": round(
+                row["updated"]
+                - Decision.model_validate_json(row["decision"]).decided_at.timestamp(),
+                3,
+            ),
             "error_code": row["error_code"],
             "classification_changed": False,
             "write_attributed": bool(

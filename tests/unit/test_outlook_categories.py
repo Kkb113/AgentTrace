@@ -397,17 +397,17 @@ def test_experimental_and_stale_evidence_are_not_previewed_as_eligible(tmp_path:
         category_preview(registry, inventory, decision, obs, raw, expired, message, NOW)
 
 
-def test_preview_rejects_definition_replacement_and_non_synthetic_targets(tmp_path: Path) -> None:
+def test_preview_rejects_definition_replacement_and_wrong_message_targets(tmp_path: Path) -> None:
     cfg, registry, transport = provisioned(tmp_path)
     raw = snapshot()
     obs, decision = decision_for(raw)
     message = {
-        "id": obs.message_id,
+        "id": "a-different-message",
         "subject": "ordinary customer subject",
         "isDraft": False,
         "categories": [],
     }
-    with pytest.raises(OutlookError, match="synthetic_message_required"):
+    with pytest.raises(OutlookError, match="message_mismatch"):
         category_preview(
             registry,
             tuple(c.category for c in registry.categories),

@@ -1,4 +1,4 @@
-"""Explicit synthetic-pilot writer commands; continuous automatic application stays disabled."""
+"""Explicit scoped writer diagnostics, recovery and rollback commands."""
 
 import argparse
 import json

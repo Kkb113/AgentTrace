@@ -45,26 +45,53 @@ class Synchronizer:
     def __init__(self, store: StateStore, reader: MailReader):
         self.store, self.reader = store, reader
         self.state = SyncState(store)
+        with store.transaction(lease=store.lease) as db:
+            db.execute(
+                "UPDATE sync_jobs SET status='due',generation=generation+1 "
+                "WHERE status='dead_letter' OR (status='blocked' AND error='retry_after_requires_operator')"
+            )
+            prior = db.execute("SELECT value FROM metadata WHERE key='incoming_scope'").fetchone()
+            if prior is None or prior[0] != "all_incoming_headers/v2":
+                # Recover previously filtered mail without resetting delta cursors,
+                # decisions or the conditional-write journal.
+                for row in db.execute(
+                    "SELECT message_id FROM sync_items WHERE status IN ('non_synthetic','eligible')"
+                ).fetchall():
+                    self.state.hydrate(db, row[0])
+                db.execute("DELETE FROM metadata WHERE key='synthetic_message_ids'")
+                db.execute(
+                    "INSERT INTO metadata VALUES ('incoming_scope','all_incoming_headers/v2') "
+                    "ON CONFLICT(key) DO UPDATE SET value=excluded.value"
+                )
 
     def run_cycle(self) -> int:
         self.state.start_discovery()
         completed = 0
+        completed_collections: set[str] = set()
         for _ in range(self.store.config.sync_operations_per_cycle):
             self.store.heartbeat()
             self.state.start_discovery()
             job = self.state.next_job()
             if job is None:
                 break
+            if job["key"] in completed_collections:
+                break
+            observed = False
             try:
                 if job["kind"] == "system":
                     self.system(job)
                 elif job["kind"] == "detail":
-                    self.detail(job)
+                    observed = self.detail(job)
                 else:
-                    self.page(job)
+                    if self.page(job):
+                        completed_collections.add(job["key"])
             except SourceError as error:
                 self.state.fail(job, error, random.SystemRandom().uniform(0, 1))
             completed += 1
+            if observed:
+                # Let classification/annotation run immediately after durable
+                # ingestion rather than waiting behind further mailbox requests.
+                break
         return completed
 
     def system(self, job: dict[str, Any]) -> None:
@@ -78,7 +105,7 @@ class Synchronizer:
             )
             self.state.checkpoint(db, job, cursor=None, complete=True)
 
-    def page(self, job: dict[str, Any]) -> None:
+    def page(self, job: dict[str, Any]) -> bool:
         page = self.reader.page(job["kind"], job["target"], job["cursor"])
         values = page.get("value")
         if (
@@ -173,17 +200,17 @@ class Synchronizer:
             self.state.checkpoint(db, job, cursor=continuation, complete=complete)
             if job["kind"] == "discover" and complete:
                 self.state.finish_discovery(db, job["epoch"])
+        return complete
 
-    def detail(self, job: dict[str, Any]) -> None:
+    def detail(self, job: dict[str, Any]) -> bool:
+        observed = False
         try:
             detail = self.reader.sync_detail(job["target"], include_headers=False)
-            # Do not request ordinary or historical headers merely to establish
-            # that the item is outside the synthetic qualification population.
+            # Retain the explicit history/draft boundary; every new incoming
+            # subject and sender is eligible. No body or attachment is requested.
             if (
                 detail.get("isDraft") is False
                 and source_time(detail.get("receivedDateTime")) >= self.state.cutoff
-                and isinstance(detail.get("subject"), str)
-                and detail["subject"].startswith(self.store.config.synthetic_subject_prefix)
             ):
                 detail = self.reader.sync_detail(job["target"], include_headers=True)
         except SourceError as error:
@@ -194,7 +221,7 @@ class Synchronizer:
                 self.state.invalidate(db, job["target"], "gone_or_inaccessible")
                 self.state.gap(db, job["key"], "message_removed_or_unreadable")
                 self.state.checkpoint(db, job, cursor=None, complete=True)
-            return
+            return False
         identity, folder = opaque(detail.get("id")), opaque(detail.get("parentFolderId"))
         if identity != job["target"] or type(detail.get("isDraft")) is not bool:
             raise SourceError("source_message_mismatch")
@@ -224,10 +251,6 @@ class Synchronizer:
                 if location[0] or not location[1] or detail["isDraft"]
                 else "history"
                 if received < self.state.cutoff
-                else "non_synthetic"
-                if not str(detail.get("subject", "")).startswith(
-                    self.store.config.synthetic_subject_prefix
-                )
                 else "eligible"
             )
             if status != "eligible":
@@ -242,6 +265,7 @@ class Synchronizer:
                 if current is None:
                     raise OutlookError("sync_item_missing")
                 if current[0] != digest or current[1] != "eligible":
+                    observed = True
                     revision = int(current[2]) + 1
                     observation = Observation(
                         scope=self.store.config.scope,
@@ -273,3 +297,4 @@ class Synchronizer:
                 (folder, str(detail.get("changeKey", "")), identity),
             )
             self.state.checkpoint(db, job, cursor=None, complete=True)
+        return observed

@@ -305,7 +305,7 @@ def test_semantic_edit_during_conflict_never_receives_old_verdict(tmp_path):
         server.mode = "semantic_conflict"
         assert writer.step(identity)["status"] == "pending"
         clock.advance()
-        assert writer.step(identity)["status"] == "blocked"
+        assert writer.step(identity)["status"] == "superseded"
         assert server.patch_count == 1
     finally:
         store.close()

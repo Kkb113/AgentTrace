@@ -1,4 +1,4 @@
-"""Standalone read-only mailbox monitor with durable, evidence-based category previews."""
+"""Mailbox monitor with explicit opt-in to scoped, evidence-based Outlook labels."""
 
 from __future__ import annotations
 
@@ -6,6 +6,7 @@ import argparse
 import json
 import sqlite3
 import time
+from contextlib import ExitStack
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -13,6 +14,10 @@ from pydantic import ValidationError
 from agenttrace_feasibility.validation import InputError, canonical_bytes, load_json
 
 from .audit_source import certificate_audit
+from .category_application import ApplicationSettings, CategoryApplication
+from .category_catalog import certificate_catalog
+from .category_ownership import OwnershipStore, verify_ownership
+from .category_writer import CategoryWriter
 from .config import read_config
 from .contracts import FixtureBatch
 from .errors import OutlookError
@@ -21,6 +26,7 @@ from .rule_store import RuleStore
 from .runner import run_once
 from .sender_rules import RuleAssessment, sha
 from .source_collector import SenderCollector
+from .source_worker import SourceWorker
 from .state import StateStore
 from .synchronizer import Synchronizer
 
@@ -61,13 +67,31 @@ def main(argv: list[str] | None = None) -> int:
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true")
     mode.add_argument("--apply-categories", action="store_true")
+    parser.add_argument("--category-settings", type=Path)
+    parser.add_argument("--category-qualification", type=Path)
     args = parser.parse_args(argv)
+    application = None
+    writes_enabled = False
     try:
         config = read_config(args.config)
-        if args.apply_categories or (config.mode == "apply_categories" and not args.dry_run):
+        if config.mode == "apply_categories" and not (args.apply_categories or args.dry_run):
             raise OutlookError("category_application_not_enabled")
-        if args.dry_run:
-            config = config.model_copy(update={"mode": "dry_run"})
+        # The state engine remains a non-writing collector. Only this explicit flag
+        # can connect its decisions to the independently authenticated writer.
+        config = config.model_copy(update={"mode": "dry_run"})
+        if args.apply_categories:
+            if (
+                args.category_settings is None
+                or args.category_qualification is None
+                or args.fixture
+                or args.inspect_rules
+            ):
+                raise OutlookError("explicit_live_category_configuration_required")
+            application = ApplicationSettings.read(
+                config, args.category_settings, args.category_qualification
+            )
+        elif args.category_settings or args.category_qualification:
+            raise OutlookError("category_settings_require_apply_flag")
         fixture = None
         if args.fixture:
             fixture = FixtureBatch.model_validate_json(canonical_bytes(load_json(args.fixture)))
@@ -80,12 +104,16 @@ def main(argv: list[str] | None = None) -> int:
         if args.check:
             emit(
                 "configuration_valid",
-                mode=config.mode,
-                runtime_stage="mailbox_sync_dry_run" if config.sync_enabled else "foundation_only",
+                mode="apply_categories" if application else "dry_run",
+                runtime_stage=("mailbox_sync_apply" if application else "mailbox_sync_dry_run")
+                if config.sync_enabled
+                else "foundation_only",
                 category_writes=False,
+                category_application_requested=application is not None,
             )
             return 0
-        with StateStore(config) as store:
+        with ExitStack() as resources:
+            store = resources.enter_context(StateStore(config))
             if args.inspect_rules:
                 emit(
                     "rule_summary",
@@ -104,10 +132,29 @@ def main(argv: list[str] | None = None) -> int:
                             **RuleAssessment.model_validate_json(row[1]).model_dump(mode="json"),
                         )
                 return 0
+            category_application = None
+            if application:
+                ownership = OwnershipStore(application.settings)
+                resources.callback(ownership.close)
+                registry = ownership.load()
+                if registry is None:
+                    raise OutlookError("category_ownership_required")
+                catalog = certificate_catalog(application.settings, "writer")
+                verify_ownership(registry, catalog.inventory())
+                category_application = CategoryApplication(
+                    CategoryWriter(store, catalog, registry, application.qualification)
+                )
+                writes_enabled = True
             sync = Synchronizer(store, certificate_reader(config)) if config.sync_enabled else None
             sender = (
                 SenderCollector(
-                    store, certificate_audit(config), mail=sync.reader if sync else None
+                    store,
+                    certificate_audit(config),
+                    mail=certificate_reader(config)
+                    if sync and not args.once
+                    else sync.reader
+                    if sync
+                    else None,
                 )
                 if config.sender_source
                 else None
@@ -116,46 +163,81 @@ def main(argv: list[str] | None = None) -> int:
                 emit("sync_requeued", jobs=sync.state.retry_failed())
             if sender and args.retry_failed_sources:
                 emit("sources_requeued", jobs=sender.rules.retry_failed())
+            source_worker = SourceWorker(sender) if sender and not args.once else None
+            if source_worker:
+                resources.callback(source_worker.close)
             if fixture:
                 accepted = store.observe(fixture.observations)
                 emit("fixture_imported", accepted=accepted, synthetic=True)
             emit(
                 "ready",
-                mode="dry_run",
+                mode="apply_categories" if category_application else "dry_run",
                 mailbox_collection="read_only_delta" if sync else "disabled",
-                actor_rules="corroborated_poc_ai_and_human_label",
-                category_writes=False,
+                actor_rules="accepted_poc_indicators_and_human_compatibility"
+                if config.known_mcp_marker_poc_enabled or config.gmail_api_agent_poc_enabled
+                else "corroborated_poc_ai_and_human_label",
+                known_mcp_marker_poc_enabled=config.known_mcp_marker_poc_enabled,
+                gmail_api_agent_poc_enabled=config.gmail_api_agent_poc_enabled,
+                receiving_scope="all_incoming_headers",
+                category_writes=writes_enabled,
             )
             while True:
                 if sync:
                     sync.run_cycle()
                     emit("sync_cycle_completed", **sync.state.summary())
-                if sender:
+                fast_poc = config.known_mcp_marker_poc_enabled or config.gmail_api_agent_poc_enabled
+                if sender and args.once and not fast_poc:
                     sender.step()
                     emit("sender_sources", **sender.rules.summary())
                 processed = run_once(store)
+                if category_application:
+                    # Each item is independently checked against its current live
+                    # version/location. An unrelated folder failure cannot starve it.
+                    for result in category_application.run_cycle():
+                        emit("category_result", **result)
+                    emit("category_cycle_completed", **category_application.summary())
                 emit("cycle_completed", processed=processed, **store.summary())
+                if source_worker:
+                    emit("sender_worker", **source_worker.tick())
+                    emit("sender_sources", **source_worker.collector.rules.summary())
+                elif sender and fast_poc:
+                    # Header/transport POC verdicts do not wait behind the slower
+                    # analytical audit endpoint. Its evidence is still collected
+                    # and reassessed in the next cycle; it can expose conflicts.
+                    sender.step()
+                    emit("sender_sources", **sender.rules.summary())
                 if args.once:
                     return (
                         1
-                        if (sync and sync.state.summary()["sync_health"] == "degraded")
+                        if (
+                            sync
+                            and (
+                                sync.state.summary()["sync_health"] == "degraded"
+                                or sync.state.summary()["sync_retry_waiting"]
+                            )
+                        )
                         or (sender and sender.rules.summary()["source_blocked"])
+                        or (
+                            category_application
+                            and category_application.summary()["category_health"] != "current"
+                        )
                         else 0
                     )
-                time.sleep(config.poll_seconds)
+                if not sync or not sync.state.summary()["sync_ready_jobs"]:
+                    time.sleep(config.poll_seconds)
     except KeyboardInterrupt:
-        emit("stopped", reason="operator_interrupt", category_writes=False)
+        emit("stopped", reason="operator_interrupt", category_writes=writes_enabled)
         return 0
     except OutlookError as error:
-        emit("error", code=error.code, category_writes=False)
+        emit("error", code=error.code, category_writes=writes_enabled)
         return 1
     except (InputError, ValidationError, OSError, ValueError, sqlite3.Error):
-        emit("error", code="invalid_input_or_runtime_unavailable", category_writes=False)
+        emit("error", code="invalid_input_or_runtime_unavailable", category_writes=writes_enabled)
         return 1
     except Exception:
         # Last-resort process boundary: never print third-party exception text,
         # tokens, URLs or source data, and never turn a failure into a verdict.
-        emit("error", code="unexpected_runtime_failure", category_writes=False)
+        emit("error", code="unexpected_runtime_failure", category_writes=writes_enabled)
         return 1
 
 

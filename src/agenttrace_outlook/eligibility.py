@@ -4,7 +4,7 @@ from datetime import datetime
 
 from .contracts import Decision, Scope
 from .errors import OutlookError
-from .sender_rules import AGENT_RULE, HUMAN_RULE, PROVIDER_RULE
+from .sender_rules import AGENT_RULE, GMAIL_API_RULE, HUMAN_RULE, MCP_MARKER_RULE, PROVIDER_RULE
 
 UNKNOWN_RULE = "foundation/unknown/v1"
 SENDER_UNKNOWN_RULE = "sender-rules/unknown/v1"
@@ -23,6 +23,23 @@ def require_annotation_eligible(decision: Decision, scope: Scope, now: datetime)
         and decision.qualification == "qualified"
         and any(ref.startswith("snapshot-sha256:") for ref in decision.evidence_refs)
     ):
+        return
+    if (
+        decision.category == "AI Agent"
+        and decision.rule_version in {MCP_MARKER_RULE, GMAIL_API_RULE}
+        and decision.qualification == "qualified"
+        and all(
+            any(ref.startswith(prefix) for ref in decision.evidence_refs)
+            for prefix in (
+                "header-sha256:"
+                if decision.rule_version == MCP_MARKER_RULE
+                else "transport-sha256:",
+                "snapshot-sha256:",
+            )
+        )
+    ):
+        # The state/writer additionally recompute this optional POC rule using
+        # the explicit runtime policy. This is not authenticated execution proof.
         return
     if (
         decision.category == "AI Agent"

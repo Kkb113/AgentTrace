@@ -1,3 +1,7 @@
+# Current scope
+
+This document records the earlier synchronization qualification. The active [generalized monitor](simple-poc-monitor.md) now processes every incoming message in the connected mailbox without subject or message-ID filters; the earlier synthetic-only restriction below is historical.
+
 # Read-only Outlook mailbox synchronization
 
 The standalone runner now supports durable Graph collection for one designated receiving mailbox. The [sender-rule extension](sender-detection-rules.md) now adds corroborated POC AI and Human-capable previews; actual Outlook category application remains a later milestone. No Graph activity-log prerequisite, application server, dashboard, new Azure resource or category permission was introduced.

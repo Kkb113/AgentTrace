@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "policy_version": "corroborated-poc-human/v3",
+  "policy_version": "corroborated-poc-human/v6",
   "enabled_positive_agent_rules": [
     "sender-rules/claude-corroborated/v1",
     "sender-rules/provider-corroborated/v1"
   ],
-  "compatible_client_rule": "sender-rules/human/v2",
+  "compatible_client_rule": "sender-rules/human/v3",
   "initial_window_seconds": 7200,
   "late_window_seconds": 86400,
   "agent_false_positive_one_sided_confidence": 0.95,
@@ -19,5 +19,6 @@
   "human_label_is_human_identity": false,
   "required_holdout_controls": "Independent curator OS identity, private ACLs, separate key, encrypted frozen dataset, code/policy binding and one-use archive authorization",
   "accepted_residual_risk": "Unobservable copied-ID full replacement can defeat the corroborated POC association",
-  "category_writes_enabled": false
+  "category_writes_enabled": false,
+  "optional_indicator_modes_excluded_from_accuracy_qualification": true
 }

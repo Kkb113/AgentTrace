@@ -38,6 +38,7 @@ ALLOWED_IMPORTS = {
     "secrets",
     "cryptography",
     "unicodedata",
+    "threading",
     "agenttrace_foundation.workload_identity",
     "agenttrace_foundation.authorization",
     "agenttrace_ingestion.transport",

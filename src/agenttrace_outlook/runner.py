@@ -32,6 +32,8 @@ def run_once(store: StateStore) -> int:
                 providers=store.config.sender_source.agent_providers
                 if store.config.sender_source
                 else (),
+                allow_known_mcp_marker=store.config.known_mcp_marker_poc_enabled,
+                allow_gmail_api_poc=store.config.gmail_api_agent_poc_enabled,
             )
             if snapshot
             else None

@@ -1,25 +1,29 @@
-# Run the POC monitor
+# Outlook classification monitor
 
-Use the existing operator session on this PC. No Administrator PowerShell, account creation, service installation or new Azure resource is needed.
-
-From `C:\AgentDetection`, start the qualified monitor:
+From `C:\AgentDetection`, run the existing process with the existing scoped identities:
 
 ```powershell
-uv run --frozen python scripts/monitor-outlook-mail.py --config work/private/agent-provider-monitor/runtime.private.json --dry-run
+uv run --frozen python scripts/monitor-outlook-mail.py --config work/private/agent-provider-monitor/runtime.private.json --apply-categories --category-settings work/private/outlook-categories/settings.private.json --category-qualification work/private/outlook-categories/monitor-qualification.private.json
 ```
 
-Leave it running and stop it with **Ctrl+C**. Restart with the same command and configuration to resume the saved mailbox checkpoints. Outlook can be closed. The PC and Python process must remain running; this does not promise continued operation through Windows sign-out or shutdown.
+Keep this command running. Stop with **Ctrl+C** and restart with the same configuration/state to resume. Outlook can be closed; the PC/process must remain running. No Administrator PowerShell, dedicated Windows account, service installation, new Entra app/grant or Azure resource is needed. Only one monitor may own this state at a time.
 
-To run one collection cycle for a check, append `--once`. To validate configuration without mailbox access, append `--check`.
+Every incoming email in the enrolled receiving folders is eligible, regardless of sender, subject, language or body text. There is no subject prefix, sender allowlist or message-ID exception list. Previously filtered messages are rehydrated through the same durable pipeline. Sent Items, Drafts, Outbox and Deleted Items remain outside receiving scope. The recorded activation/backfill cutoff bounds history; existing older mail is not silently treated as new delivery.
 
-After stopping the monitor, inspect stored classifications and evidence references:
+The collector requests metadata and technical headers, not the subject/body properties or attachments. The RFC Subject header is excluded from the classification snapshot. Labels are based on sender/action indicators, not writing style or content. The latest owner instruction authorizes header-only processing and category annotation of incoming mail in this connected mailbox; the previous synthetic-subject restriction is retired.
 
-```powershell
-uv run --frozen python scripts/monitor-outlook-mail.py --config work/private/agent-provider-monitor/runtime.private.json --inspect-rules
-```
+The native categories are **AI Agent (red)**, **Human (green)** and **Unknown (yellow)**. The demo configuration enables both owner-accepted POC indicator rules: the known Office365 MCP marker and the Gmail API HTTPREST transport indicator. A copied marker can cause a false positive; ordinary Gmail API automation can also receive AI Agent. These indicators do not establish authenticated agent execution. New configurations default to authenticated agent rules. The [policy decision](../adr/poc-marker-and-refresh-policy.md) documents the limitations. Human means clean normal-client compatibility, including browser-controlled agents, rather than proof of a biological controller. Missing or conflicting evidence remains Unknown.
 
-Inspection displays stored assessments and does not refresh evidence. A `cycle_completed` message reports local collection/decision progress; it does not mean that an Outlook category was applied. Use the [existing scoped category-writer procedure](outlook-category-writer.md) for explicit category application; automatic category rollout remains gated by the remaining Outlook validation/pilot work.
+The current live configuration uses a one-second idle pause and two-second folder-delta interval. Newly ingested observations yield immediately to classification/application; known queued work does not incur an idle pause. A separate bounded audit thread in the same process performs analytical requests without blocking incoming mail. It has its own transport/token-provider instances. SQLite transactions and shutdown are serialized; late network results cannot write after state closure. No extra service is created.
 
-The existing synthetic subject prefix and enrolled receiving folders still define the POC population. AgentTrace does not send test mail. Agent attribution can wait for audit evidence; generic Gmail API traffic alone remains Unknown. Authentication/network failures are reported as failures or evidence gaps, not proof of a human or agent.
+These polling settings do not guarantee instant visible labels. Graph fetch, conditional update/readback, throttling and Outlook's own refresh contribute to latency. `decision_to_status_seconds` measures decision-to-server-status time; receipt-to-ingestion and owner-observed client display time must be reported separately. A cached Outlook view can lag a confirmed server write. No read/unread toggles, moves or content edits are used to force display refresh.
 
-The incremental Azure resource cost for this method is **₹0/month**. Existing storage/logging resources can still incur usage charges, and existing Microsoft 365 licences and PC electricity are excluded. No new licence purchase, VM, database or publisher-reader grant is needed.
+The writer preserves unrelated categories and read state, recomputes the selected rule against current evidence, and conditionally PATCHes only `categories`. It records an intent before IO and reads the result back. `applied` means attributed write/readback; `unchanged` means the desired category was already present; `reconciled` means present with uncertain attribution. Repeated work does not issue another PATCH. A live metadata mismatch requeues that message for fresh collection/decision rather than permanently abandoning it. Genuine conflicts, permission denials and exhausted mutation budgets remain visible and guarded.
+
+Transient synchronization and pre-write read failures retain their durable jobs and retry with bounded backoff, honoring Retry-After. An outage does not permanently discard a message after a few read attempts. One folder's failure does not prevent independently validated messages from being labeled. Explicit access/shape errors remain blocked for correction. Uncertain mutations are reconciled before another write; later user edits remain protected. Use the [writer diagnostics, retry and rollback commands](outlook-category-writer.md) after stopping the monitor.
+
+For preview only, replace the apply arguments with `--dry-run`. `--check` validates files/qualification offline; startup additionally validates live ownership and credentials. `--once` runs one bounded diagnostic cycle and then stops; it cannot label later arrivals. An exit code alone is not proof that all asynchronous evidence has completed. `--inspect-rules`, after stopping, displays stored explanations without refreshing evidence. Error messages and normal logs use fixed codes and hashed message references; private headers/addresses/tokens stay out of Git and general logs.
+
+The endpoint receipt must match the mailbox/writer and expires within seven days of its probe. Renew it with the existing narrow qualification procedure when needed. Definitions are checked rather than recreated. Preserve the journal and ownership receipts during recovery; do not delete them to bypass ambiguous writes. Header evidence follows the seven-day local retention boundary and decisions the thirty-day boundary. SQLite itself is not encrypted.
+
+Incremental Azure resource cost is **INR 0/month**. Existing Microsoft 365 licences, previously created storage/logging resources and PC costs remain separate. Broader deployment/accuracy claims still require the pilot and measured qualification; optional POC indicators are not a validated regulatory identity control.

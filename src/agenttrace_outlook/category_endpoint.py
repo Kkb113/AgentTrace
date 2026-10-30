@@ -1,4 +1,4 @@
-"""Fixed-mailbox, categories-only conditional updates on inspected synthetic items."""
+"""Fixed-mailbox, categories-only conditional updates on inspected incoming items."""
 
 import hashlib
 import re
@@ -14,7 +14,7 @@ from .category_write_contracts import CategoryEndpointQualification
 from .errors import OutlookError
 
 FIELDS = (
-    "id,changeKey,parentFolderId,receivedDateTime,sentDateTime,isDraft,isRead,subject,"
+    "id,changeKey,parentFolderId,receivedDateTime,sentDateTime,isDraft,isRead,"
     "internetMessageId,internetMessageHeaders,categories"
 )
 
@@ -39,8 +39,6 @@ class CategoryEndpoint:
             row.get("id") != message_id
             or row.get("isDraft") is not False
             or type(row.get("isRead")) is not bool
-            or not isinstance(row.get("subject"), str)
-            or not row["subject"].startswith("AgentTrace synthetic test:")
             or not isinstance(row.get("parentFolderId"), str)
             or not isinstance(row.get("changeKey"), str)
             or not re.fullmatch(
@@ -54,7 +52,7 @@ class CategoryEndpoint:
             )
             or len(set(row["categories"])) != len(row["categories"])
         ):
-            raise OutlookError("category_current_message_invalid_or_not_synthetic")
+            raise OutlookError("category_current_message_invalid")
         return row
 
     @staticmethod

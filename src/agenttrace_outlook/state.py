@@ -11,6 +11,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from threading import RLock
 from uuid import uuid4
 
 from .category_write_schema import CATEGORY_WRITE_SCHEMA
@@ -67,6 +68,7 @@ class StateStore:
         if config.mode != "dry_run":
             raise OutlookError("category_application_not_enabled")
         self.config, self.clock = config, clock
+        self._mutex = RLock()
         self._connection: sqlite3.Connection | None = None
         self._lock: ProcessLock | None = None
         self.lease: Lease | None = None
@@ -91,7 +93,9 @@ class StateStore:
             self._lock = ProcessLock(directory / "runtime.lock")
             fd = os.open(db_path, os.O_RDWR | os.O_CREAT, 0o600)
             os.close(fd)
-            self._connection = sqlite3.connect(db_path, isolation_level=None, timeout=5)
+            self._connection = sqlite3.connect(
+                db_path, isolation_level=None, timeout=5, check_same_thread=False
+            )
             self.db.row_factory = sqlite3.Row
             if self.db.execute("PRAGMA journal_mode=WAL").fetchone()[0].casefold() != "wal":
                 raise OutlookError("wal_unavailable")
@@ -122,30 +126,31 @@ class StateStore:
 
     @contextmanager
     def transaction(self, *, lease: Lease | None = None) -> Iterator[sqlite3.Connection]:
-        try:
-            self.db.execute("BEGIN IMMEDIATE")
-            if lease is not None:
-                row = self.db.execute(
-                    "SELECT owner,generation,expires FROM lease WHERE id=1"
-                ).fetchone()
-                if (
-                    row is None
-                    or row[0] != lease.owner
-                    or row[1] != lease.generation
-                    or row[2] <= self.clock().timestamp()
-                ):
-                    raise OutlookError("lease_lost")
-            yield self.db
-            self.db.execute("COMMIT")
-        except BaseException as error:
-            if self._connection is not None and self.db.in_transaction:
-                try:
-                    self.db.execute("ROLLBACK")
-                except sqlite3.Error:
+        with self._mutex:
+            try:
+                self.db.execute("BEGIN IMMEDIATE")
+                if lease is not None:
+                    row = self.db.execute(
+                        "SELECT owner,generation,expires FROM lease WHERE id=1"
+                    ).fetchone()
+                    if (
+                        row is None
+                        or row[0] != lease.owner
+                        or row[1] != lease.generation
+                        or row[2] <= self.clock().timestamp()
+                    ):
+                        raise OutlookError("lease_lost")
+                yield self.db
+                self.db.execute("COMMIT")
+            except BaseException as error:
+                if self._connection is not None and self.db.in_transaction:
+                    try:
+                        self.db.execute("ROLLBACK")
+                    except sqlite3.Error:
+                        raise OutlookError("state_transaction_failed") from None
+                if isinstance(error, sqlite3.Error):
                     raise OutlookError("state_transaction_failed") from None
-            if isinstance(error, sqlite3.Error):
-                raise OutlookError("state_transaction_failed") from None
-            raise
+                raise
 
     def _migrate_and_bind(self) -> None:
         with self.transaction() as db:
@@ -357,6 +362,8 @@ class StateStore:
                     providers=self.config.sender_source.agent_providers
                     if self.config.sender_source
                     else (),
+                    allow_known_mcp_marker=self.config.known_mcp_marker_poc_enabled,
+                    allow_gmail_api_poc=self.config.gmail_api_agent_poc_enabled,
                 )
                 if (
                     expected.category != decision.category
@@ -470,24 +477,25 @@ class StateStore:
             return result
 
     def close(self) -> None:
-        if self._connection is not None:
-            try:
-                if self.lease is not None:
-                    self.db.execute(
-                        "UPDATE lease SET expires=0 WHERE id=1 AND owner=? AND generation=?",
-                        (self.lease.owner, self.lease.generation),
-                    )
-            except sqlite3.Error:
-                pass
-            finally:
+        with self._mutex:
+            if self._connection is not None:
                 try:
-                    self._connection.close()
+                    if self.lease is not None:
+                        self.db.execute(
+                            "UPDATE lease SET expires=0 WHERE id=1 AND owner=? AND generation=?",
+                            (self.lease.owner, self.lease.generation),
+                        )
                 except sqlite3.Error:
                     pass
-            self._connection = None
-        if self._lock is not None:
-            self._lock.close()
-            self._lock = None
+                finally:
+                    try:
+                        self._connection.close()
+                    except sqlite3.Error:
+                        pass
+                self._connection = None
+            if self._lock is not None:
+                self._lock.close()
+                self._lock = None
 
     def __enter__(self) -> StateStore:
         return self

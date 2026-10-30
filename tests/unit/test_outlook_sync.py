@@ -150,20 +150,20 @@ def test_discovery_activation_body_exclusion_and_restart(tmp_path: Path) -> None
     with StateStore(config(tmp_path), clock=lambda: NOW) as store:
         sync = Synchronizer(store, MailReader(store.config, graph))
         settle(sync)
-        assert store.summary()["decisions"] == 1
+        assert store.summary()["decisions"] == 2
         assert sync.state.summary()["sync_items"] == 3
         assert sync.state.summary()["folders_receiving"] == 3
         assert sync.state.summary()["folders_excluded"] == 4
         assert [
             r[0] for r in store.db.execute("SELECT status FROM sync_items ORDER BY message_id")
-        ] == ["eligible", "history", "non_synthetic"]
+        ] == ["eligible", "history", "eligible"]
         assert (
             "private subject" not in store.db.execute("SELECT payload FROM snapshots").fetchone()[0]
         )
         assert not any("body" in url or "$filter" in url for _, url in graph.calls)
     with StateStore(config(tmp_path), clock=lambda: NOW) as store:
         settle(Synchronizer(store, MailReader(store.config, graph)))
-        assert store.summary()["decisions"] == 1
+        assert store.summary()["decisions"] == 2
 
 
 def test_move_old_tombstone_category_echo_and_real_evidence_change(tmp_path: Path) -> None:
@@ -284,14 +284,15 @@ def test_retry_exhaustion_requires_explicit_retry(tmp_path: Path) -> None:
         sync.run_cycle()
         current += timedelta(seconds=10)
         sync.run_cycle()
-        assert sync.state.summary()["sync_jobs_dead_letter"] == 1
+        assert sync.state.summary()["sync_jobs_dead_letter"] == 0
+        assert sync.state.summary()["sync_retry_waiting"] == 1
         del graph.failures["/mailFolders/drafts"]
-        assert sync.state.retry_failed() == 1
+        current += timedelta(seconds=30)
         settle(sync)
         assert sync.state.summary()["folders_receiving"] == 3
         assert sync.state.summary()["sync_gaps"] == 0
         assert (
-            store.db.execute("SELECT count(*) FROM sync_gaps WHERE resolved=1").fetchone()[0] == 1
+            store.db.execute("SELECT count(*) FROM sync_gaps WHERE resolved=1").fetchone()[0] == 0
         )
 
 
@@ -489,7 +490,7 @@ def test_incomplete_headers_and_current_deleted_copy_are_explicit(tmp_path: Path
         assert store.summary()["outbox_preview"] == 0
 
 
-def test_long_retry_after_is_blocked_instead_of_retrying_early(tmp_path: Path) -> None:
+def test_long_retry_after_is_scheduled_without_retrying_early(tmp_path: Path) -> None:
     graph = Graph()
     graph.failures["/mailFolders/drafts"] = IngestionError(
         "source_throttled", retryable=True, retry_after=3600
@@ -499,9 +500,13 @@ def test_long_retry_after_is_blocked_instead_of_retrying_early(tmp_path: Path) -
         sync.run_cycle()
         assert (
             store.db.execute("SELECT error FROM sync_jobs WHERE key='system:drafts'").fetchone()[0]
-            == "retry_after_requires_operator"
+            == "source_throttled"
         )
-        assert sync.state.summary()["sync_jobs_blocked"] == 1
+        assert sync.state.summary()["sync_jobs_blocked"] == 0
+        assert (
+            store.db.execute("SELECT due FROM sync_jobs WHERE key='system:drafts'").fetchone()[0]
+            >= NOW.timestamp() + 3600
+        )
 
 
 def test_folder_pagination_and_fairness_under_message_backlog(tmp_path: Path) -> None:
@@ -511,7 +516,9 @@ def test_folder_pagination_and_fairness_under_message_backlog(tmp_path: Path) ->
     graph.pages["inbox"] = [[{"id": identity} for identity in graph.messages], []]
     with StateStore(config(tmp_path, sync_operations_per_cycle=5), clock=lambda: NOW) as store:
         sync = Synchronizer(store, MailReader(store.config, graph))
-        settle(sync, cycles=60)
+        # Each new observation yields a cycle to classification. Ready work is
+        # drained without a polling sleep; all 100 still must be processed.
+        settle(sync, cycles=len(graph.messages) + 20)
         assert sync.state.summary()["folders_receiving"] == 3
         assert store.summary()["decisions"] == 100
         urls = [url for _, url in graph.calls]
