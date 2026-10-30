@@ -1,5 +1,7 @@
 # Outlook runtime foundation
 
+Additional dedicated agent sending applications use the [explicit provider enrollment and qualification procedure](../agent-provider-qualification.md). This preserves the frozen terminal demo and requires authenticated send evidence for headerless attribution.
+
 The standalone runner is installable and runs without the historical web/API/content workers, Docker, Azure resources or mailbox credentials. Fixture mode validates configuration and processes **synthetic metadata fixtures** into durable **Unknown previews**. The [mailbox synchronization mode](outlook-mailbox-sync.md) now adds durable read-only Graph collection. The [sender-rule extension](sender-detection-rules.md) adds the approved corroborated POC AI and Human-capable rules. Outlook category application remains disabled. The existing experimental terminal demo remains unchanged.
 
 ## Prepare and run

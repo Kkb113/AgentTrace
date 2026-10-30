@@ -74,7 +74,8 @@
         "sender-rules/unknown/v1",
         "sender-rules/human/v2",
         "sender-rules/human-capable/v1",
-        "sender-rules/claude-corroborated/v1"
+        "sender-rules/claude-corroborated/v1",
+        "sender-rules/provider-corroborated/v1"
       ],
       "title": "Rule Version",
       "type": "string"

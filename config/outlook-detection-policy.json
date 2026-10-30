@@ -1,16 +1,22 @@
 {
   "schema_version": "1.0",
-  "policy_version": "corroborated-poc-human/v2",
-  "labels": {"agent": "AI Agent", "compatible_client": "Human", "unresolved": "Unknown"},
+  "policy_version": "corroborated-poc-human/v3",
+  "labels": {
+    "agent": "AI Agent",
+    "compatible_client": "Human",
+    "unresolved": "Unknown"
+  },
   "human_label_means": "Complete supported-field inspection with no observed automation indicators; includes human-controlled and agent-controlled normal clients",
   "human_identity_proof_claimed": false,
   "agent_rule": "sender-rules/claude-corroborated/v1",
-  "agent_coverage": "Enrolled own-mailbox Claude Microsoft 365 MCP declaration corroborated by authenticated Send audit, current publisher, matching message context and unique provider copies",
+  "agent_coverage": "Enrolled own-mailbox sending applications: successful authenticated Exchange Send, current exact publisher/application pins, matching tenant/mailbox/Message-ID/time and unique provider copies. Claude additionally requires the MCP marker; a separately qualified dedicated agent application can use authenticated application evidence without that marker.",
   "independent_forensic_receipt_identity_claimed": false,
   "known_residual_risk": "An unobservable forged replacement preserving every correlation field may be misclassified",
   "declaration_or_generic_api_alone": "Unknown",
   "failed_or_incomplete_inspection": "Unknown",
   "category_writes_enabled": false,
   "statistical_accuracy_qualified": false,
-  "owner_policy_revision": "Human browser/client policy and corroborated-indicator POC AI rule explicitly approved in this chat on 30 October 2026"
+  "owner_policy_revision": "Human browser/client policy and corroborated-indicator POC AI rule explicitly approved in this chat on 30 October 2026",
+  "provider_rule": "sender-rules/provider-corroborated/v1",
+  "provider_enrollment": "Explicit per-application configuration and live capability qualification; no automatic enrollment by name, API trace or pasted transcript"
 }

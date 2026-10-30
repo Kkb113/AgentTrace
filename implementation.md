@@ -32,7 +32,7 @@ The current POC detects corroborated AI-agent submission indicators and normal-c
 
 | Outlook category | Color / Graph preset | Production meaning |
 | --- | --- | --- |
-| AI Agent | Red / preset0 | The qualified POC rule corroborates the known MCP marker with authenticated enrolled Send evidence, current publisher and unique matching provider-copy context; accepted residual replacement risk remains |
+| AI Agent | Red / preset0 | A qualified POC rule corroborates an enrolled agent application's successful Send with current publisher pins and unique matching provider-copy context. Claude also requires its known MCP marker; separately qualified dedicated applications can use authenticated execution without that header. Accepted residual replacement risk remains |
 | Human | Green / preset4 | Complete supported-field inspection is compatible with a normal client, including a human-controlled or agent-controlled browser; no observed automation indicators or conflicts. This does not prove the controller |
 | Unknown | Yellow / preset3 | Required inspection or AI corroboration is missing, conflicting, failed or outside coverage; includes known conventional automation. Healthy pending audit checks do not establish a controller |
 
@@ -62,6 +62,7 @@ No frontend, custom application UI, public backend API, custom Outlook extension
 | Input or observation | Allowed production treatment |
 | --- | --- |
 | Known MCP declaration corroborated by authenticated enrolled Claude Send, scope/time/Message-ID, current publisher and unique observed copies | AI Agent under the approved indicator-based POC rule; residual replacement risk disclosed |
+| Separately qualified dedicated agent application, with exact application/publisher pins, authenticated successful Exchange Send and unique matching message-copy context | AI Agent under the explicitly enrolled provider rule; no invented universal header. Each application/route requires live qualification |
 | x-ai-generated: mcp-office365 alone | Retain as an agent-origin declaration/hint; Unknown until a rule qualifies its trust and execution link |
 | Received trace containing gmailapi.google.com and HTTPREST alone | API-submission hint; Unknown because ordinary applications can use the same API |
 | Complete supported-field inspection with no observed MCP/API/other automation indicators or conflicts | Human; includes a human- or agent-controlled normal browser/client |
@@ -79,6 +80,8 @@ The active **Human** label retains the accepted normal-client/browser compatibil
 For the POC AI lane, the owner explicitly accepted the known MCP declaration corroborated by an authenticated enrolled Claude Send event, current publisher pin, matching tenant/mailbox/Message-ID/time and a unique observed copy pair. This is a corroborated-indicator rule; it does not claim an independent forensic received-item ID link. Declaration-only and generic-API-only cases remain Unknown. Observable collisions/conflicts are rejected; a carefully forged replacement that leaves no observable difference remains an accepted residual POC risk. No statistical accuracy claim is implied.
 
 Keep the following distinct: independent test ground truth, vendor/source observations, hints, correlation candidates and qualified verdicts. Do not feed operator A/B labels, test subjects, filenames or existing Outlook categories back into prediction. Approximate subject/time/body similarity is not a verified join. Internet Message-ID and provider-local immutable IDs are not interchangeable or universally unique.
+
+Before Phase 7, the [provider qualification extension](docs/agent-provider-qualification.md) adds explicit application/publisher profiles for headerless agent sends. ChatGPT's own-mailbox Outlook test passed authenticated Send/copy qualification and actual category application/readback; Claude and manual controls still pass. The frozen Gmail terminal heuristic remains experimental, and ChatGPT Gmail API-only evidence remains Unknown in production. The [validation record](docs/evidence/agent-provider-validation.json) records actual scope and remaining gaps. This does not add email sending, generic automation attribution, new Azure resources or automatic category rollout.
 
 ## 3. Small implementation and operational design
 

@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from agenttrace_outlook.config import CategoryMapping
-from agenttrace_outlook.sender_rules import AGENT_RULE, POLICY_VERSION
+from agenttrace_outlook.sender_rules import AGENT_RULE, POLICY_VERSION, PROVIDER_RULE
 
 
 def main() -> int:
@@ -20,6 +20,7 @@ def main() -> int:
         "unresolved": "Unknown",
     }
     assert policy["agent_rule"] == AGENT_RULE
+    assert policy["provider_rule"] == PROVIDER_RULE
     for field in (
         "category_writes_enabled",
         "statistical_accuracy_qualified",
@@ -35,7 +36,7 @@ def main() -> int:
         )
     )
     assert accuracy["policy_version"] == POLICY_VERSION
-    assert accuracy["enabled_positive_agent_rules"] == [AGENT_RULE]
+    assert accuracy["enabled_positive_agent_rules"] == [AGENT_RULE, PROVIDER_RULE]
     assert accuracy["initial_window_seconds"] == 7200 and accuracy["late_window_seconds"] == 86400
     assert accuracy["maximum_agent_false_positive_upper_bound"] == 0.001
     assert accuracy["agent_false_positive_one_sided_confidence"] == 0.95

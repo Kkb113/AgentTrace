@@ -6,6 +6,7 @@ import json
 from datetime import timedelta
 from typing import Any
 
+from .agent_providers import AgentProvider
 from .contracts import Observation
 from .errors import OutlookError
 from .sender_rules import POLICY_VERSION, RuleAssessment, enrolled_sender, sha
@@ -49,7 +50,9 @@ class RuleStore:
                 sha(
                     {
                         **source.model_dump(
-                            mode="json", exclude={"audit_identity", "refresh_seconds"}
+                            mode="json",
+                            exclude={"audit_identity", "refresh_seconds"}
+                            | ({"agent_providers"} if not source.agent_providers else set()),
                         ),
                         "audit_client_id": str(source.audit_identity.client_id),
                     }
@@ -191,6 +194,7 @@ class RuleStore:
         refs: tuple[str, ...] = (),
         raw: dict[str, Any] | None = None,
         receipt_context: str = "unqualified",
+        provider: AgentProvider | None = None,
     ) -> None:
         now = self.store.clock()
         payload = {
@@ -204,6 +208,11 @@ class RuleStore:
                 (observation.observed_at + timedelta(days=7)).timestamp(),
             ),
         }
+        if provider is not None:
+            payload.update(
+                provider_fingerprint=provider.fingerprint,
+                provider_client_id=str(provider.client_id),
+            )
         with self.store.transaction(lease=self.store.lease) as db:
             row = db.execute(
                 "SELECT generation FROM rule_jobs WHERE observation_id=?", (job["observation_id"],)

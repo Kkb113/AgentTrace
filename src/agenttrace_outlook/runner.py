@@ -24,7 +24,17 @@ def run_once(store: StateStore) -> int:
             continue
         snapshot = rules.snapshot(observation)
         assessment = (
-            evaluate(observation, snapshot, rules.source(observation_id), now) if snapshot else None
+            evaluate(
+                observation,
+                snapshot,
+                rules.source(observation_id),
+                now,
+                providers=store.config.sender_source.agent_providers
+                if store.config.sender_source
+                else (),
+            )
+            if snapshot
+            else None
         )
         decision = Decision(
             scope=observation.scope,

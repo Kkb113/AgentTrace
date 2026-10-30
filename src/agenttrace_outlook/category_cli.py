@@ -103,6 +103,9 @@ def main(argv: list[str] | None = None) -> int:
                                 rules.source(row[2]),
                                 probe.metadata(decision.message_id),
                                 datetime.now(UTC),
+                                providers=runtime.sender_source.agent_providers
+                                if runtime.sender_source
+                                else (),
                             )
                             rows.append({"message_ref_sha256": reference, "preview": item})
                         except OutlookError as error:

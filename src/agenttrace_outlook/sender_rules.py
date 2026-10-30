@@ -11,13 +11,17 @@ from typing import Any, Literal
 
 from pydantic import Field, ValidationInfo, field_validator
 
+from .agent_providers import AgentProvider, declaration_matches
 from .contracts import Code, Observation, Opaque, Record
 
 RULE_VERSION: Literal["sender-rules/unknown/v1"] = "sender-rules/unknown/v1"
 CLAUDE_APP = "07c030f6-5743-41b7-ba00-0a6e85f37c17"
 HUMAN_RULE: Literal["sender-rules/human/v2"] = "sender-rules/human/v2"
 AGENT_RULE: Literal["sender-rules/claude-corroborated/v1"] = "sender-rules/claude-corroborated/v1"
-POLICY_VERSION = "corroborated-poc-human/v2"
+PROVIDER_RULE: Literal["sender-rules/provider-corroborated/v1"] = (
+    "sender-rules/provider-corroborated/v1"
+)
+POLICY_VERSION = "corroborated-poc-human/v3"
 
 
 class RuleAssessment(Record):
@@ -26,6 +30,7 @@ class RuleAssessment(Record):
         "sender-rules/human/v2",
         "sender-rules/human-capable/v1",
         "sender-rules/claude-corroborated/v1",
+        "sender-rules/provider-corroborated/v1",
     ] = RULE_VERSION
     category: Literal["Unknown", "Human", "AI Agent"] = "Unknown"
     inspection: Literal["complete", "incomplete", "conflicting"]
@@ -160,6 +165,8 @@ def evaluate(
     snapshot: dict[str, Any] | None,
     source: dict[str, Any] | None,
     now: datetime,
+    *,
+    providers: tuple[AgentProvider, ...] = (),
 ) -> RuleAssessment:
     inspection, hints = inspect_snapshot(observation, snapshot)
     reasons = set(hints)
@@ -172,6 +179,9 @@ def evaluate(
     link: Literal["unqualified", "missing", "conflicting", "corroborated_indicators"] = "missing"
     refs: tuple[str, ...] = ()
     agent = False
+    agent_rule: Literal[
+        "sender-rules/claude-corroborated/v1", "sender-rules/provider-corroborated/v1"
+    ] = AGENT_RULE
     if source:
         refs = tuple(source.get("evidence_refs", ()))
         if (
@@ -194,15 +204,37 @@ def evaluate(
                 )
                 if r.get("name", "").lower() == "x-ai-generated"
             ]
+            provider = next(
+                (p for p in providers if p.fingerprint == source.get("provider_fingerprint")),
+                None,
+            )
+            provider_bound = (
+                provider is not None
+                and provider.evidence_ref in refs
+                and source.get("provider_client_id") == str(provider.client_id)
+            )
+            legacy = (
+                source.get("provider_fingerprint") is None
+                and source.get("provider_client_id") is None
+            )
+            if not legacy and not provider_bound:
+                reasons.add("enrolled_provider_pin_unavailable_or_changed")
             if (
                 inspection == "complete"
-                and declarations == ["mcp-office365"]
+                and (legacy or provider_bound)
+                and declaration_matches(provider, declarations)
                 and source.get("receipt_context") == "corroborated_scope_messageid_time"
             ):
                 agent, link = True, "corroborated_indicators"
                 reasons.discard("received_copy_link_unqualified")
                 reasons.discard("untrusted_agent_declaration")
-                reasons.add("known_mcp_marker_corroborated")
+                reasons.add(
+                    "enrolled_application_send_corroborated"
+                    if provider_bound
+                    else "known_mcp_marker_corroborated"
+                )
+                if provider_bound:
+                    agent_rule = PROVIDER_RULE
                 reasons.add("corroborated_poc_indicators_not_forensic_identity")
         elif source.get("status") == "conflicting":
             execution, link, human = "conflicting", "conflicting", False
@@ -213,6 +245,9 @@ def evaluate(
         ):
             execution = "not_established"
             reasons.add("compatible_path_does_not_establish_controller")
+            if providers and source.get("status") == "pending":
+                human = False
+                reasons.add("enrolled_application_audit_pending")
         else:
             execution = "not_established"
             reasons.add(str(source.get("reason", "completed_send_evidence_missing")))
@@ -224,8 +259,10 @@ def evaluate(
         reasons.add("late_observation_window_closed")
     elif observation.observed_at + timedelta(hours=2) <= now:
         reasons.add("initial_evidence_window_closed")
+    if not human:
+        reasons.discard("compatible_client_path_not_human_identity")
     return RuleAssessment(
-        rule_version=AGENT_RULE if agent else HUMAN_RULE if human else RULE_VERSION,
+        rule_version=agent_rule if agent else HUMAN_RULE if human else RULE_VERSION,
         category="AI Agent" if agent else "Human" if human else "Unknown",
         inspection=inspection,
         human_candidate=human,
@@ -245,6 +282,7 @@ def qualify_exchange_send(
     message_id: str,
     sent_at: datetime,
     publisher_current: bool,
+    client_id: str = CLAUDE_APP,
 ) -> tuple[str, str, tuple[str, ...]]:
     """Source semantics only. This does not bind an audit item to a received copy."""
     if not publisher_current:
@@ -317,7 +355,7 @@ def qualify_exchange_send(
     ref = "audit-sha256:" + sha(record)
     if (
         common
-        and data.get("ClientAppId") != CLAUDE_APP
+        and data.get("ClientAppId") != client_id
         and str(data.get("ClientInfoString", "")).split(";")[0].lower()
         in {"client=owa", "client=outlook", "client=outlookservice", "client=msexchangerpc"}
     ):
@@ -326,7 +364,7 @@ def qualify_exchange_send(
         common
         and data.get("ClientAppId")
         == data.get("AppAccessContext", {}).get("ClientAppId")
-        == CLAUDE_APP
+        == client_id
         and isinstance(data.get("ClientRequestId"), str)
         and 1 <= len(data["ClientRequestId"]) <= 2048
     )

@@ -8,6 +8,7 @@ from typing import Any, Literal
 
 from pydantic import AwareDatetime, Field, model_validator
 
+from .agent_providers import AgentProvider
 from .contracts import Code, Observation, Opaque, Record, Scope, Sha256
 
 Actor = Literal["human", "ai_agent", "non_ai_automation", "unresolved"]
@@ -34,6 +35,7 @@ class Enrollment(Record):
     exchange_mailbox_guid: str = Field(min_length=1, max_length=100, repr=False)
     publisher_id: str = Field(min_length=1, max_length=100)
     publisher_owner_tenant: str = Field(min_length=1, max_length=100)
+    agent_providers: tuple[AgentProvider, ...] = Field(default=(), max_length=20)
 
 
 class SourceCapture(Record):

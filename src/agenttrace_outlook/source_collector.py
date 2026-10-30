@@ -6,11 +6,12 @@ import json
 from datetime import datetime, timedelta
 from typing import Any
 
+from .agent_providers import AgentProvider, declaration_matches, provider_for_send
 from .audit_source import AuditReader, publisher_snapshot
 from .errors import SourceError
 from .reader import MailReader
 from .rule_store import RuleStore
-from .sender_rules import corroborated_copy_context, qualify_exchange_send, sha
+from .sender_rules import CLAUDE_APP, corroborated_copy_context, qualify_exchange_send, sha
 from .state import StateStore
 
 
@@ -21,15 +22,43 @@ class SenderCollector:
         self.mail = mail
         self._publisher: dict[str, Any] | None = None
         self._publisher_expires = 0.0
+        self._publishers: dict[str, tuple[dict[str, Any], float]] = {}
 
-    def _publisher_current(self) -> bool:
+    def _publisher_current(self, provider: AgentProvider | None = None) -> bool:
         now = self.store.clock().timestamp()
-        if self._publisher and now < self._publisher_expires:
+        key = provider.fingerprint if provider else "legacy_claude"
+        cached = self._publishers.get(key)
+        if cached and now < cached[1]:
+            self._publisher, self._publisher_expires = cached
             return True
         self._publisher = None
-        self._publisher = publisher_snapshot(self.store.config)
+        self._publishers.pop(key, None)
+        self._publisher = (
+            publisher_snapshot(self.store.config, provider)
+            if provider
+            else publisher_snapshot(self.store.config)
+        )
         self._publisher_expires = self.store.clock().timestamp() + 300
+        self._publishers[key] = self._publisher, self._publisher_expires
         return True
+
+    def _qualify(
+        self, records: list[dict[str, Any]], snapshot: dict[str, Any], sent: datetime
+    ) -> tuple[str, str, tuple[str, ...], AgentProvider | None]:
+        source = self.store.config.sender_source
+        assert source is not None
+        provider = provider_for_send(records, snapshot["internetMessageId"], source.agent_providers)
+        status, reason, refs = qualify_exchange_send(
+            records,
+            tenant=str(self.store.config.scope.tenant_id),
+            mailbox=source.mailbox_address,
+            mailbox_guid=str(source.exchange_mailbox_guid),
+            message_id=snapshot["internetMessageId"],
+            sent_at=sent,
+            publisher_current=self._publisher_current(provider),
+            client_id=str(provider.client_id) if provider else CLAUDE_APP,
+        )
+        return status, reason, (*refs, *((provider.evidence_ref,) if provider else ())), provider
 
     def step(self) -> bool:
         self.rules.prepare()
@@ -48,7 +77,8 @@ class SenderCollector:
         source = self.store.config.sender_source
         assert source is not None
         try:
-            self._publisher_current()
+            if not source.agent_providers:
+                self._publisher_current()
             sent = datetime.fromisoformat(snapshot["sentDateTime"])
             if sent.tzinfo is None:
                 raise SourceError("source_timestamp_invalid")
@@ -119,15 +149,7 @@ class SenderCollector:
                         records=records,
                     )
                 else:
-                    status, reason, refs = qualify_exchange_send(
-                        records,
-                        tenant=str(self.store.config.scope.tenant_id),
-                        mailbox=source.mailbox_address,
-                        mailbox_guid=str(source.exchange_mailbox_guid),
-                        message_id=snapshot["internetMessageId"],
-                        sent_at=sent,
-                        publisher_current=self._publisher_current(),
-                    )
+                    status, reason, refs, provider = self._qualify(records, snapshot, sent)
                     publisher_ref = "publisher-sha256:" + sha(self._publisher)
                     declarations = [
                         r["value"].strip().lower()
@@ -136,7 +158,7 @@ class SenderCollector:
                     ]
                     if (
                         status == "verified_enrolled_send"
-                        and declarations == ["mcp-office365"]
+                        and declaration_matches(provider, declarations)
                         and self.mail is not None
                     ):
                         self.rules.update(
@@ -149,6 +171,7 @@ class SenderCollector:
                         status=status,
                         reason=reason,
                         refs=(*refs, publisher_ref),
+                        provider=provider,
                         raw={
                             "records": records,
                             "publisher": self._publisher,
@@ -204,20 +227,13 @@ class SenderCollector:
                     ]
                     sent_folder = self.mail.well_known("sentitems")["id"]
                     good = corroborated_copy_context(observation, snapshot, copies, sent_folder)
-                    status, reason, refs = qualify_exchange_send(
-                        audits,
-                        tenant=str(self.store.config.scope.tenant_id),
-                        mailbox=source.mailbox_address,
-                        mailbox_guid=str(source.exchange_mailbox_guid),
-                        message_id=snapshot["internetMessageId"],
-                        sent_at=sent,
-                        publisher_current=self._publisher_current(),
-                    )
+                    status, reason, refs, provider = self._qualify(audits, snapshot, sent)
                     self.rules.capture(
                         job,
                         observation,
                         status=status if good else "conflicting",
                         reason=reason if good else "message_copy_collision_or_context_conflict",
+                        provider=provider,
                         refs=(
                             *refs,
                             "publisher-sha256:" + sha(self._publisher),

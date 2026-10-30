@@ -3,6 +3,7 @@
 from datetime import datetime
 from typing import Any
 
+from .agent_providers import AgentProvider
 from .category_contracts import CategoryOwnership, MasterCategory
 from .category_ownership import verify_ownership
 from .contracts import Decision, Observation
@@ -20,6 +21,8 @@ def category_preview(
     source: dict[str, Any] | None,
     message: dict[str, Any],
     now: datetime,
+    *,
+    providers: tuple[AgentProvider, ...] = (),
 ) -> dict[str, Any]:
     verify_ownership(registry, inventory)
     require_annotation_eligible(decision, registry.scope, now)
@@ -30,7 +33,7 @@ def category_preview(
     ):
         raise OutlookError("category_preview_observation_mismatch")
     if decision.rule_version.startswith("sender-rules/"):
-        current = evaluate(observation, snapshot, source, now)
+        current = evaluate(observation, snapshot, source, now, providers=providers)
         if current.category != decision.category or current.rule_version != decision.rule_version:
             raise OutlookError("category_preview_evidence_stale")
         if tuple(current.reason_codes) != decision.reason_codes:
