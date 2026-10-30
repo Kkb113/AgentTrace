@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0",
+  "executed_at": "2026-10-30T09:06:26.426088+00:00",
+  "scope": "Owner-requested simple operator-run POC; replaces dedicated-account deployment",
+  "status": "validated_for_revised_poc_scope",
+  "detection_code_changed": false,
+  "detection_source_commit": "cbb5c79726d69a907c6f2d0e84bfc2ee7078915e",
+  "detection_source_sha256": "039f731d02b40a48b065420333755e83dbdbe282a5518efe56a76072f574c2e2",
+  "existing_configuration_validated": true,
+  "existing_operator_credentials_reused": true,
+  "mailbox_collection": "read_only_delta",
+  "actual_runs": {
+    "first_cycle_observations": 2,
+    "restart_cycle_observations": 2,
+    "after_interrupt_observations": 2,
+    "final_sync_health": "current",
+    "final_pending_items": 0,
+    "final_sync_gaps": 0,
+    "final_blocked_jobs": 0,
+    "final_metadata_items": 115,
+    "receiving_folders": 5,
+    "eligible_synthetic_messages": 2,
+    "stored_case_labels": [
+      "Unknown",
+      "AI Agent"
+    ],
+    "classification_inspection_is_stored_evidence": true
+  },
+  "ctrl_c": {
+    "python_operator_interrupt_stop_event_observed": true,
+    "windows_terminal_wrapper_exit_code": 1,
+    "subsequent_restart_exit_code": 0,
+    "state_lock_released": true
+  },
+  "targeted_regressions": {
+    "passed": 201,
+    "skipped": 1,
+    "junit": {
+      "tests": 202,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "coverage": [
+      "sender rule qualification and counterexamples",
+      "explicit provider pins",
+      "mailbox synchronization and failure handling",
+      "state locking and crash/restart recovery",
+      "category write guards"
+    ]
+  },
+  "mail_sent": 0,
+  "mailbox_category_writes": 0,
+  "new_azure_resources": 0,
+  "new_entra_permissions": 0,
+  "new_publisher_reader_created": false,
+  "incremental_azure_resource_cost_inr_month": 0,
+  "automatic_category_application_enabled": false,
+  "background_service_running": false,
+  "discarded_design": {
+    "uncommitted_complex_code_archived_and_removed": true,
+    "old_elevated_entrypoint_retired_to_noop": true,
+    "unused_dedicated_monitor_disabled": true,
+    "local_account_and_manual_only_tasks_and_unregistered_machine_certificates_not_deleted": true,
+    "previous_mailbox_state_category_ownership_and_unrelated_work_preserved": true
+  },
+  "private_log_sha256": {
+    "simple-poc-first-cycle": "6fd60670bc18ae0b5327fe95ba8618ef0c80523df7624940d7c66468e0670cb6",
+    "simple-poc-restart-cycle": "087187f193a95e907b7186d2a85370cd1847c50f82c11183fb777fa8d806a559",
+    "simple-poc-after-interrupt": "a44836b82182c82d1c3f44678df8ddc57582c56e8e3023811c0e62b8c156685f"
+  },
+  "limits": [
+    "PC and process must stay running; no sign-out/reboot-survival claim",
+    "Synthetic-only scope; no new ordinary-mail data-handling authorization",
+    "Existing authentication may require operator renewal",
+    "Generic Gmail API evidence alone remains Unknown",
+    "No population-level accuracy claim or unattended production-release claim"
+  ]
+}
