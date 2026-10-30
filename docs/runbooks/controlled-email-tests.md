@@ -6,12 +6,12 @@ Test actual sending actions, not writing style. Operators send harmless syntheti
 
 | Actual operator action | Expected supported POC result |
 | --- | --- |
-| Manually send in Outlook, including copied AI-written wording | Human-capable when complete inspection shows no automation/conflict |
-| Manually send Gmail → Outlook | Human-capable when the received fields meet the same inspection policy |
+| Manually send in Outlook, including copied AI-written wording | Human when complete inspection shows no automation/conflict |
+| Manually send Gmail → Outlook | Human when the received fields meet the same inspection policy |
 | Claude Microsoft 365 connector executes Send, with or without approval | AI Agent when the known marker, authenticated Send, publisher and copy-context evidence qualify; otherwise Unknown |
 | Generic Gmail API/MCP-looking header without enrolled corroboration | Unknown; API submission alone does not establish an AI executor |
 | Incomplete inspection, failed/stale/conflicting required evidence | Unknown |
-| Normal browser controlled by a person or agent | Human-capable under the previously approved compatibility policy |
+| Normal browser controlled by a person or agent | Human under the previously approved compatibility policy |
 
 Record which action was actually performed before inspecting the result. Use the same harmless wording for manual and agent messages. The action log supplies expected outcomes only; subjects, expected labels and body origin must not feed the classifier. These results do not prove human identity or universal agent coverage.
 

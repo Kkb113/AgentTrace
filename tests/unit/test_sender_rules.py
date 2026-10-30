@@ -125,17 +125,14 @@ def install(store: StateStore, raw: dict[str, Any]) -> int:
     return store.pending(1)[0][0]
 
 
-def test_clean_manual_policy_is_human_capable_not_human_identity() -> None:
+def test_clean_manual_policy_is_human_label_not_human_identity() -> None:
     raw = snapshot()
     result = evaluate(observation(raw), raw, None, NOW)
     assert result.inspection == "complete" and result.human_candidate is True
-    assert (
-        result.category == "Human-capable"
-        and result.human_support == "supported_client_compatibility"
-    )
+    assert result.category == "Human" and result.human_support == "supported_client_compatibility"
 
 
-def test_browser_agent_and_human_are_both_human_capable_under_owner_policy() -> None:
+def test_browser_agent_and_human_are_both_human_label_under_owner_policy() -> None:
     # Ground truth deliberately stays outside detector input. Same received
     # observables can result from human clicks or agent-controlled browser clicks.
     raw = snapshot()
@@ -144,7 +141,7 @@ def test_browser_agent_and_human_are_both_human_capable_under_owner_policy() -> 
         evaluate(obs, copy.deepcopy(raw), None, NOW) for truth in ("manual_human", "browser_agent")
     ]
     assert outputs[0] == outputs[1]
-    assert all(v.human_candidate and v.category == "Human-capable" for v in outputs)
+    assert all(v.human_candidate and v.category == "Human" for v in outputs)
 
 
 @pytest.mark.parametrize(
@@ -522,7 +519,7 @@ def test_agent_action_does_not_depend_on_approval_or_text_origin(approval: str) 
     assert qualify([row])[0] == "verified_enrolled_send"
     raw = snapshot()
     before = evaluate(observation(raw), raw, None, NOW)
-    assert before.category == "Human-capable"  # Pasted AI drafting is not a send signal.
+    assert before.category == "Human"  # Pasted AI drafting is not a send signal.
 
 
 def test_folded_headers_are_supported_but_unfolded_injection_is_not() -> None:

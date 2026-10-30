@@ -4,7 +4,7 @@
 - **Repository:** [Kkb113/AgentTrace](https://github.com/Kkb113/AgentTrace)
 - **Revision:** 30 October 2026 — Outlook-native production POC.
 - **Deliverable:** A new, maintainable Python monitor that classifies received email and applies native Outlook color categories.
-- **Outlook categories:** **AI Agent** (red), **Human-capable** (green), **Unknown** (yellow).
+- **Outlook categories:** **AI Agent** (red), **Human** (green), **Unknown** (yellow).
 - **Scope:** Sender/action detection only; no AI-written-text detection.
 - **Interface:** Outlook itself, plus a terminal and local operational reports. No standalone application, web dashboard, custom backend API, Office.js add-in or custom icon framework.
 - **Deployment:** One designated Microsoft 365 mailbox, one supervised worker on a suitable always-on Windows host initially. Outlook can be closed; the monitor host must remain available.
@@ -18,29 +18,29 @@ The owner now wants the successful terminal demonstration refined into a reliabl
 
 Preserve the existing demo, its command and its tests. The demo intentionally uses a binary experimental rule: the Office365 MCP declaration or Gmail API trace produces an AI label; other messages produce a human label. The latest targeted suite passed 51 tests and 65 subtests, and an existing Outlook capture reproduced the declaration match. These are engineering/demo results, not a measured production false-positive rate.
 
-The production monitor must be a separate entry point with **AI Agent / Human-capable / Unknown** decisions. The latest owner policy classifies fully inspected normal-client-compatible mail as Human-capable, including a browser controlled by either a person or an agent, independently of text origin. Incomplete inspection, unavailable headers, observed automation clues and conflicts remain Unknown. Existing demo shortcuts and results are not production qualification.
+The production monitor must be a separate entry point with **AI Agent / Human / Unknown** decisions. The latest owner policy classifies fully inspected normal-client-compatible mail as Human, including a browser controlled by either a person or an agent, independently of text origin. Incomplete inspection, unavailable headers, observed automation clues and conflicts remain Unknown. Existing demo shortcuts and results are not production qualification.
 
 A [recorded authenticated Claude test](docs/evidence/agent-audit-fallback-validation.json) separately demonstrated the narrow enrolled Microsoft 365 connector route using successful Exchange Send audit evidence and a unique scoped message link. Reuse its verified collection/rule components where appropriate. It is not universal Claude attribution, and sender-to-received-copy linkage still needs its own collision and transformation tests. Graph activity-log delivery remains unqualified and must not be a hidden prerequisite.
 
 Earlier repository Phases 0–4 and their reports remain historical evidence under the previous baseline. The **new phase numbering below is a replanned delivery sequence**, not a claim that the first five phases of this sequence are already complete. Existing incomplete evaluation work and legacy v1 contracts must be preserved; migrate only what the new monitor actually needs.
 
-The owner-approved [Human-capable and corroborated-indicator revision](docs/adr/human-capable-classification.md) supersedes the earlier Human/controller and independent receipt-identity requirements for this POC. Historical Phase 0 reports remain records of their prior baseline.
+The owner-approved [three-label revision](docs/adr/simple-classification-labels.md) uses only AI Agent, Human and Unknown. It preserves the [accepted compatibility and corroborated-indicator semantics](docs/adr/human-capable-classification.md) that superseded earlier Human/controller and independent receipt-identity requirements. Historical reports remain records of their prior baseline and names; current output uses the simple names.
 
 ## 1. Product contract and coverage
 
-The current POC detects corroborated AI-agent submission indicators and normal-client compatibility. An enrolled agent tool sending after human approval is an AI-agent case; manually sending an AI-written draft is Human-capable when inspection shows no automation indicators. An agent controlling a normal browser/client also falls under Human-capable by the owner's explicit policy. These labels do not establish a biological controller or independent forensic item identity.
+The current POC detects corroborated AI-agent submission indicators and normal-client compatibility. An enrolled agent tool sending after human approval is an AI-agent case; manually sending an AI-written draft is Human when inspection shows no automation indicators. An agent controlling a normal browser/client also falls under Human by the owner's explicit policy. These labels do not establish a biological controller or independent forensic item identity.
 
 | Outlook category | Color / Graph preset | Production meaning |
 | --- | --- | --- |
 | AI Agent | Red / preset0 | The qualified POC rule corroborates the known MCP marker with authenticated enrolled Send evidence, current publisher and unique matching provider-copy context; accepted residual replacement risk remains |
-| Human-capable | Green / preset4 | Complete supported-field inspection is compatible with a normal client, including a human-controlled or agent-controlled browser; no observed automation indicators or conflicts. This does not prove the controller |
+| Human | Green / preset4 | Complete supported-field inspection is compatible with a normal client, including a human-controlled or agent-controlled browser; no observed automation indicators or conflicts. This does not prove the controller |
 | Unknown | Yellow / preset3 | Required inspection or AI corroboration is missing, conflicting, failed or outside coverage; includes known conventional automation. Healthy pending audit checks do not establish a controller |
 
 Pending source evidence is an internal state/reason within Unknown, not a fourth Outlook category. A database/source failure is an operational failure, not evidence of either actor. If an initial message cannot be read or a category write fails, report it as unprocessed/apply-pending; do not claim that Unknown was successfully applied.
 
 Use native Outlook categories rather than custom icons or an add-in. The category name remains readable without color, and the worker applies names from the mailbox's master category list. Actual shades and placement vary by Outlook client; test the web and new Windows clients rather than promising identical rendering. [Microsoft category model and colors](https://learn.microsoft.com/en-us/graph/api/resources/outlookcategory?view=graph-rest-1.0).
 
-Default visible names are AI Agent, Human-capable and Unknown. Provision them only when absent or explicitly enrolled as AgentTrace-owned. If those names already belong to the user, stop setup with a conflict; use an explicitly configured namespaced alternative rather than silently adopting, recoloring or deleting user categories. Record category IDs, names, presets and ownership in private configuration.
+Default visible names are AI Agent, Human and Unknown. Provision them only when absent or explicitly enrolled as AgentTrace-owned. If those names already belong to the user, stop setup with a conflict; use an explicitly configured namespaced alternative rather than silently adopting, recoloring or deleting user categories. Record category IDs, names, presets and ownership in private configuration.
 
 Record annotation lifetime explicitly. Start with the thirty-day decision window: expire or remove the unchanged service-owned label when its supporting decision expires, unless a separately accepted annotation policy permits a longer lifetime. Do not silently retain authoritative-looking native labels forever after deleting their evidence. Failed expiry cleanup is a visible operational backlog; it must not reset the original retention deadline.
 
@@ -64,17 +64,17 @@ No frontend, custom application UI, public backend API, custom Outlook extension
 | Known MCP declaration corroborated by authenticated enrolled Claude Send, scope/time/Message-ID, current publisher and unique observed copies | AI Agent under the approved indicator-based POC rule; residual replacement risk disclosed |
 | x-ai-generated: mcp-office365 alone | Retain as an agent-origin declaration/hint; Unknown until a rule qualifies its trust and execution link |
 | Received trace containing gmailapi.google.com and HTTPREST alone | API-submission hint; Unknown because ordinary applications can use the same API |
-| Complete supported-field inspection with no observed MCP/API/other automation indicators or conflicts | Human-capable; includes a human- or agent-controlled normal browser/client |
+| Complete supported-field inspection with no observed MCP/API/other automation indicators or conflicts | Human; includes a human- or agent-controlled normal browser/client |
 | Missing/unavailable header inspection, source failure or merely absent audit records | Unknown; absence caused by collection failure cannot imply Human |
 | Ordinary Outlook/Gmail session, client header, SPF/DKIM/DMARC pass or sender certificate alone | Context, not send-executor proof |
-| Normal-client/browser-compatible evidence | Human-capable with compatibility basis; no human-controller identity assertion |
+| Normal-client/browser-compatible evidence | Human with compatibility basis; no human-controller identity assertion |
 | Non-AI script, alert, rule or auto-reply | Unknown, with conventional-automation context in the decision record |
-| Agent draft manually sent in a normal client, without observed automation indicators | Human-capable; text origin does not establish send execution |
+| Agent draft manually sent in a normal client, without observed automation indicators | Human; text origin does not establish send execution |
 | Conflicting executors, duplicate/forged IDs, revoked issuer or incomplete source pages | Unknown with explicit reasons |
 
 The Office365 declaration is useful and remains supported as evidence; it cannot become a universal authenticated detector just because the demo matched it. A domain signature alone does not establish that a particular AI workflow created a header. Qualify any stronger declaration route with independently verified source semantics, tamper protection and actual negative tests before enabling a positive category.
 
-The owner revised the active Human policy to **Human-capable**: normal-client/browser-compatible sending is accepted whether a human or an agent controls the client. Complete inspection without automation indicators may produce this bounded compatibility label; it does not establish a human controller. Browser-agent indistinguishability is therefore a supported policy case, not a blocker. Failures, incomplete inspection, known automation and conflicts remain Unknown. See the [accepted policy revision](docs/adr/human-capable-classification.md).
+The active **Human** label retains the accepted normal-client/browser compatibility policy whether a human or an agent controls the client. Complete inspection without automation indicators may produce this label; it does not establish a human controller. Browser-agent indistinguishability is therefore a supported policy case, not a blocker. Failures, incomplete inspection, known automation and conflicts remain Unknown. See the [current naming and migration record](docs/adr/simple-classification-labels.md).
 
 For the POC AI lane, the owner explicitly accepted the known MCP declaration corroborated by an authenticated enrolled Claude Send event, current publisher pin, matching tenant/mailbox/Message-ID/time and a unique observed copy pair. This is a corroborated-indicator rule; it does not claim an independent forensic received-item ID link. Declaration-only and generic-API-only cases remain Unknown. Observable collisions/conflicts are rejected; a carefully forged replacement that leaves no observable difference remains an accepted residual POC risk. No statistical accuracy claim is implied.
 
@@ -89,7 +89,7 @@ The separate runner is scripts/monitor-outlook-mail.py (also installed as agentt
 | Runtime | Pinned Python dependencies, typed configuration and strict decision records; no new web server |
 | Reader | Existing mailbox-scoped read identity and metadata/header-only Graph reads |
 | Audit | Existing separate authorized audit reader; bounded message/actor/time queries and asynchronous reassessment |
-| Verdict | Versioned AI Agent / Human-capable / Unknown with reason codes, evidence references, source freshness and qualification |
+| Verdict | Versioned AI Agent / Human / Unknown with reason codes, evidence references, source freshness and qualification |
 | State | SQLite transactions/WAL on an encrypted, ACL-protected local disk for one host/worker; use the existing isolated PostgreSQL only if an actual deployment need justifies it |
 | Checkpoints | Durable per-mailbox/per-folder delta cursors, pending-page state, deduplication and activation/backfill boundary |
 | Work | Transactional decision plus category-write intent, bounded retries and separate observed/decided/apply-pending/applied/dead-letter states |
@@ -110,7 +110,7 @@ Initial synchronization may enumerate older metadata, but only the activation/ba
 
 ### Decisions and late evidence
 
-Persist the decision/rule/source version and exact evidence references before writing. Record source-event, observation, decision and category-confirmation times separately. Unknown may later become AI Agent or Human-capable when sufficient evidence arrives; invalidated positive evidence can downgrade a result. Do not use the demo's two-hour timeout as proof of a human sender. Retain a configurable pending window and late reassessment protocol; record the initial and final result for measurement.
+Persist the decision/rule/source version and exact evidence references before writing. Record source-event, observation, decision and category-confirmation times separately. Unknown may later become AI Agent or Human when sufficient evidence arrives; invalidated positive evidence can downgrade a result. Do not use the demo's two-hour timeout as proof of a human sender. Retain a configurable pending window and late reassessment protocol; record the initial and final result for measurement.
 
 Only a qualified, versioned production decision can enter the live category outbox. Experimental demo verdicts and legacy no-agent-observed negatives must be rejected by the writer. Legacy records can remain historical; no full migration of obsolete content APIs/workers is required to ship this small monitor.
 
@@ -154,7 +154,7 @@ Operational hardening, controlled POC validation and population-level accuracy a
 | --- | --- |
 | G1 — Agent false positives | One-sided 95% upper bound ≤0.1% for the union of every enabled positive agent rule. At least 3,000 independent representative zero-error non-agent sends is one sufficient binomial case; ordinary automation is included |
 | G2 — Supported-path recall | ≥99% observed recall on ≥1,000 independent agent sends across qualified available sources and approval/autonomy cases, with intervals; report all-path recall and unknowns separately |
-| H1/H2 — Human-capable semantics | Complete supported-field inspection and no observed automation/conflicts. Human- and agent-controlled browser cases are policy-positive for compatibility; do not report this label as proof of a human executor. Evaluate marker bypass and unsupported coverage separately |
+| H1/H2 — Human semantics | Complete supported-field inspection and no observed automation/conflicts. Human- and agent-controlled browser cases are policy-positive for compatibility; do not report this label as proof of a human executor. Evaluate marker bypass and unsupported coverage separately |
 | S1 — Semantic safety | No AI category from drafting/recipient reads, generic API use, an untrusted declaration or text origin alone; no Human fallback after incomplete inspection, collection errors or conflicting/automation evidence |
 | O1 — Durable processing | No silent observable-event loss or duplicate logical decisions across pagination, crashes, moves, expired cursors, restarts or throttling |
 | O2 — Classification latency | P95 <5 seconds after the last required evidence is available to the worker; separately measure polling, source lag, outbox and Outlook display delay |
@@ -167,7 +167,7 @@ Unknown and pending known-agent positives at the frozen deadline are recall miss
 
 Use controlled actual-email tests first to find defects. Record observed results and sample counts without claiming the 0.1% bound. Broad production-accuracy claims remain gated by G1/G2 evidence. Keep the existing two-hour initial and twenty-four-hour late-observation protocol and report source lag and later reassessments rather than quietly changing a test's timing.
 
-The three labels follow the accepted POC semantics. Human-capable is not a human-identity result; browser-driven agents intentionally share that compatibility label. Phase 4 validates the supported POC using actual emails; independent population-accuracy measurements remain unqualified until separately performed. Report blind spots and accepted copied-ID/replacement risk alongside observed results.
+The three labels follow the accepted POC semantics. Human is not a human-identity result; browser-driven agents intentionally share that compatibility label. Phase 4 validates the supported POC using actual emails; independent population-accuracy measurements remain unqualified until separately performed. Report blind spots and accepted copied-ID/replacement risk alongside observed results.
 
 ## 5. Phase-wise implementation
 
@@ -178,7 +178,7 @@ Every phase has an objective, implementation scope, expected outcomes, validatio
 | 0 | Freeze Outlook-native production scope and source feasibility | Complete; [review](docs/outlook-production-baseline.md), [exit evidence](docs/evidence/outlook-production-baseline-validation.json) |
 | 1 | Separate production runner, contracts and durable state foundation | Complete; [review](docs/outlook-runtime-review.md), [exit evidence](docs/evidence/outlook-runtime-validation.json) |
 | 2 | Reliable incoming-mail synchronization and restart recovery | Complete; [review](docs/outlook-sync-review.md), [exit evidence](docs/evidence/outlook-sync-validation.json) |
-| 3 | Corroborated POC AI / Human-capable rules and conservative Unknown policy | Complete under the owner-approved POC semantics; [review](docs/sender-rule-qualification.md), [exit evidence](docs/evidence/sender-rule-validation.json) |
+| 3 | Corroborated POC AI / Human rules and conservative Unknown policy | Complete under the owner-approved POC semantics; [review](docs/sender-rule-qualification.md), [exit evidence](docs/evidence/sender-rule-validation.json) |
 | 4 | Controlled actual-email POC and adversarial validation | Complete under the owner-operated POC revision; [actual-email evidence](docs/evidence/controlled-email-poc-validation.json), [review](docs/sender-accuracy-review.md) |
 | 5 | Scoped category permissions, ownership and setup preview | Not started; no new grants |
 | 6 | Safe category writer, idempotency and rollback | Not started |
@@ -261,14 +261,14 @@ Executed evidence: [engineering review](docs/outlook-sync-review.md), [clean-sou
 
 ## Phase 3 — Qualify sender-evidence rules
 
-**Objective:** Qualify the approved corroborated AI-agent rule and Human-capable compatibility rule, with Unknown for incomplete, conflicting or unsupported evidence.
+**Objective:** Qualify the approved corroborated AI-agent rule and Human compatibility rule, with Unknown for incomplete, conflicting or unsupported evidence.
 
 **Implementation work**
 
 - Adapt the enrolled Claude/Exchange Send rule with authenticated capture, publisher/source enrollment, completed-send semantics and exact scoped joins.
 - Implement the owner-approved corroborated POC copy-context checks; reject observable collisions and contradictions. Document the unobservable copied-ID/replacement risk; do not claim independent forensic item identity.
 - Parse Office365 MCP and Gmail API hints as context; positive promotion requires a separately documented qualified trust rule.
-- Implement Human-capable after complete supported-field inspection without observed automation/conflicts. Human- and agent-controlled normal browsers share this compatibility label; ordinary automation and incomplete/error cases remain explicit.
+- Implement Human after complete supported-field inspection without observed automation/conflicts. Human- and agent-controlled normal browsers share this compatibility label; ordinary automation and incomplete/error cases remain explicit.
 - Add source freshness, revocation, pending/late reassessment and deterministic versioned downgrade behavior.
 
 **Expected outcomes:** Source-specific rules, evidence explanations and actual qualified/unavailable capability states.
@@ -279,11 +279,11 @@ Executed evidence: [engineering review](docs/outlook-sync-review.md), [clean-sou
 
 - [x] Qualified agent routes work with actual authenticated evidence and precise coverage limits.
 - [x] Declaration/API-only and missing-evidence cases return Unknown.
-- [x] Human-capable behavior is qualified for the approved compatibility semantics, with real manual-client evidence and browser-controller equivalence tests.
+- [x] Human behavior is qualified for the approved compatibility semantics, with real manual-client evidence and browser-controller equivalence tests.
 - [x] Source outages/conflicts/revocations cannot create an unsupported affirmative label.
 - [x] Observable copy-collision/conflict attacks are rejected; unobservable replacement risk is explicitly accepted and recorded before POC preview enablement. Category writes remain disabled.
 
-Executed evidence: [engineering/semantic review](docs/sender-rule-qualification.md), [validation record](docs/evidence/sender-rule-validation.json), [real synthetic manual/Claude evidence](docs/evidence/sender-rule-live-validation.json) and [operations](docs/runbooks/sender-detection-rules.md). The fresh Claude test progressed from Unknown to AI Agent after audit evidence arrived; the manual Outlook control produced Human-capable. These exits qualify the explicitly revised POC semantics and engineering behavior. Independent numeric accuracy remains Phase 4; category writes and production pilot qualification remain later gates.
+Executed evidence: [engineering/semantic review](docs/sender-rule-qualification.md), [validation record](docs/evidence/sender-rule-validation.json), [real synthetic manual/Claude evidence](docs/evidence/sender-rule-live-validation.json) and [operations](docs/runbooks/sender-detection-rules.md). The fresh Claude test progressed from Unknown to AI Agent after audit evidence arrived; the manual Outlook control produced Human. These exits qualify the explicitly revised POC semantics and engineering behavior. Independent numeric accuracy remains Phase 4; category writes and production pilot qualification remain later gates.
 
 ## Phase 4 — Validate the POC with actual emails
 
@@ -310,7 +310,7 @@ Executed evidence: [engineering/semantic review](docs/sender-rule-qualification.
 
 The [owner-approved revision](docs/adr/live-email-poc-validation.md) replaces Phase 4's former corpus/curator exits with controlled actual-email verification. The [earlier engineering record](docs/evidence/sender-accuracy-validation.json) remains historical evidence of its original scope. The [accuracy workbench](docs/runbooks/sender-accuracy.md) and [frozen statistical policy](config/sender-accuracy-policy.json) remain available for later qualification, without blocking the current POC. Category setup/writes retain their own subsequent permission and engineering gates.
 
-Executed POC evidence: [controlled actual-email recheck](docs/evidence/controlled-email-poc-validation.json) and [test instructions](docs/runbooks/controlled-email-tests.md). Three existing actual synthetic emails were reprocessed using fresh authenticated reads: manual Outlook and manual Gmail → Outlook returned Human-capable; Claude/Microsoft 365 returned AI Agent. The two manual controls received no AI badge. This closes all four revised POC exits, not G1/G2 population-accuracy qualification or new-message latency qualification.
+Executed POC evidence: [controlled actual-email recheck](docs/evidence/controlled-email-poc-validation.json) and [test instructions](docs/runbooks/controlled-email-tests.md). Three existing actual synthetic emails were reprocessed using fresh authenticated reads: manual Outlook and manual Gmail → Outlook returned Human; Claude/Microsoft 365 returned AI Agent. The two manual controls received no AI badge. This closes all four revised POC exits, not G1/G2 population-accuracy qualification or new-message latency qualification.
 
 ## Phase 5 — Establish minimal category permissions and ownership
 
@@ -359,7 +359,9 @@ Executed evidence: [category access and ownership review](docs/outlook-category-
 - [x] No source/prod decision failure can be mistaken for successful category application.
 - [x] Rollback preserves later user changes and removes only demonstrably service-owned labels.
 
-Executed evidence: [writer review](docs/outlook-category-writer.md), [commands/recovery](docs/runbooks/outlook-category-writer.md) and [validation record](docs/evidence/category-writer-validation.json). Explicit scoped pilot writes/readback for Unknown, AI Agent and Human-capable passed. The real endpoint rejected stale versions with 412; conflict retry preserved an unrelated category, duplicate apply left the provider version unchanged, and category-only hydration created no new decisions. Attributed rollback removed only its added label; a later user edit blocked rollback. Uncertain outcomes remain separate from attributed writes. Continuous testing also fixed missing reassessment of age-based explanations without weakening eligibility. No new Azure resource or permission was added. Unattended monitor application remains disabled pending the operational, client-display and pilot gates; this completion does not establish population detection accuracy.
+Executed evidence: [writer review](docs/outlook-category-writer.md), [commands/recovery](docs/runbooks/outlook-category-writer.md) and [validation record](docs/evidence/category-writer-validation.json). Explicit scoped pilot writes/readback for Unknown, AI Agent and Human passed. The real endpoint rejected stale versions with 412; conflict retry preserved an unrelated category, duplicate apply left the provider version unchanged, and category-only hydration created no new decisions. Attributed rollback removed only its added label; a later user edit blocked rollback. Uncertain outcomes remain separate from attributed writes. Continuous testing also fixed missing reassessment of age-based explanations without weakening eligibility. No new Azure resource or permission was added. Unattended monitor application remains disabled pending the operational, client-display and pilot gates; this completion does not establish population detection accuracy.
+
+The [three-label naming correction](docs/adr/simple-classification-labels.md) is also complete before Phase 7: current contracts/output use AI Agent, Human and Unknown; historical decisions remain intact and the retired human rule cannot authorize new writes. Outlook's owned definition and the two synthetic test tags were migrated without new permissions. Full validation and live category readback are recorded in [the naming validation](docs/evidence/simple-labels-validation.json). This does not enable unattended category application or start Phase 7.
 
 ## Phase 7 — Deploy supervised low-cost operation
 

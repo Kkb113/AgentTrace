@@ -9,24 +9,25 @@ from datetime import datetime, timedelta
 from email.utils import getaddresses, parsedate_to_datetime
 from typing import Any, Literal
 
-from pydantic import Field
+from pydantic import Field, ValidationInfo, field_validator
 
 from .contracts import Code, Observation, Opaque, Record
 
 RULE_VERSION: Literal["sender-rules/unknown/v1"] = "sender-rules/unknown/v1"
 CLAUDE_APP = "07c030f6-5743-41b7-ba00-0a6e85f37c17"
-HUMAN_CAPABLE_RULE: Literal["sender-rules/human-capable/v1"] = "sender-rules/human-capable/v1"
+HUMAN_RULE: Literal["sender-rules/human/v2"] = "sender-rules/human/v2"
 AGENT_RULE: Literal["sender-rules/claude-corroborated/v1"] = "sender-rules/claude-corroborated/v1"
-POLICY_VERSION = "corroborated-poc-human-capable/v1"
+POLICY_VERSION = "corroborated-poc-human/v2"
 
 
 class RuleAssessment(Record):
     rule_version: Literal[
         "sender-rules/unknown/v1",
+        "sender-rules/human/v2",
         "sender-rules/human-capable/v1",
         "sender-rules/claude-corroborated/v1",
     ] = RULE_VERSION
-    category: Literal["Unknown", "Human-capable", "AI Agent"] = "Unknown"
+    category: Literal["Unknown", "Human", "AI Agent"] = "Unknown"
     inspection: Literal["complete", "incomplete", "conflicting"]
     human_candidate: bool
     human_support: Literal["supported_client_compatibility"] = "supported_client_compatibility"
@@ -36,6 +37,16 @@ class RuleAssessment(Record):
     receipt_link: Literal["unqualified", "missing", "conflicting", "corroborated_indicators"]
     reason_codes: tuple[Code, ...] = Field(min_length=1)
     evidence_refs: tuple[Opaque, ...] = ()
+
+    @field_validator("category", mode="before")
+    @classmethod
+    def historical_label(cls, value: Any, info: ValidationInfo) -> Any:
+        if (
+            value == "Human-capable"
+            and info.data.get("rule_version") == "sender-rules/human-capable/v1"
+        ):
+            return "Human"
+        return value
 
 
 def sha(value: Any) -> str:
@@ -214,8 +225,8 @@ def evaluate(
     elif observation.observed_at + timedelta(hours=2) <= now:
         reasons.add("initial_evidence_window_closed")
     return RuleAssessment(
-        rule_version=AGENT_RULE if agent else HUMAN_CAPABLE_RULE if human else RULE_VERSION,
-        category="AI Agent" if agent else "Human-capable" if human else "Unknown",
+        rule_version=AGENT_RULE if agent else HUMAN_RULE if human else RULE_VERSION,
+        category="AI Agent" if agent else "Human" if human else "Unknown",
         inspection=inspection,
         human_candidate=human,
         agent_execution=execution,

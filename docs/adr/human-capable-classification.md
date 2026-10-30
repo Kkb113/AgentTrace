@@ -1,5 +1,7 @@
 # Human-capable and corroborated-indicator POC policy
 
+Historical naming revision: the later owner-requested [three-label change](simple-classification-labels.md) replaces the visible Human-capable name with Human. Its compatibility meaning and AI evidence requirements remain unchanged. This document records the earlier acceptance; current names and deployment state follow the later revision.
+
 Policy revision recorded on 30 October 2026 following the owner's explicit instructions in this chat: a browser or normal email client may be controlled by either a person or an agent and still receive **Human-capable**. This replaces the active release's Human label and its inferred-manual-controller meaning. The green preset remains preset4. No existing Outlook category has been renamed or provisioned; only local contracts and dry-run previews change here.
 
 Human-capable means the complete configured message inspection is compatible with a normal client and reveals no MCP/API/known-automation indicator or conflicting evidence. It does not establish who clicked Send, exclude browser-driven agents or measure biological-human identity. A normal-client-compatible message can therefore be Human-capable whether its body was typed, pasted from an assistant or supplied by an agent. Incomplete inspection, known automation, source errors and conflicts remain Unknown. Known automation does not automatically imply AI.

@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "policy_version": "corroborated-poc-human-capable/v1",
+  "policy_version": "corroborated-poc-human/v2",
   "enabled_positive_agent_rules": ["sender-rules/claude-corroborated/v1"],
-  "compatible_client_rule": "sender-rules/human-capable/v1",
+  "compatible_client_rule": "sender-rules/human/v2",
   "initial_window_seconds": 7200,
   "late_window_seconds": 86400,
   "agent_false_positive_one_sided_confidence": 0.95,
@@ -12,8 +12,8 @@
   "independence_accounting": "One conservative outcome per independent cluster within each actor class; crossed actor pairs retain both denominators without claiming cross-class independence",
   "ordinary_automation_in_negative_population": true,
   "known_positive_unknown_counts_as_miss": true,
-  "browser_agent_human_capable_counts_as_all_path_agent_miss": true,
-  "human_capable_is_human_identity": false,
+  "browser_agent_human_label_counts_as_all_path_agent_miss": true,
+  "human_label_is_human_identity": false,
   "required_holdout_controls": "Independent curator OS identity, private ACLs, separate key, encrypted frozen dataset, code/policy binding and one-use archive authorization",
   "accepted_residual_risk": "Unobservable copied-ID full replacement can defeat the corroborated POC association",
   "category_writes_enabled": false

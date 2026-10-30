@@ -1,0 +1,198 @@
+{
+  "schema_version": "1.0",
+  "executed_at": "2026-10-30T05:11:28.310866+00:00",
+  "milestone": "Three-label Outlook classification normalization",
+  "status": "complete",
+  "active_labels": {
+    "AI Agent": "preset0",
+    "Human": "preset4",
+    "Unknown": "preset3"
+  },
+  "policy_version": "corroborated-poc-human/v2",
+  "human_rule": "sender-rules/human/v2",
+  "validated_source_sha256": "94299a5783c0520e5856cdb8bef6b9c37436b33d9d2370e6da0ad48089a7db38",
+  "source_files_hashed": 283,
+  "source_hash_scope": "Sorted tracked src/, packages/, scripts/, tests/, config/ plus pyproject.toml, uv.lock and requirements files. SHA256 stream: UTF-8 path + NUL + ASCII byte length + NUL + LF-normalized bytes. Documentation and validation records excluded.",
+  "validation_basis": "Isolated selected-index checkout with pinned Python 3.12.14; unrelated evaluation/workbook changes excluded",
+  "gates": {
+    "quality": "passed",
+    "security": "passed",
+    "infrastructure": "passed",
+    "guard_controls": "passed",
+    "integration_end_to_end": "passed",
+    "live_sender_source_recheck": "passed",
+    "live_owned_category_inventory_and_write_readback": "passed",
+    "legacy_history_and_retired_rule_guards": "passed"
+  },
+  "unit_primary_tests_passed": 579,
+  "unit_subtests_passed": 97,
+  "unit_skipped": 1,
+  "new_label_regressions_passed": 5,
+  "integration_tests_passed": 123,
+  "junit_counts_including_subtests": {
+    "unit": {
+      "tests": 677,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "integration": {
+      "tests": 123,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "platform_limit": "One Windows symlink privilege test skipped locally; Linux CI executes it. Desktop UI automation was not resumed; current server inventory/message state was verified through existing APIs.",
+  "cleanup": {
+    "executed_at": "2026-10-30T04:47:04.490127+00:00",
+    "test_messages_cleaned": 2,
+    "results": [
+      {
+        "message_ref_sha256": "5389a8961ff70b16cf22368ebaf897756ae6a754507fccf456f6dd64c907e70e",
+        "test_tag_removed": true,
+        "read_state_and_headers_preserved": true,
+        "unrelated_category_definitions_preserved": true
+      },
+      {
+        "message_ref_sha256": "3a13cbd7c1490a1d16c8bd8f9db0b3e6503e3819add01f87cc9bb006f414a5b7",
+        "test_tag_removed": true,
+        "read_state_and_headers_preserved": true,
+        "unrelated_category_definitions_preserved": true
+      }
+    ],
+    "ordinary_messages_modified": 0,
+    "mail_sent": 0,
+    "new_permissions": 0,
+    "master_categories_deleted": 0
+  },
+  "category_migration": {
+    "owned_labels": [
+      "AI Agent",
+      "Human",
+      "Unknown"
+    ],
+    "old_owned_definition_absent": true,
+    "green_color_preserved": true,
+    "provider_replaced_human_category_id": true,
+    "unrelated_master_definitions_preserved": true,
+    "ownership_origin": "Explicit owner-requested Outlook web edit; private replacement receipt and normalized provider readback digest",
+    "setup_app_recreated": false
+  },
+  "source_validation": {
+    "actual_cases": 3,
+    "matched_send_actions": 3,
+    "manual_false_agent_flags": 0,
+    "labels": [
+      "AI Agent",
+      "Human",
+      "Human"
+    ],
+    "expected_send_actions_used_as_predictor": false
+  },
+  "mailbox_validation": {
+    "executed_at": "2026-10-30T05:03:43.196703+00:00",
+    "owned_labels": [
+      "AI Agent",
+      "Human",
+      "Unknown"
+    ],
+    "live_cases": [
+      {
+        "message_ref_sha256": "3a13cbd7c1490a1d16c8bd8f9db0b3e6503e3819add01f87cc9bb006f414a5b7",
+        "classification": "Human",
+        "mailbox_categories": [
+          "Human"
+        ],
+        "apply_status": "applied",
+        "readback_verified": true,
+        "headers_and_read_state_preserved": true,
+        "repeat_apply_provider_version_unchanged": true
+      },
+      {
+        "message_ref_sha256": "5389a8961ff70b16cf22368ebaf897756ae6a754507fccf456f6dd64c907e70e",
+        "classification": "Human",
+        "mailbox_categories": [
+          "Human"
+        ],
+        "apply_status": "unchanged",
+        "readback_verified": true,
+        "headers_and_read_state_preserved": true,
+        "repeat_apply_provider_version_unchanged": true
+      },
+      {
+        "message_ref_sha256": "99ec0efa17b9837e1d108c5c04c9146764a35a14c8c1f01902c42d2bae330886",
+        "classification": "AI Agent",
+        "mailbox_categories": [
+          "AI Agent"
+        ],
+        "apply_status": "unchanged",
+        "readback_verified": true,
+        "headers_and_read_state_preserved": true,
+        "repeat_apply_provider_version_unchanged": true
+      }
+    ],
+    "old_definition_absent": true,
+    "new_permissions": 0,
+    "azure_resources_created": 0,
+    "mail_send_calls": 0,
+    "automatic_application_enabled": false,
+    "desktop_ui_actions_resumed": false
+  },
+  "history": {
+    "historical_decision_payloads_preserved": true,
+    "historical_decisions_checked": 31,
+    "new_rule_assessments_generated": 5
+  },
+  "compatibility": {
+    "old_raw_decisions_unchanged": true,
+    "retired_label_readable_only_under_retired_rule": true,
+    "retired_rule_blocked_for_new_writes": true,
+    "current_schemas_expose_exactly_three_labels": true,
+    "old_private_mapping_normalizes_to_human": true,
+    "legacy_sql_enum_retained_only_for_existing_history": true
+  },
+  "private_proof_sha256": {
+    "cleanup.private.json": "6a8a3da297940004bc5776d6995e35921268a3a8cc726144a5c46b534a093af8",
+    "owner-rename-receipt.private.json": "cbe43ee4b06561d46ea5ced14cb4dc0b6147f4972338b32b912470845a7a5ebc",
+    "ownership-before.private.json": "d4c414a33093c5228ff8d610d8b668f6de16121409e65ce3814f180b4fda0263",
+    "catalog-before.private.json": "1b3cffb12df62864ea0a57ed1c4bc4e55ae3312d858f901026778165df639cc1",
+    "catalog-after-ui.private.json": "b7a3029a60bdc2a319543a0ed09fa3ecfafbe4cc8d846531ab577f5164a9efc2",
+    "history-preservation.private.json": "57746cca29e4878b1246befee4040f4259a247337305cf6bbb6e297ec9cd4c29",
+    "live-validation.private.json": "b2ceb466422c2062b83d784de6707ca0a021b0bf46b278149502cefd1c3349c2",
+    "endpoint-current.private.json": "2d7eae86de5f5128be80fac0bba839bbba48a33eaf8962120788faf51d8a91af"
+  },
+  "detection_evidence_requirements_relaxed": false,
+  "ai_agent_rule_changed": false,
+  "human_identity_proof_claimed": false,
+  "population_accuracy_qualified": false,
+  "new_application_permissions": 0,
+  "azure_resources_created": 0,
+  "mail_send_calls": 0,
+  "automatic_application_enabled": false,
+  "review": "docs/adr/simple-classification-labels.md",
+  "acceptance": [
+    {
+      "id": "exactly_three_current_labels",
+      "met": true
+    },
+    {
+      "id": "test_artifacts_removed_without_deleting_personal_categories",
+      "met": true
+    },
+    {
+      "id": "owned_ui_replacement_verified_and_recorded",
+      "met": true
+    },
+    {
+      "id": "old_history_preserved_without_authorizing_stale_writes",
+      "met": true
+    },
+    {
+      "id": "full_regression_and_live_validation",
+      "met": true
+    }
+  ],
+  "all_acceptance_criteria_met": true,
+  "phase_7_started": false
+}

@@ -389,7 +389,7 @@ def run_study(
         else "pilot_only_or_unqualified",
         "declared_blind_spots": list(dataset.declared_blind_spots),
         "accepted_copied_id_replacement_risk": True,
-        "human_capable_is_controller_proof": False,
+        "human_label_is_controller_proof": False,
         "category_writes_enabled": False,
         "email_mutations": 0,
     }

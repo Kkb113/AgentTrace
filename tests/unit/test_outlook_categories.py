@@ -122,7 +122,7 @@ def test_unrelated_categories_survive_setup_unchanged(tmp_path: Path) -> None:
 def test_confirmed_partial_setup_resumes_from_pinned_ids(tmp_path: Path) -> None:
     cfg = settings(tmp_path)
     transport = CatalogTransport()
-    transport.fail_label = "Human-capable"
+    transport.fail_label = "Human"
     store = OwnershipStore(cfg)
     try:
         with pytest.raises(OutlookError):

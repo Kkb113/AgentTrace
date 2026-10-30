@@ -1,5 +1,7 @@
 # Scoped category write operations
 
+The current output names are **AI Agent**, **Human** and **Unknown**. Old Human-capable records are readable history; they cannot authorize a new write under the retired rule. Run the detector to obtain a fresh current-rule assessment after the naming migration. The [migration decision](../adr/simple-classification-labels.md) records the owner-UI category replacement and cleanup; no setup app needs recreating.
+
 Use PowerShell under the designated Windows operator profile in `C:\AgentDetection`. The existing category writer certificate and private configuration are required. This is an explicit synthetic-pilot command workflow; the continuous monitor still runs read-only. No new Azure deployment or mail permission is needed.
 
 All operations need a fresh private `--output` filename; reports are never overwritten. Actual IDs, addresses, headers, category inventory and certificates must stay outside Git. Protect the existing private parent directory and state backup. Stop another runtime before accessing its exclusively locked state; do not copy or edit its live WAL files.
@@ -48,7 +50,7 @@ $intentId = 1 # Replace with an actual ID from your private plan report.
   --intent-id $intentId --output work\private\outlook-categories\verify-new.private.json
 ```
 
-Repeated `apply` on a completed intent makes no additional PATCH. Read the status and attribution flags; `reconciled` means the result is present but write origin is uncertain. It is not a confirmed AgentTrace-owned mutation. `verify` can show stale evidence or a later user change even after a historically confirmed apply. The owner-approved meaning of Human-capable includes browser-controlled agents; a green category is not forensic proof of a person.
+Repeated `apply` on a completed intent makes no additional PATCH. Read the status and attribution flags; `reconciled` means the result is present but write origin is uncertain. It is not a confirmed AgentTrace-owned mutation. `verify` can show stale evidence or a later user change even after a historically confirmed apply. The owner-approved meaning of Human includes browser-controlled agents; a green category is not forensic proof of a person.
 
 ## Retry, status and rollback
 

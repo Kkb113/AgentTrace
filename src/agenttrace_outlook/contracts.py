@@ -3,15 +3,23 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
 
 Opaque = Annotated[str, Field(pattern=r"^[A-Za-z0-9_.:/+=-]{1,2048}$")]
 Code = Annotated[str, Field(pattern=r"^[a-z][a-z0-9_]{0,99}$")]
 Sha256 = Annotated[str, Field(pattern=r"^[a-f0-9]{64}$")]
-Category = Literal["AI Agent", "Human-capable", "Human", "Unknown"]
+Category = Literal["AI Agent", "Human", "Unknown"]
 
 
 class Record(BaseModel):
@@ -56,14 +64,26 @@ class Decision(Record):
     scope: Scope
     message_id: Opaque = Field(repr=False)
     source_version: Opaque = Field(repr=False)
-    category: Category
     rule_version: Opaque
+    category: Category
     basis: Literal["production", "experimental"]
     qualification: Literal["qualified", "not_required", "unqualified"]
     reason_codes: tuple[Code, ...] = Field(min_length=1, max_length=32)
     evidence_refs: tuple[Opaque, ...] = Field(default=(), max_length=100)
     decided_at: AwareDatetime
     expires_at: AwareDatetime
+
+    @field_validator("category", mode="before")
+    @classmethod
+    def historical_label(cls, value: Any, info: ValidationInfo) -> Any:
+        # Read old records without rewriting the stored audit payload or rule version.
+        # Eligibility still rejects that retired rule for new writes.
+        if (
+            value == "Human-capable"
+            and info.data.get("rule_version") == "sender-rules/human-capable/v1"
+        ):
+            return "Human"
+        return value
 
     @model_validator(mode="after")
     def semantics(self) -> Decision:

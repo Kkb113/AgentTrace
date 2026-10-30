@@ -240,7 +240,7 @@ class RuleStore:
     def summary(self) -> dict[str, int | str]:
         with self.store.transaction(lease=self.store.lease) as db:
             return {
-                "rules_profile": "corroborated_poc_ai_and_human_capable",
+                "rules_profile": "corroborated_poc_ai_and_human_label",
                 "source_jobs": db.execute("SELECT count(*) FROM rule_jobs").fetchone()[0],
                 "source_blocked": db.execute(
                     "SELECT count(*) FROM rule_jobs WHERE stage='blocked'"

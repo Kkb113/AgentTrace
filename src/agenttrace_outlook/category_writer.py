@@ -1,7 +1,7 @@
 """Fenced decision-bound write intents with conservative uncertainty and rollback handling."""
 
 import json
-from typing import Any, cast
+from typing import Any
 
 from agenttrace_foundation.authorization import AccessDenied
 from agenttrace_ingestion.contracts import IngestionError
@@ -249,9 +249,10 @@ class CategoryWriter:
                     return self.summary(identity)
             if row["attempts"] >= self.store.config.max_attempts:
                 raise OutlookError("category_write_attempt_limit")
+            label: Label | None
             if operation == "apply":
                 decision = self._current(row, current)
-                label = cast(Label, decision.category)
+                label = decision.category
                 with self.store.transaction(lease=self.store.lease) as db:
                     other = db.execute(
                         "SELECT id FROM category_intents WHERE message_id=? AND id!=? AND status IN ('prepared','uncertain','rollback_pending') LIMIT 1",

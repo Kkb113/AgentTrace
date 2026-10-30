@@ -144,7 +144,7 @@ def test_apply_is_owned_merge_readback_and_duplicate_idempotent(tmp_path):
     store, writer, server, clock, identity, sync = setup(tmp_path)
     try:
         assert writer.step(identity)["status"] == "applied"
-        assert server.item["categories"] == ["Personal", "Human-capable"]
+        assert server.item["categories"] == ["Personal", "Human"]
         assert server.item["isRead"] is False
         assert writer.plan(server.item["id"]) == [identity]
         assert writer.plan() == []
@@ -164,7 +164,7 @@ def test_stale_etag_remerges_later_unrelated_user_category(tmp_path):
         assert server.item["categories"] == ["Personal", "Later personal"]
         clock.advance()
         assert writer.step(identity)["status"] == "applied"
-        assert server.item["categories"] == ["Personal", "Later personal", "Human-capable"]
+        assert server.item["categories"] == ["Personal", "Later personal", "Human"]
     finally:
         store.close()
 
@@ -314,7 +314,7 @@ def test_semantic_edit_during_conflict_never_receives_old_verdict(tmp_path):
 def test_existing_identical_label_is_unchanged_and_not_rollback_owned(tmp_path):
     store, writer, server, clock, identity, sync = setup(tmp_path)
     try:
-        server.edit(["Personal", "Human-capable"])
+        server.edit(["Personal", "Human"])
         assert writer.step(identity)["status"] == "unchanged"
         assert server.patch_count == 0
         with pytest.raises(OutlookError):
@@ -435,7 +435,7 @@ def test_unknown_is_a_real_separate_verdict_and_replaces_only_owned_labels(tmp_p
     raw["internetMessageHeaders"].append({"name": "x-ai-generated", "value": "mcp-office365"})
     store, writer, server, clock, identity, sync = setup(tmp_path, raw)
     try:
-        server.edit(["Personal", "AI Agent", "Human-capable"])
+        server.edit(["Personal", "AI Agent", "Human"])
         result = writer.step(identity)
         assert result["status"] == "applied" and result["write_attributed"]
         assert server.item["categories"] == ["Personal", "Unknown"]
@@ -521,7 +521,7 @@ def test_unavailable_source_explanation_windows_reassess_once_without_message_ed
                 ).fetchone()[0]
             )
             assert reason in current["reason_codes"]
-            assert current["category"] == "Human-capable"
+            assert current["category"] == "Human"
             count = reopened.db.execute("SELECT count(*) FROM decisions").fetchone()[0]
             assert count == original + 1
             assert run_once(reopened) == 0

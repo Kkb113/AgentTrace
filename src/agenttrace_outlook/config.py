@@ -16,11 +16,16 @@ from .errors import OutlookError
 
 class CategoryMapping(Record):
     ai_agent: Literal["AI Agent"] = "AI Agent"
-    human: Literal["Human-capable"] = "Human-capable"
+    human: Literal["Human"] = "Human"
     unknown: Literal["Unknown"] = "Unknown"
     ai_color: Literal["preset0"] = "preset0"
     human_color: Literal["preset4"] = "preset4"
     unknown_color: Literal["preset3"] = "preset3"
+
+    @field_validator("human", mode="before")
+    @classmethod
+    def old_config_name(cls, value: object) -> object:
+        return "Human" if value == "Human-capable" else value
 
 
 class ReaderIdentity(Record):

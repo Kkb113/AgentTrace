@@ -35,7 +35,6 @@
     "category": {
       "enum": [
         "AI Agent",
-        "Human-capable",
         "Human",
         "Unknown"
       ],
@@ -110,8 +109,8 @@
     "scope",
     "message_id",
     "source_version",
-    "category",
     "rule_version",
+    "category",
     "basis",
     "qualification",
     "reason_codes",
