@@ -179,7 +179,7 @@ Every phase has an objective, implementation scope, expected outcomes, validatio
 | 1 | Separate production runner, contracts and durable state foundation | Complete; [review](docs/outlook-runtime-review.md), [exit evidence](docs/evidence/outlook-runtime-validation.json) |
 | 2 | Reliable incoming-mail synchronization and restart recovery | Complete; [review](docs/outlook-sync-review.md), [exit evidence](docs/evidence/outlook-sync-validation.json) |
 | 3 | Corroborated POC AI / Human-capable rules and conservative Unknown policy | Complete under the owner-approved POC semantics; [review](docs/sender-rule-qualification.md), [exit evidence](docs/evidence/sender-rule-validation.json) |
-| 4 | Independent accuracy and adversarial validation in dry-run | Not complete |
+| 4 | Independent accuracy and adversarial validation in dry-run | Validation software implemented; independent dataset/reviews/curator evidence and G1/G2 qualification remain pending; [review](docs/sender-accuracy-review.md) |
 | 5 | Scoped category permissions, ownership and setup preview | Not started; no new grants |
 | 6 | Safe category writer, idempotency and rollback | Not started |
 | 7 | Supervised operation, credential lifecycle and retention | Not started |
@@ -302,10 +302,12 @@ Executed evidence: [engineering/semantic review](docs/sender-rule-qualification.
 
 **Exit criteria**
 
-- [ ] Mandatory semantic/forgery/source counterexamples pass.
+- [x] Mandatory semantic/forgery/source counterexamples pass.
 - [ ] Independent labels, leakage checks and actual locked-set access controls are evidenced.
 - [ ] Accuracy gates are met for the population to be enabled; underpowered results remain pilot-only.
-- [ ] Any unavailable Human-capable inspection capability or external-source blind spot remains an explicit release blocker/limitation, never a default label.
+- [x] Any unavailable Human-capable inspection capability or external-source blind spot remains an explicit release blocker/limitation, never a default label.
+
+Software and authored controls: [review](docs/sender-accuracy-review.md), [executed evidence](docs/evidence/sender-accuracy-validation.json), [frozen measurement policy](config/sender-accuracy-policy.json), [curator collection/runbook](docs/runbooks/sender-accuracy.md). The tool enforces actual source/review/hash/retention checks, disjoint splits, frozen initial/late windows and a curator holdout. It reports exact intervals, correlated-cluster accounting and unsupported/Unknown agent misses. It does not supply independent labels or replace actual curator custody. The existing owner examples and simulated encrypted drill are pilot/engineering evidence only. Phase 4 remains incomplete until the two independent-evidence/accuracy exits pass; no category write or production-accuracy claim is enabled.
 
 ## Phase 5 — Establish minimal category permissions and ownership
 

@@ -4,12 +4,11 @@ from __future__ import annotations
 
 import json
 from datetime import timedelta
-from email.utils import getaddresses
 from typing import Any
 
 from .contracts import Observation
 from .errors import OutlookError
-from .sender_rules import POLICY_VERSION, RuleAssessment, sha
+from .sender_rules import POLICY_VERSION, RuleAssessment, enrolled_sender, sha
 from .state import StateStore
 
 
@@ -88,18 +87,7 @@ class RuleStore:
                 observation = Observation.model_validate_json(row[1])
                 snapshot = json.loads(row[2])
                 source = store.config.sender_source
-                addresses = getaddresses(
-                    [
-                        h["value"]
-                        for h in (snapshot.get("internetMessageHeaders") or [])
-                        if h.get("name", "").lower() == "from"
-                    ]
-                )
-                eligible = (
-                    source is not None
-                    and len(addresses) == 1
-                    and addresses[0][1].lower() == source.mailbox_address.lower()
-                )
+                eligible = source is not None and enrolled_sender(snapshot, source.mailbox_address)
                 db.execute(
                     "INSERT INTO rule_jobs(observation_id,stage) VALUES (?,?)",
                     (row[0], "new" if eligible else "unavailable"),

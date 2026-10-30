@@ -42,6 +42,20 @@ def sha(value: Any) -> str:
     return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
 
 
+def enrolled_sender(snapshot: dict[str, Any], address: str) -> bool:
+    rows = snapshot.get("internetMessageHeaders")
+    if not isinstance(rows, list) or any(not isinstance(row, dict) for row in rows):
+        return False
+    values = [r.get("value") for r in rows if str(r.get("name", "")).lower() == "from"]
+    if len(values) != 1 or not isinstance(values[0], str):
+        return False
+    try:
+        addresses = getaddresses(values)
+        return len(addresses) == 1 and addresses[0][1].lower() == address.lower()
+    except (ValueError, TypeError):
+        return False
+
+
 def inspect_snapshot(
     observation: Observation, snapshot: dict[str, Any] | None
 ) -> tuple[Literal["complete", "incomplete", "conflicting"], tuple[str, ...]]:
@@ -64,7 +78,10 @@ def inspect_snapshot(
         ):
             return "incomplete", ("header_shape_invalid",)
         name, value = row["name"], row["value"]
-        size += len(name.encode()) + len(value.encode())
+        try:
+            size += len(name.encode()) + len(value.encode())
+        except UnicodeEncodeError:
+            return "incomplete", ("header_encoding_invalid",)
         if (
             len(name) > 256
             or len(value) > 32768
@@ -159,7 +176,11 @@ def evaluate(
             reasons.add("received_copy_link_unqualified")
             declarations = [
                 r["value"].strip().lower()
-                for r in (snapshot or {}).get("internetMessageHeaders", [])
+                for r in (
+                    (snapshot or {}).get("internetMessageHeaders", [])
+                    if inspection == "complete"
+                    else []
+                )
                 if r.get("name", "").lower() == "x-ai-generated"
             ]
             if (
@@ -302,4 +323,36 @@ def qualify_exchange_send(
         ("verified_enrolled_send", "authenticated_enrolled_agent_send_observed", (ref,))
         if valid
         else ("conflicting", "audit_executor_or_scope_unresolved", (ref,))
+    )
+
+
+def corroborated_copy_context(
+    observation: Observation,
+    snapshot: dict[str, Any],
+    rows: list[dict[str, Any]],
+    sent_folder: str,
+) -> bool:
+    """Shared live/replay copy checks; contradictory repeated provider IDs reject."""
+    copies: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        key = row.get("id")
+        if (
+            not isinstance(key, str)
+            or not key
+            or row.get("internetMessageId") != snapshot.get("internetMessageId")
+            or not isinstance(row.get("parentFolderId"), str)
+            or (key in copies and copies[key] != row)
+        ):
+            return False
+        copies[key] = row
+    sent = [r for r in copies.values() if r["parentFolderId"] == sent_folder]
+    received = [r for r in copies.values() if r["parentFolderId"] != sent_folder]
+    return (
+        len(copies) == 2
+        and len(sent) == len(received) == 1
+        and received[0]["id"] == observation.message_id
+        and all(
+            r.get("isDraft") is False and r.get("sentDateTime") == snapshot.get("sentDateTime")
+            for r in copies.values()
+        )
     )

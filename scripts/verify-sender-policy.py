@@ -29,6 +29,19 @@ def main() -> int:
         assert policy[field] is False
     assert policy["declaration_or_generic_api_alone"] == "Unknown"
     assert policy["failed_or_incomplete_inspection"] == "Unknown"
+    accuracy = json.loads(
+        (Path(__file__).resolve().parents[1] / "config/sender-accuracy-policy.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert accuracy["policy_version"] == POLICY_VERSION
+    assert accuracy["enabled_positive_agent_rules"] == [AGENT_RULE]
+    assert accuracy["initial_window_seconds"] == 7200 and accuracy["late_window_seconds"] == 86400
+    assert accuracy["maximum_agent_false_positive_upper_bound"] == 0.001
+    assert accuracy["agent_false_positive_one_sided_confidence"] == 0.95
+    assert accuracy["minimum_supported_agent_positive_clusters"] == 1000
+    assert accuracy["minimum_supported_agent_recall"] == 0.99
+    assert accuracy["category_writes_enabled"] is False
     print(
         json.dumps(
             {

@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
+from agenttrace_outlook.accuracy_contracts import AccuracyDataset, DetectorPacket
 from agenttrace_outlook.config import RuntimeConfig
 from agenttrace_outlook.contracts import Decision, FixtureBatch, Observation
 from agenttrace_outlook.sender_rules import RuleAssessment
@@ -21,6 +22,8 @@ def main() -> int:
         ("outlook-decision", Decision),
         ("outlook-fixtures", FixtureBatch),
         ("sender-rule-assessment", RuleAssessment),
+        ("sender-accuracy-dataset", AccuracyDataset),
+        ("sender-replay-packet", DetectorPacket),
     ):
         path = ROOT / "packages/contracts/schemas" / (name + ".schema.json")
         expected = json.dumps(model.model_json_schema(), indent=2, sort_keys=True) + "\n"
