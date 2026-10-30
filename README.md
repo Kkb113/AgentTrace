@@ -12,6 +12,8 @@ The working demo uses experimental binary header rules, including a Human fallba
 
 ## Run the existing terminal demo
 
+Phase 4's [controlled actual-email tests](docs/runbooks/controlled-email-tests.md) pass under the [owner-approved POC revision](docs/adr/live-email-poc-validation.md): manual Outlook/Gmail cases return Human-capable and the supported Claude/Microsoft 365 case returns AI Agent. No external corpus or separate curator is required for this POC. The formal [accuracy workbench](docs/runbooks/sender-accuracy.md) remains optional for future G1/G2 qualification. No population-accuracy claim or Outlook category write is enabled.
+
 From PowerShell:
 
 ```powershell

@@ -1,0 +1,85 @@
+{
+  "executed_at": "2026-10-30T02:42:42.002353+00:00",
+  "basis": "Owner-operated actual synthetic email tests; existing send actions and current authenticated reads",
+  "cases": [
+    {
+      "scenario": "operator_reported_manual_gmail_to_outlook_send",
+      "expected": "Human-capable",
+      "actual": "Human-capable",
+      "pass": true,
+      "inspection": "complete",
+      "agent_execution": "not_established",
+      "receipt_link": "missing",
+      "private_evidence_sha256": "4a046ad36c320f8218eedd5e800abc43ac8d4f9fbdba218cf7a900d2e647e192",
+      "captured_at": "2026-10-30T02:42:41.977805+00:00"
+    },
+    {
+      "scenario": "operator_reported_manual_outlook_send",
+      "expected": "Human-capable",
+      "actual": "Human-capable",
+      "pass": true,
+      "inspection": "complete",
+      "agent_execution": "not_established",
+      "receipt_link": "missing",
+      "private_evidence_sha256": "b3e8021b817dd4bf72710b757a0b9e21b8aa3aca62c98d130bef20df54b4414f",
+      "captured_at": "2026-10-30T02:42:41.986512+00:00"
+    },
+    {
+      "scenario": "operator_reported_claude_outlook_send",
+      "expected": "AI Agent",
+      "actual": "AI Agent",
+      "pass": true,
+      "inspection": "complete",
+      "agent_execution": "verified_enrolled_send",
+      "receipt_link": "corroborated_indicators",
+      "private_evidence_sha256": "b1e9c9daae6cc7dc922372e61d02ab99efffc5d6a79ae27af272b251973def54",
+      "captured_at": "2026-10-30T02:42:41.995576+00:00"
+    }
+  ],
+  "actual_mail_cases": 3,
+  "passed": 3,
+  "observed_false_agent_flags_in_two_manual_cases": 0,
+  "public_text_dataset_used": false,
+  "human_writing_style_judgments_used": false,
+  "send_action_ground_truth_used_as_predictor": false,
+  "bodies_requested": false,
+  "mail_mutations": 0,
+  "category_writes": 0,
+  "azure_resources_created": 0,
+  "new_permissions": 0,
+  "independent_statistical_accuracy_qualified": false,
+  "general_population_accuracy_claimed": false,
+  "limitations": [
+    "Existing synthetic test sends reread retrospectively; no new-send latency measurement",
+    "Qualified AI coverage remains the enrolled Claude Microsoft 365 route",
+    "Generic Gmail API-only evidence is not sufficient for an AI label",
+    "Human-capable means normal-client compatibility and includes browser-controlled agents",
+    "Unobservable copied-ID replacement remains the accepted POC risk"
+  ],
+  "acceptance_revision": "Owner-operated actual-email POC; no external corpus or independent curator required",
+  "policy_reference": "docs/adr/live-email-poc-validation.md",
+  "production_rule_commit": "d639cb0282148f3667cac1f62cd69bc2a9717e70",
+  "source_algorithm_changed": false,
+  "exit_criteria": [
+    {
+      "id": "actual_manual_and_supported_agent_cases",
+      "met": true
+    },
+    {
+      "id": "read_only_end_to_end_and_explanations",
+      "met": true
+    },
+    {
+      "id": "semantic_adversarial_and_source_controls",
+      "met": true,
+      "engineering_evidence": "docs/evidence/sender-accuracy-validation.json"
+    },
+    {
+      "id": "coverage_and_claim_limits",
+      "met": true
+    }
+  ],
+  "exit_criteria_met": 4,
+  "exit_criteria_total": 4,
+  "all_revised_poc_exits_met": true
+}

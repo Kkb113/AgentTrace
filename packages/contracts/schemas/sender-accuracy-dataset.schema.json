@@ -1,0 +1,514 @@
+{
+  "$defs": {
+    "ActionReview": {
+      "additionalProperties": false,
+      "properties": {
+        "action_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Action Sha256",
+          "type": "string"
+        },
+        "action_source_verified": {
+          "title": "Action Source Verified",
+          "type": "boolean"
+        },
+        "actor": {
+          "enum": [
+            "human",
+            "ai_agent",
+            "non_ai_automation",
+            "unresolved"
+          ],
+          "title": "Actor",
+          "type": "string"
+        },
+        "adjudication": {
+          "default": false,
+          "title": "Adjudication",
+          "type": "boolean"
+        },
+        "attestation": {
+          "$ref": "#/$defs/Asset"
+        },
+        "blind_to_predictions": {
+          "title": "Blind To Predictions",
+          "type": "boolean"
+        },
+        "capture_custody_verified": {
+          "title": "Capture Custody Verified",
+          "type": "boolean"
+        },
+        "case_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Case Sha256",
+          "type": "string"
+        },
+        "input_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Input Sha256",
+          "type": "string"
+        },
+        "reviewed_at": {
+          "format": "date-time",
+          "title": "Reviewed At",
+          "type": "string"
+        },
+        "reviewer_ref": {
+          "pattern": "^[a-z][a-z0-9_]{0,99}$",
+          "title": "Reviewer Ref",
+          "type": "string"
+        },
+        "rights_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Rights Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reviewer_ref",
+        "actor",
+        "reviewed_at",
+        "blind_to_predictions",
+        "action_source_verified",
+        "capture_custody_verified",
+        "input_sha256",
+        "action_sha256",
+        "rights_sha256",
+        "case_sha256",
+        "attestation"
+      ],
+      "title": "ActionReview",
+      "type": "object"
+    },
+    "Asset": {
+      "additionalProperties": false,
+      "properties": {
+        "collected_at": {
+          "format": "date-time",
+          "title": "Collected At",
+          "type": "string"
+        },
+        "expires_at": {
+          "format": "date-time",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 240,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "collected_at",
+        "expires_at"
+      ],
+      "title": "Asset",
+      "type": "object"
+    },
+    "Enrollment": {
+      "additionalProperties": false,
+      "properties": {
+        "exchange_mailbox_guid": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Exchange Mailbox Guid",
+          "type": "string"
+        },
+        "mailbox_address": {
+          "pattern": "^[^\\s<>@]+@[^\\s<>@]+$",
+          "title": "Mailbox Address",
+          "type": "string"
+        },
+        "publisher_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Publisher Id",
+          "type": "string"
+        },
+        "publisher_owner_tenant": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Publisher Owner Tenant",
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/$defs/Scope"
+        }
+      },
+      "required": [
+        "scope",
+        "mailbox_address",
+        "exchange_mailbox_guid",
+        "publisher_id",
+        "publisher_owner_tenant"
+      ],
+      "title": "Enrollment",
+      "type": "object"
+    },
+    "EvaluationCase": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/Asset"
+        },
+        "actor": {
+          "enum": [
+            "human",
+            "ai_agent",
+            "non_ai_automation",
+            "unresolved"
+          ],
+          "title": "Actor",
+          "type": "string"
+        },
+        "approval": {
+          "enum": [
+            "approved",
+            "autonomous",
+            "none",
+            "unknown"
+          ],
+          "title": "Approval",
+          "type": "string"
+        },
+        "basis": {
+          "enum": [
+            "independent_action_history",
+            "owner_reported_pilot",
+            "authored_adversarial"
+          ],
+          "title": "Basis",
+          "type": "string"
+        },
+        "case_ref": {
+          "pattern": "^[a-z][a-z0-9_]{0,99}$",
+          "title": "Case Ref",
+          "type": "string"
+        },
+        "creator_ref": {
+          "pattern": "^[a-z][a-z0-9_]{0,99}$",
+          "title": "Creator Ref",
+          "type": "string"
+        },
+        "families": {
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]{0,99}$",
+            "type": "string"
+          },
+          "maxItems": 30,
+          "minItems": 1,
+          "title": "Families",
+          "type": "array"
+        },
+        "groups": {
+          "$ref": "#/$defs/Groups"
+        },
+        "input": {
+          "$ref": "#/$defs/Asset"
+        },
+        "message": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Asset"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "population": {
+          "pattern": "^[a-z][a-z0-9_]{0,99}$",
+          "title": "Population",
+          "type": "string"
+        },
+        "prepared_at": {
+          "format": "date-time",
+          "title": "Prepared At",
+          "type": "string"
+        },
+        "reviews": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ActionReview"
+          },
+          "maxItems": 3,
+          "title": "Reviews",
+          "type": "array"
+        },
+        "rights": {
+          "$ref": "#/$defs/Asset"
+        },
+        "route": {
+          "enum": [
+            "outlook_to_outlook",
+            "gmail_to_outlook",
+            "outlook_to_gmail",
+            "gmail_to_gmail"
+          ],
+          "title": "Route",
+          "type": "string"
+        },
+        "source_family": {
+          "pattern": "^[a-z][a-z0-9_]{0,99}$",
+          "title": "Source Family",
+          "type": "string"
+        },
+        "split": {
+          "enum": [
+            "development",
+            "calibration",
+            "evaluation"
+          ],
+          "title": "Split",
+          "type": "string"
+        },
+        "supported_agent_path": {
+          "title": "Supported Agent Path",
+          "type": "boolean"
+        },
+        "text_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text Sha256"
+        },
+        "time_basis": {
+          "enum": [
+            "send_record",
+            "operator_attestation",
+            "collection_only"
+          ],
+          "title": "Time Basis",
+          "type": "string"
+        }
+      },
+      "required": [
+        "case_ref",
+        "basis",
+        "split",
+        "actor",
+        "approval",
+        "creator_ref",
+        "prepared_at",
+        "time_basis",
+        "route",
+        "source_family",
+        "population",
+        "supported_agent_path",
+        "families",
+        "groups",
+        "input",
+        "action",
+        "rights"
+      ],
+      "title": "EvaluationCase",
+      "type": "object"
+    },
+    "Groups": {
+      "additionalProperties": false,
+      "properties": {
+        "independence_cluster": {
+          "pattern": "^[a-z][a-z0-9_]{0,99}$",
+          "title": "Independence Cluster",
+          "type": "string"
+        },
+        "sender": {
+          "pattern": "^[a-z][a-z0-9_]{0,99}$",
+          "title": "Sender",
+          "type": "string"
+        },
+        "source": {
+          "pattern": "^[a-z][a-z0-9_]{0,99}$",
+          "title": "Source",
+          "type": "string"
+        },
+        "template": {
+          "pattern": "^[a-z][a-z0-9_]{0,99}$",
+          "title": "Template",
+          "type": "string"
+        },
+        "thread": {
+          "pattern": "^[a-z][a-z0-9_]{0,99}$",
+          "title": "Thread",
+          "type": "string"
+        },
+        "workflow": {
+          "pattern": "^[a-z][a-z0-9_]{0,99}$",
+          "title": "Workflow",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sender",
+        "workflow",
+        "thread",
+        "template",
+        "source",
+        "independence_cluster"
+      ],
+      "title": "Groups",
+      "type": "object"
+    },
+    "Reviewer": {
+      "additionalProperties": false,
+      "properties": {
+        "independent_of_detector": {
+          "title": "Independent Of Detector",
+          "type": "boolean"
+        },
+        "kind": {
+          "enum": [
+            "human",
+            "fictional_test_identity"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "reviewer_ref": {
+          "pattern": "^[a-z][a-z0-9_]{0,99}$",
+          "title": "Reviewer Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reviewer_ref",
+        "kind",
+        "independent_of_detector"
+      ],
+      "title": "Reviewer",
+      "type": "object"
+    },
+    "Scope": {
+      "additionalProperties": false,
+      "properties": {
+        "mailbox_id": {
+          "format": "uuid",
+          "title": "Mailbox Id",
+          "type": "string"
+        },
+        "tenant_id": {
+          "format": "uuid",
+          "title": "Tenant Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tenant_id",
+        "mailbox_id"
+      ],
+      "title": "Scope",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "cases": {
+      "items": {
+        "$ref": "#/$defs/EvaluationCase"
+      },
+      "maxItems": 20000,
+      "minItems": 1,
+      "title": "Cases",
+      "type": "array"
+    },
+    "declared_blind_spots": {
+      "items": {
+        "pattern": "^[a-z][a-z0-9_]{0,99}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Declared Blind Spots",
+      "type": "array"
+    },
+    "detector_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Detector Sha256",
+      "type": "string"
+    },
+    "enabled_populations": {
+      "items": {
+        "pattern": "^[a-z][a-z0-9_]{0,99}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Enabled Populations",
+      "type": "array"
+    },
+    "enrollments": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Enrollment"
+      },
+      "maxItems": 100,
+      "title": "Enrollments",
+      "type": "array"
+    },
+    "policy_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Policy Sha256",
+      "type": "string"
+    },
+    "reviewers": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Reviewer"
+      },
+      "maxItems": 100,
+      "title": "Reviewers",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "study_ref": {
+      "pattern": "^[a-z][a-z0-9_]{0,99}$",
+      "title": "Study Ref",
+      "type": "string"
+    },
+    "synthetic_only": {
+      "const": true,
+      "title": "Synthetic Only",
+      "type": "boolean"
+    },
+    "usage": {
+      "default": "curator_study",
+      "enum": [
+        "curator_study",
+        "development_export"
+      ],
+      "title": "Usage",
+      "type": "string"
+    }
+  },
+  "required": [
+    "study_ref",
+    "synthetic_only",
+    "detector_sha256",
+    "policy_sha256",
+    "enabled_populations",
+    "declared_blind_spots",
+    "cases"
+  ],
+  "title": "AccuracyDataset",
+  "type": "object"
+}

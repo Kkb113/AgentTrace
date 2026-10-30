@@ -1,0 +1,161 @@
+{
+  "schema_version": "1.0",
+  "executed_at": "2026-10-30T00:24:58.102413+00:00",
+  "milestone": "Outlook sender independent-accuracy validation software",
+  "phase_status": "software_implemented_independent_evidence_and_accuracy_exits_pending",
+  "python_version": "3.12.14",
+  "sqlite_version": "3.53.1",
+  "validation_basis": "Isolated selected-index checkout and pinned environment; existing unrelated evaluation and workbook changes excluded",
+  "validated_source_sha256": "f92cdbef1c037a4c8870deafd1a02641604d0931e55143d75bb0ab4935d70064",
+  "source_files_hashed": 260,
+  "source_hash_scope": "Sorted tracked src/, packages/, scripts/, tests/, config/ plus pyproject.toml, uv.lock and requirements files. SHA256 stream: UTF-8 path + NUL + ASCII byte length + NUL + LF-normalized bytes. Documentation and validation records excluded.",
+  "gates": {
+    "quality": "passed",
+    "security": "passed",
+    "infrastructure": "passed",
+    "guard_controls": "passed",
+    "integration_end_to_end": "passed",
+    "actual_cli_encrypted_control_drill": "passed",
+    "actual_windows_acl_helper_and_same_operator_denial": "passed",
+    "authenticated_live_claude_rule_regression": "passed"
+  },
+  "unit_primary_tests_passed": 498,
+  "unit_subtests_passed": 97,
+  "unit_skipped": 1,
+  "new_accuracy_tests_passed": 82,
+  "integration_tests_passed": 123,
+  "junit_counts_including_subtests": {
+    "unit": {
+      "tests": 596,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "integration": {
+      "tests": 123,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "platform_limit": "One Windows symlink privilege test is skipped locally; Linux CI executes it. The real Windows ACL helper is tested locally.",
+  "review": "docs/sender-accuracy-review.md",
+  "operations": "docs/runbooks/sender-accuracy.md",
+  "frozen_measurement_policy": "config/sender-accuracy-policy.json",
+  "exit_criteria": [
+    {
+      "id": "mandatory_semantic_forgery_source_controls",
+      "met": true,
+      "basis": "Authored adversarial cases, live rule regression, crypto/access/deadline/source controls; the accepted unobservable replacement is explicitly a counterexample, not a rejected attack"
+    },
+    {
+      "id": "independent_labels_leakage_and_actual_locked_access",
+      "met": false,
+      "basis": "Software and simulated tests pass, but actual independent send-action reviews, real curator-role/custody evidence and an untouched representative holdout have not been supplied"
+    },
+    {
+      "id": "population_accuracy_gates",
+      "met": false,
+      "basis": "No current independently reviewed qualification dataset; G1/G2 remain unmeasured. Owner examples and authored cases cannot enter independent accuracy denominators"
+    },
+    {
+      "id": "inspection_and_external_coverage_limits_explicit",
+      "met": true,
+      "basis": "Narrow enrolled Claude Microsoft 365 route, generic Gmail API limitation, external/browser agents, missing inspection, source lag and copied-ID residual risk remain explicit"
+    }
+  ],
+  "exit_criteria_met": 2,
+  "exit_criteria_total": 4,
+  "all_exit_criteria_met": false,
+  "actual_independent_qualification_cases": 0,
+  "actual_curator_access_confirmed": false,
+  "current_intake_inventory": {
+    "historical_case_folders": 4,
+    "historical_review_csv_files": 2,
+    "current_sender_accuracy_manifest_supplied": false,
+    "earlier_relayed_style_judgments_are_not_send_action_review": true
+  },
+  "control_drill": {
+    "actual_curator_access_confirmed": false,
+    "actual_independent_cases": 0,
+    "azure_resources_created": 0,
+    "basis": "authored software control drill, not independent accuracy data",
+    "commands": [
+      {
+        "command": "create-key",
+        "exit_code": 0,
+        "expected_exit_code": 0
+      },
+      {
+        "command": "inspect",
+        "exit_code": 1,
+        "expected_exit_code": 1
+      },
+      {
+        "command": "export-development",
+        "exit_code": 0,
+        "expected_exit_code": 0
+      },
+      {
+        "command": "run",
+        "exit_code": 0,
+        "expected_exit_code": 0
+      },
+      {
+        "command": "seal",
+        "exit_code": 0,
+        "expected_exit_code": 0
+      },
+      {
+        "command": "grant",
+        "exit_code": 0,
+        "expected_exit_code": 0
+      },
+      {
+        "command": "evaluate-locked",
+        "exit_code": 1,
+        "expected_exit_code": 1
+      },
+      {
+        "command": "evaluate-locked",
+        "exit_code": 2,
+        "expected_exit_code": 2
+      }
+    ],
+    "executed_at": "2026-10-30T00:16:36.455387+00:00",
+    "frozen_report_sha256": "a529419ea9d5a2d74565027c827565459a51227b59701c94e4d79d55965a7ba9",
+    "mail_mutations": 0,
+    "private_os_evidence_sha256": "45846e88b4fcf17e7a30eb1001c411b576981a21abde5949192f0ecd495d8a9d",
+    "release_accuracy_qualified": false,
+    "repeat_evaluation_rejected": true,
+    "same_operator_actual_os_check_rejected": true
+  },
+  "live_rule_regression": {
+    "captured_at": "2026-10-29T23:53:12.041213+00:00",
+    "actual_authenticated_read_result": "AI Agent",
+    "private_capture_sha256": "2b9ca06eb2a28c1de5f24082aeddbe523f6d34a19b461e8fb6c8163a144c301b",
+    "basis": "Prior owner-prepared synthetic Claude send, current authenticated audit/publisher/mailbox reads; regression only, not independent accuracy or latency evidence"
+  },
+  "accuracy_status": {
+    "G1": "not_measured",
+    "G2": "not_measured",
+    "human_capable_identity_proof": false,
+    "release_accuracy_qualified": false,
+    "category_writes_enabled": false
+  },
+  "known_residual_counterexample": "A fully unobservable copied-ID replacement can still satisfy the approved corroborated POC rule. Authored tests demonstrate this limitation without counting it as a correctly rejected negative.",
+  "data_handling": "Source/review bytes and OS identities remain private. Public evidence contains redacted results and capture digests only. Original seven-day raw deadlines are preserved; physical purge remains a later operational gate.",
+  "review_method": "Engineering self-review plus executable controls; no independent human code or dataset review claimed",
+  "permissions_added": 0,
+  "azure_resources_created": 0,
+  "mail_mutations": 0,
+  "category_writes": 0,
+  "archived_demo_unchanged": true,
+  "unrelated_work_preserved": true,
+  "next_required_evidence": [
+    "Independent curator and blind source-action review records",
+    "Representative disjoint development/calibration/evaluation cases and actual access/custody proof",
+    "Independent G1 non-agent negatives including ordinary automation and G2 supported-agent positives",
+    "Frozen-window measurement and explicit route/source coverage before any accuracy release claim"
+  ]
+}

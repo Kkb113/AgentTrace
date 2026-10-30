@@ -148,7 +148,7 @@ Use encrypted host storage, restrictive ACLs, consistent encrypted backups and a
 
 ## 4. Acceptance and production-readiness gates
 
-Operational hardening and classification accuracy are different gates. Reliable retries and colored categories cannot establish AI attribution. Preserve the earlier low-false-positive requirements rather than silently lowering them for the POC.
+Operational hardening, controlled POC validation and population-level accuracy are different gates. Under the owner's [live-email POC revision](docs/adr/live-email-poc-validation.md), operators may validate the POC using actual synthetic emails and known send actions without an external corpus, independent curator or large benchmark. G1/G2 below remain future broad production-accuracy targets; they are not prerequisites for this limited POC and must not be claimed passed from a few self-tests.
 
 | Gate | Required evidence |
 | --- | --- |
@@ -160,14 +160,14 @@ Operational hardening and classification accuracy are different gates. Reliable 
 | O2 — Classification latency | P95 <5 seconds after the last required evidence is available to the worker; separately measure polling, source lag, outbox and Outlook display delay |
 | W1 — Controlled writes | Exact mailbox scope, categories-only payloads, no send path, no unrelated-category loss, tested concurrency and zero duplicate-loop amplification |
 | W2 — Correct display | Exactly one service-managed category after a successful uncontested apply; correct red/green/yellow mapping in supported Outlook clients; apply failures remain visible |
-| R1 — Reproducibility | Rule/source/config versions, credible independent truth, no label leakage, protected holdout and a traceable decision-to-applied-category chain |
+| R1 — Reproducibility | For the POC: rule/source/config versions, operator-recorded actual send actions, no expected-label leakage and traceable evidence/decisions. Independent truth and a protected holdout apply to future population-accuracy qualification |
 | P1 — Pilot | Ten consecutive business days after the last material fix without an unresolved critical/high defect, unexplained event loss or unsafe category mutation |
 
 Unknown and pending known-agent positives at the frozen deadline are recall misses. Unknown ground truth is not an assumed human/non-agent negative. Report class/source/route counts, correlated-template handling, intervals, precision, false alerts per thousand, source availability and unknown coverage. A pooled bound does not establish each source/subgroup's error rate.
 
-Use a representative pilot dataset first to find defects; call that a pilot, not a passed 0.1% claim if underpowered. The general production release remains gated by the above evidence. Freeze the observation window before qualification: initially retain the earlier two-hour pending and twenty-four-hour late-observation protocol, revising it explicitly if measured feed lag requires it. Keep initial versus late results visible rather than waiting indefinitely to improve recall.
+Use controlled actual-email tests first to find defects. Record observed results and sample counts without claiming the 0.1% bound. Broad production-accuracy claims remain gated by G1/G2 evidence. Keep the existing two-hour initial and twenty-four-hour late-observation protocol and report source lag and later reassessments rather than quietly changing a test's timing.
 
-The three labels follow the accepted POC semantics. Human-capable is not a human-identity result; browser-driven agents intentionally share that compatibility label. Independent AI false-positive/recall measurements remain unqualified until Phase 4. Report blind spots and accepted copied-ID/replacement risk alongside measured results.
+The three labels follow the accepted POC semantics. Human-capable is not a human-identity result; browser-driven agents intentionally share that compatibility label. Phase 4 validates the supported POC using actual emails; independent population-accuracy measurements remain unqualified until separately performed. Report blind spots and accepted copied-ID/replacement risk alongside observed results.
 
 ## 5. Phase-wise implementation
 
@@ -179,7 +179,7 @@ Every phase has an objective, implementation scope, expected outcomes, validatio
 | 1 | Separate production runner, contracts and durable state foundation | Complete; [review](docs/outlook-runtime-review.md), [exit evidence](docs/evidence/outlook-runtime-validation.json) |
 | 2 | Reliable incoming-mail synchronization and restart recovery | Complete; [review](docs/outlook-sync-review.md), [exit evidence](docs/evidence/outlook-sync-validation.json) |
 | 3 | Corroborated POC AI / Human-capable rules and conservative Unknown policy | Complete under the owner-approved POC semantics; [review](docs/sender-rule-qualification.md), [exit evidence](docs/evidence/sender-rule-validation.json) |
-| 4 | Independent accuracy and adversarial validation in dry-run | Not complete |
+| 4 | Controlled actual-email POC and adversarial validation | Complete under the owner-operated POC revision; [actual-email evidence](docs/evidence/controlled-email-poc-validation.json), [review](docs/sender-accuracy-review.md) |
 | 5 | Scoped category permissions, ownership and setup preview | Not started; no new grants |
 | 6 | Safe category writer, idempotency and rollback | Not started |
 | 7 | Supervised operation, credential lifecycle and retention | Not started |
@@ -285,27 +285,32 @@ Executed evidence: [engineering review](docs/outlook-sync-review.md), [clean-sou
 
 Executed evidence: [engineering/semantic review](docs/sender-rule-qualification.md), [validation record](docs/evidence/sender-rule-validation.json), [real synthetic manual/Claude evidence](docs/evidence/sender-rule-live-validation.json) and [operations](docs/runbooks/sender-detection-rules.md). The fresh Claude test progressed from Unknown to AI Agent after audit evidence arrived; the manual Outlook control produced Human-capable. These exits qualify the explicitly revised POC semantics and engineering behavior. Independent numeric accuracy remains Phase 4; category writes and production pilot qualification remain later gates.
 
-## Phase 4 — Validate accuracy and lock the decision policy
+## Phase 4 — Validate the POC with actual emails
 
-**Objective:** Establish detection quality before attaching authoritative-looking colors to mail.
+**Objective:** Demonstrate correct evidence-based behavior for controlled actual emails before adding Outlook categories, without requiring a text corpus or claiming population-wide accuracy.
 
 **Implementation work**
 
-- Import permitted independently prepared synthetic emails and actual send/action histories; keep ground-truth labels outside detector input.
-- Cross identical text with human, agent and ordinary automated senders; include current Outlook/Gmail-to-Outlook paths and uninstrumented positives.
-- Separate development/calibration/locked evaluation by sender/workflow/thread/template/source/time; sample source quality and adjudicate ambiguous history.
-- Freeze enabled rules, trust scope, thresholds if any, observation windows and independent sample accounting; compute G1/G2/H1/H2 and unknown coverage.
+- Use actual permitted synthetic emails sent by the owner manually in Outlook/Gmail and through an existing supported Claude connector; record the actual send action separately from detection.
+- Compare manual and agent sends with the same wording. Detect submission evidence; do not judge whether the words were AI-generated.
+- Run received-message ingestion, header inspection, authenticated-source correlation, decision persistence and rule-output checks. Record actual results, evidence references, repeated reads/reassessment and any source delay.
+- Run semantic/adversarial/source-failure regressions. Known manual controls must not get AI badges; missing, generic API-only, failed or conflicting evidence must not become a qualified AI label.
+- Freeze the supported rule/scope and document limitations. Keep formal independent accuracy, corpus/curator workflows and G1/G2 measurement optional for later broad production qualification.
 
-**Expected outcomes:** Reproducible independent accuracy report, regression corpus and a versioned policy eligible for deployment.
+**Expected outcomes:** A concise actual-email POC test record, explainable technical evidence, passing regression controls and a clear statement of supported coverage.
 
-**Validation criteria:** Measure every enabled positive rule's union, not just the strongest rule; include false-human errors and known positives left Unknown. Authored tests and the two-message A/B demo cannot satisfy independent sample requirements.
+**Validation criteria:** Compare actual decisions with the operator's recorded manual/agent actions. The classifier must not receive the expected label or use the test subject or wording to predict the actor. Report unknowns, delays and any mismatch honestly. Authored regressions are software controls; small live tests do not establish statistical error bounds.
 
 **Exit criteria**
 
-- [ ] Mandatory semantic/forgery/source counterexamples pass.
-- [ ] Independent labels, leakage checks and actual locked-set access controls are evidenced.
-- [ ] Accuracy gates are met for the population to be enabled; underpowered results remain pilot-only.
-- [ ] Any unavailable Human-capable inspection capability or external-source blind spot remains an explicit release blocker/limitation, never a default label.
+- [x] Actual manual Outlook/Gmail-to-Outlook and supported Claude-send cases match their recorded send actions, with no AI badge on the tested manual cases.
+- [x] End-to-end received-message inspection, evidence correlation, persisted decision and output are verified without expected-label/text-origin leakage.
+- [x] Mandatory semantic/forgery/source-failure controls pass; the accepted unobservable replacement limitation is recorded.
+- [x] Scope, Unknown behavior, delays, observed sample counts and unsupported routes are explicit; no population-accuracy or human-identity guarantee is claimed.
+
+The [owner-approved revision](docs/adr/live-email-poc-validation.md) replaces Phase 4's former corpus/curator exits with controlled actual-email verification. The [earlier engineering record](docs/evidence/sender-accuracy-validation.json) remains historical evidence of its original scope. The [accuracy workbench](docs/runbooks/sender-accuracy.md) and [frozen statistical policy](config/sender-accuracy-policy.json) remain available for later qualification, without blocking the current POC. Category setup/writes retain their own subsequent permission and engineering gates.
+
+Executed POC evidence: [controlled actual-email recheck](docs/evidence/controlled-email-poc-validation.json) and [test instructions](docs/runbooks/controlled-email-tests.md). Three existing actual synthetic emails were reprocessed using fresh authenticated reads: manual Outlook and manual Gmail → Outlook returned Human-capable; Claude/Microsoft 365 returned AI Agent. The two manual controls received no AI badge. This closes all four revised POC exits, not G1/G2 population-accuracy qualification or new-message latency qualification.
 
 ## Phase 5 — Establish minimal category permissions and ownership
 

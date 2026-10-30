@@ -10,7 +10,7 @@ from .audit_source import AuditReader, publisher_snapshot
 from .errors import SourceError
 from .reader import MailReader
 from .rule_store import RuleStore
-from .sender_rules import qualify_exchange_send, sha
+from .sender_rules import corroborated_copy_context, qualify_exchange_send, sha
 from .state import StateStore
 
 
@@ -197,28 +197,13 @@ class SenderCollector:
                     )
                 else:
                     audits = [r for r in records if "__agenttrace_copy_candidate" not in r]
-                    copies = {
-                        r["__agenttrace_copy_candidate"]["id"]: r["__agenttrace_copy_candidate"]
+                    copies = [
+                        r["__agenttrace_copy_candidate"]
                         for r in records
                         if "__agenttrace_copy_candidate" in r
-                    }
+                    ]
                     sent_folder = self.mail.well_known("sentitems")["id"]
-                    sent_items = [
-                        r
-                        for r in copies.values()
-                        if r.get("parentFolderId") == sent_folder and r.get("isDraft") is False
-                    ]
-                    received = [
-                        r for r in copies.values() if r.get("parentFolderId") != sent_folder
-                    ]
-                    good = (
-                        len(copies) == 2
-                        and len(sent_items) == len(received) == 1
-                        and received[0]["id"] == observation.message_id
-                        and received[0].get("isDraft") is False
-                        and sent_items[0].get("sentDateTime") == snapshot.get("sentDateTime")
-                        and received[0].get("sentDateTime") == snapshot.get("sentDateTime")
-                    )
+                    good = corroborated_copy_context(observation, snapshot, copies, sent_folder)
                     status, reason, refs = qualify_exchange_send(
                         audits,
                         tenant=str(self.store.config.scope.tenant_id),
@@ -236,7 +221,7 @@ class SenderCollector:
                         refs=(
                             *refs,
                             "publisher-sha256:" + sha(self._publisher),
-                            "correlation-sha256:" + sha(list(copies.values())),
+                            "correlation-sha256:" + sha(copies),
                         ),
                         receipt_context="corroborated_scope_messageid_time"
                         if good and status == "verified_enrolled_send"
@@ -245,7 +230,7 @@ class SenderCollector:
                             "records": audits,
                             "publisher": self._publisher,
                             "query_id": job["query_id"],
-                            "message_copies": list(copies.values()),
+                            "message_copies": copies,
                         },
                     )
                     self.rules.update(job, stage="new", delay=source.refresh_seconds)
