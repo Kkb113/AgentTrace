@@ -1,0 +1,139 @@
+{
+  "schema_version": "1.0",
+  "executed_at": "2026-10-30T04:28:34.757810+00:00",
+  "milestone": "Scoped Outlook category writer",
+  "phase_status": "complete",
+  "validated_source_sha256": "341dfc20e9b033df310cb3a031d5d32f190907e3814cd9bb67b1bf56f3f18359",
+  "source_files_hashed": 282,
+  "source_hash_scope": "Sorted tracked src/, packages/, scripts/, tests/, config/ plus pyproject.toml, uv.lock and requirements files. SHA256 stream: UTF-8 path + NUL + ASCII byte length + NUL + LF-normalized bytes. Documentation and validation records excluded.",
+  "validation_basis": "Isolated selected-index checkout with pinned Python 3.12.14; unrelated evaluation/workbook changes excluded",
+  "gates": {
+    "quality": "passed",
+    "security": "passed",
+    "infrastructure": "passed",
+    "guard_controls": "passed",
+    "integration_end_to_end": "passed",
+    "strict_outlook_types": "passed",
+    "live_qualified_conditional_endpoint": "passed",
+    "live_actual_synthetic_label_writes_readback_conflict_and_rollback": "passed"
+  },
+  "unit_primary_tests_passed": 574,
+  "unit_subtests_passed": 97,
+  "unit_skipped": 1,
+  "new_writer_regressions_passed": 42,
+  "integration_tests_passed": 123,
+  "junit_counts_including_subtests": {
+    "unit": {
+      "tests": 672,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "integration": {
+      "tests": 123,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "platform_limit": "One Windows symlink privilege test skipped locally; Linux CI executes it. The native Windows certificate/setup boundary remains separately tested.",
+  "live": {
+    "executed_at": "2026-10-30T04:16:26.409636+00:00",
+    "endpoint_qualified": true,
+    "stale_explanation_blocked_then_reassessment_fixed": true,
+    "actual_unknown_apply_and_rollback": true,
+    "unknown_basis": "Isolated copy of actual synthetic header state with audit connector absent; normal runtime source records unchanged",
+    "actual_claude_ai_apply_and_readback": true,
+    "duplicate_apply_provider_version_unchanged": true,
+    "actual_manual_human_capable_apply": true,
+    "actual_concurrent_category_edit_rejected_412": true,
+    "retry_preserved_unrelated_category": true,
+    "rollback_removed_only_proven_added_label": true,
+    "rollback_after_later_edit_blocked": true,
+    "category_only_hydration_decision_counts_unchanged": true,
+    "read_state_and_sender_headers_unchanged": true,
+    "classification_decision_changed_by_writer": false,
+    "automatic_application_enabled": false,
+    "mail_send_calls": 0,
+    "new_azure_resources": 0,
+    "new_permissions": 0,
+    "source_labels_used_as_predictor": false,
+    "user_control_fixture_category_left_on_two_synthetic_items": true,
+    "explicit_retry_of_obsolete_decision_rejected_without_patch": true
+  },
+  "private_proof_sha256": {
+    "endpoint-qualification.private.json": "8b731c005501b61428285bb4f2b570f06d8429421893cf8bcb627905275d5167",
+    "live-validation.private.json": "18b10df41084e52cde856f113298608ae8f81bfdcc3a97a00a587eceef4682a9",
+    "acceptance-state.private.sqlite3": "fb22c22c327d182a74c6f1f618e66fa7e6b193967528f4d6161e8b1cf777a4eb",
+    "obsolete-retry.private.json": "61fc72af4f883c6a943f15288a27cdb4afa25667e08173b19d9118b2ef1a212d"
+  },
+  "classification_labels_tested": [
+    "Unknown",
+    "AI Agent",
+    "Human-capable"
+  ],
+  "unknown_test_context": "Isolated copy of actual synthetic header state with audit connector absent. Normal runtime source records were not disabled or altered for this negative control.",
+  "conditional_endpoint": "Microsoft Graph v1.0 message PATCH with If-Match and fixed selected response fields; stale actual version rejected with 412",
+  "software_controls": [
+    "Schema v1-v4 to v5 migration, scope/digest binding and lease fencing",
+    "Crash before/after PATCH and durable intent recovery",
+    "Timeout before/after write; attributed readback versus unowned reconciliation",
+    "Expired/stale/experimental/source-conflicting/superseded decisions blocked",
+    "Live header digest and receiving location rechecked; moved/deleted/unavailable cases stay unfinished",
+    "Category ID/name/color drift and ambiguous names block use",
+    "Bounded conflict remerge and explicit retry with all gates retained",
+    "Existing desired labels and uncertain-attribution labels cannot be rollback-owned",
+    "Rollback preserves unrelated labels and refuses all later edits, including same-label re-addition",
+    "Category-only sync excludes read state/categories/change key from sender semantics",
+    "Missing/expired/wrong qualification and shared reader/writer credential rejected",
+    "Two-hour and twenty-four-hour explanation windows reassess exactly once without message changes"
+  ],
+  "issues_found_and_fixed": [
+    "Non-enrolled source explanations did not requeue across time windows; writer blocked stale explanation, scheduler repaired without relaxing evidence",
+    "Final review required receiving-location revalidation during readback and sanitized interruption handling"
+  ],
+  "activation": {
+    "explicit_synthetic_pilot_commands_available": true,
+    "automatic_monitor_application_enabled": false,
+    "scope_mailbox_count": 1,
+    "new_permissions": 0,
+    "new_azure_resources": 0,
+    "mail_send_calls": 0
+  },
+  "rollback_limit": "Removal requires an attributed addition and unchanged provider version. Later edits block rollback; prior owned labels are not restored. No force mode.",
+  "review": "docs/outlook-category-writer.md",
+  "operations": "docs/runbooks/outlook-category-writer.md",
+  "exit_criteria": [
+    {
+      "id": "single_owned_label_preserving_unrelated_categories",
+      "met": true,
+      "basis": "Owned merge regression controls and actual concurrent-edit preservation/readback"
+    },
+    {
+      "id": "qualified_real_concurrency_and_unsafe_paths_disabled",
+      "met": true,
+      "basis": "Actual current-version update and stale 412, pinned expiring qualification and disabled automatic monitor path"
+    },
+    {
+      "id": "idempotent_retry_without_prediction_loop",
+      "met": true,
+      "basis": "Actual duplicate apply leaves provider version unchanged; category-only hydration leaves decision counts unchanged"
+    },
+    {
+      "id": "classification_and_write_failures_distinct",
+      "met": true,
+      "basis": "Source/decision guards, explicit statuses, uncertainty recovery and unattributed reconciliation; actual obsolete retry rejected"
+    },
+    {
+      "id": "rollback_preserves_later_user_intent",
+      "met": true,
+      "basis": "Actual attributed removal preserves unrelated category; later-edit rollback blocked; interruption and same-label re-add controls"
+    }
+  ],
+  "exit_criteria_met": 5,
+  "exit_criteria_total": 5,
+  "all_exit_criteria_met": true,
+  "detection_accuracy_or_coverage_claim_changed": false,
+  "population_accuracy_qualified": false,
+  "remaining_work": "Supervised operation and backups/rotation/retention; supported Outlook client display; continuous pilot and automatic activation gates in subsequent phases."
+}

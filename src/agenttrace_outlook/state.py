@@ -13,6 +13,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from uuid import uuid4
 
+from .category_write_schema import CATEGORY_WRITE_SCHEMA
 from .config import RuntimeConfig
 from .contracts import Decision, Observation
 from .eligibility import require_annotation_eligible
@@ -38,7 +39,7 @@ SYNC_DIGEST = hashlib.sha256("\n".join((*BASE_SCHEMA, *SYNC_SCHEMA)).encode()).h
 RULE_SCHEMA_VERSION = (*BASE_SCHEMA, *SYNC_SCHEMA, *RULE_SCHEMA)
 RULE_DIGEST = hashlib.sha256("\n".join(RULE_SCHEMA_VERSION).encode()).hexdigest()
 NATIVE_OUTBOX = "CREATE TABLE outbox (decision_id INTEGER PRIMARY KEY REFERENCES decisions(id), status TEXT NOT NULL CHECK(status IN ('preview','pending','superseded','failed')), category TEXT NOT NULL CHECK(category IN ('AI Agent','Human','Human-capable','Unknown')))"
-SCHEMA = (
+SCHEMA_FOUR = (
     *(
         statement
         for statement in RULE_SCHEMA_VERSION
@@ -46,6 +47,8 @@ SCHEMA = (
     ),
     NATIVE_OUTBOX,
 )
+SCHEMA_FOUR_DIGEST = hashlib.sha256("\n".join(SCHEMA_FOUR).encode()).hexdigest()
+SCHEMA = (*SCHEMA_FOUR, *CATEGORY_WRITE_SCHEMA)
 SCHEMA_DIGEST = hashlib.sha256("\n".join(SCHEMA).encode()).hexdigest()
 
 
@@ -147,7 +150,7 @@ class StateStore:
     def _migrate_and_bind(self) -> None:
         with self.transaction() as db:
             version = int(db.execute("PRAGMA user_version").fetchone()[0])
-            if version not in {0, 1, 2, 3, 4}:
+            if version not in {0, 1, 2, 3, 4, 5}:
                 raise OutlookError("unsupported_state_schema")
             if version == 0:
                 if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' LIMIT 1").fetchone():
@@ -169,6 +172,8 @@ class StateStore:
                 if version == 2
                 else RULE_DIGEST
                 if version == 3
+                else SCHEMA_FOUR_DIGEST
+                if version == 4
                 else SCHEMA_DIGEST
             )
             if (
@@ -189,6 +194,8 @@ class StateStore:
                 if version == 2
                 else RULE_SCHEMA_VERSION
                 if version == 3
+                else SCHEMA_FOUR
+                if version == 4
                 else SCHEMA
             ):
                 raise OutlookError("state_schema_modified")
@@ -215,6 +222,13 @@ class StateStore:
                     "UPDATE metadata SET value=? WHERE key='schema_digest'", (SCHEMA_DIGEST,)
                 )
                 db.execute("PRAGMA user_version=4")
+            if version in {0, 1, 2, 3, 4}:
+                for statement in CATEGORY_WRITE_SCHEMA:
+                    db.execute(statement)
+                db.execute(
+                    "UPDATE metadata SET value=? WHERE key='schema_digest'", (SCHEMA_DIGEST,)
+                )
+                db.execute("PRAGMA user_version=5")
 
     def heartbeat(self) -> None:
         with self.transaction(lease=self.lease) as db:
@@ -430,7 +444,7 @@ class StateStore:
     def summary(self) -> dict[str, int | str]:
         with self.transaction(lease=self.lease) as db:
             result: dict[str, int | str] = {
-                "schema_version": 4,
+                "schema_version": 5,
                 "journal_mode": "wal",
                 "runtime_stage": "mailbox_sync_dry_run"
                 if self.config.sync_enabled

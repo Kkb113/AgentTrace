@@ -353,11 +353,13 @@ Executed evidence: [category access and ownership review](docs/outlook-category-
 
 **Exit criteria**
 
-- [ ] At most one owned category remains after a successful uncontested apply; all unrelated categories survive.
-- [ ] Real endpoint concurrency behavior is verified; unsupported unsafe paths cannot enable automatic writes.
-- [ ] Repeated identical intents produce no unnecessary PATCH and no notification/delta loop.
-- [ ] No source/prod decision failure can be mistaken for successful category application.
-- [ ] Rollback preserves later user changes and removes only demonstrably service-owned labels.
+- [x] At most one owned category remains after a successful uncontested apply; all unrelated categories survive.
+- [x] Real endpoint concurrency behavior is verified; unsupported unsafe paths cannot enable automatic writes.
+- [x] Repeated identical intents produce no unnecessary PATCH and no notification/delta loop.
+- [x] No source/prod decision failure can be mistaken for successful category application.
+- [x] Rollback preserves later user changes and removes only demonstrably service-owned labels.
+
+Executed evidence: [writer review](docs/outlook-category-writer.md), [commands/recovery](docs/runbooks/outlook-category-writer.md) and [validation record](docs/evidence/category-writer-validation.json). Explicit scoped pilot writes/readback for Unknown, AI Agent and Human-capable passed. The real endpoint rejected stale versions with 412; conflict retry preserved an unrelated category, duplicate apply left the provider version unchanged, and category-only hydration created no new decisions. Attributed rollback removed only its added label; a later user edit blocked rollback. Uncertain outcomes remain separate from attributed writes. Continuous testing also fixed missing reassessment of age-based explanations without weakening eligibility. No new Azure resource or permission was added. Unattended monitor application remains disabled pending the operational, client-display and pilot gates; this completion does not establish population detection accuracy.
 
 ## Phase 7 — Deploy supervised low-cost operation
 
