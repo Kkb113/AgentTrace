@@ -62,6 +62,8 @@ class RuntimeConfig(Record):
     scope: Scope
     state_directory: str = Field(min_length=1, max_length=2048, repr=False)
     mode: Literal["dry_run", "apply_categories"] = "dry_run"
+    known_mcp_marker_poc_enabled: bool = False
+    gmail_api_agent_poc_enabled: bool = False
     categories: CategoryMapping = Field(default_factory=CategoryMapping)
     reader_identity: ReaderIdentity | None = None
     poll_seconds: int = Field(default=10, ge=1, le=60)
@@ -70,15 +72,14 @@ class RuntimeConfig(Record):
     max_attempts: int = Field(default=3, ge=1, le=10)
     raw_retention_days: Literal[7] = 7
     decision_retention_days: Literal[30] = 30
-    data_boundary: Literal["synthetic_only"] = "synthetic_only"
+    data_boundary: Literal["mailbox_headers_only"] = "mailbox_headers_only"
     production_positive_rules: tuple[str, ...] = ()
     sync_enabled: bool = False
-    sync_poll_seconds: int = Field(default=30, ge=10, le=600)
+    sync_poll_seconds: int = Field(default=2, ge=1, le=600)
     folder_refresh_seconds: int = Field(default=300, ge=60, le=3600)
     sync_operations_per_cycle: int = Field(default=10, ge=1, le=100)
     page_size: int = Field(default=100, ge=1, le=100)
     backfill_since: AwareDatetime | None = None
-    synthetic_subject_prefix: Literal["AgentTrace synthetic test:"] = "AgentTrace synthetic test:"
     sender_source: SenderSource | None = None
 
     @field_validator("state_directory")
@@ -105,6 +106,13 @@ class RuntimeConfig(Record):
 
 def read_config(path: Path) -> RuntimeConfig:
     try:
-        return RuntimeConfig.model_validate_json(canonical_bytes(load_json(path)))
+        value = load_json(path)
+        if isinstance(value, dict):
+            # Migrate old files without retaining any message-specific runtime gate.
+            value.pop("synthetic_subject_prefix", None)
+            value.pop("synthetic_message_ids", None)
+            if value.get("data_boundary") == "synthetic_only":
+                value["data_boundary"] = "mailbox_headers_only"
+        return RuntimeConfig.model_validate_json(canonical_bytes(value))
     except (InputError, ValidationError, OSError, ValueError):
         raise OutlookError("invalid_configuration") from None

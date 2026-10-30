@@ -71,13 +71,18 @@ class RuleStore:
             policy = db.execute(
                 "SELECT value FROM metadata WHERE key='sender_policy_version'"
             ).fetchone()
-            if policy is None or policy[0] != POLICY_VERSION:
+            current_policy = (
+                POLICY_VERSION
+                + ("/known-mcp-marker-poc" if store.config.known_mcp_marker_poc_enabled else "")
+                + ("/gmail-api-poc" if store.config.gmail_api_agent_poc_enabled else "")
+            )
+            if policy is None or policy[0] != current_policy:
                 db.execute(
                     "UPDATE work SET status='pending' WHERE status='completed' AND observation_id IN (SELECT current_observation FROM messages)"
                 )
                 db.execute(
                     "INSERT INTO metadata VALUES ('sender_policy_version',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
-                    (POLICY_VERSION,),
+                    (current_policy,),
                 )
             db.execute(
                 "UPDATE rule_jobs SET stage='superseded' WHERE observation_id NOT IN (SELECT current_observation FROM messages) AND stage!='superseded'"

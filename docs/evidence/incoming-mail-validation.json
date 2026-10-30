@@ -1,0 +1,126 @@
+{
+  "schema_version": "1.0",
+  "validated_source_sha256": "e88a3ef96c9ca489abc9899909f155e3b65b179ccf1bd259c223e7220b4f64d4",
+  "source_files_hashed": 290,
+  "source_hash_scope": "Sorted staged source/config/tests/contracts and dependency files, LF-normalized path + NUL + byte length + NUL + content; docs excluded",
+  "validation_basis": "Isolated selected-index checkout; unrelated evaluation/workbook changes excluded",
+  "gates": {
+    "quality": "passed",
+    "security": "passed",
+    "infrastructure": "passed_no_resources_created",
+    "guard_controls": "passed",
+    "integration": "passed"
+  },
+  "local_primary_tests_passed": 664,
+  "local_subtests_passed": 97,
+  "local_privilege_skip": 1,
+  "junit": {
+    "unit": {
+      "tests": 762,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "integration": {
+      "tests": 123,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "live": {
+    "executed_at": "2026-10-30T10:48:17.406134+00:00",
+    "incoming_scope": "all_incoming_headers",
+    "subject_filter": false,
+    "message_id_allowlist": false,
+    "subject_body_used_for_detection": false,
+    "eligible_messages": 21,
+    "all_eligible_labels_verified": true,
+    "controlled_results": [
+      {
+        "message_ref_sha256": "ad88bc625ee461e015bc8110d71894cd43d11d15ff4157a5dfd34e8f6458095a",
+        "classification": "Human",
+        "rule_version": "sender-rules/human/v3",
+        "color": "preset4",
+        "readback_verified": true,
+        "etag_sha256": "20429fd4e1a2753526d416c65b425a566893e73a6ebe4d54c8bcfe8189e0ec87"
+      },
+      {
+        "message_ref_sha256": "c47a594d6bb5d0bc3b0f3c1d444421fd540515239de242c3b7143355246c81f7",
+        "classification": "AI Agent",
+        "rule_version": "sender-rules/claude-corroborated/v1",
+        "color": "preset0",
+        "readback_verified": true,
+        "etag_sha256": "3da92e290a5be47c0292438bd57bf20d63ba9ee036abfa364ae0f48661ce3282"
+      },
+      {
+        "message_ref_sha256": "557eeb2a13e5cf58a5f4abd8169041950be324cfc0904b1b97c21cb03ba865fd",
+        "classification": "AI Agent",
+        "rule_version": "sender-rules/gmail-api-indicator-poc/v1",
+        "color": "preset0",
+        "readback_verified": true,
+        "etag_sha256": "e6bf98ec1e4999f5612ce9fbba002f81141e6ab701de143ab6db744c3b413907"
+      },
+      {
+        "message_ref_sha256": "29bac7210eaedb44daa776a6912b742747b5386e9ce4eb16da1a8703f29027ab",
+        "classification": "Human",
+        "rule_version": "sender-rules/human/v3",
+        "color": "preset4",
+        "readback_verified": true,
+        "etag_sha256": "7c135f826970e4aaac38ee34d3ed41eef092c4f671c2fa93b5b917d039398214"
+      },
+      {
+        "message_ref_sha256": "bec6065509f84487dabb8d1e6c890fd6644b643db329ec0d5b01aac1e2afd34d",
+        "classification": "Human",
+        "rule_version": "sender-rules/human/v3",
+        "color": "preset4",
+        "readback_verified": true,
+        "etag_sha256": "4a802dd6ffc95c077a40a0fc2cdd32178058ddc83dfd44be6fbf0e79687a812c"
+      },
+      {
+        "message_ref_sha256": "a0e16dc74f3e7f093e9683b50789c0ad8b3555224db2ced7ba03798be1cccb0a",
+        "classification": "Human",
+        "rule_version": "sender-rules/human/v3",
+        "color": "preset4",
+        "readback_verified": true,
+        "etag_sha256": "2384ab12d5f64b9079c7d373a5d2932eb68610b1127d77fdf0537ee11ed1ce55"
+      }
+    ],
+    "category_state": {
+      "category_pending": 0,
+      "category_blocked": 0,
+      "category_confirmed": 21,
+      "category_reconciled": 0,
+      "category_health": "current"
+    },
+    "observations": 39,
+    "new_permissions": 0,
+    "new_azure_resources": 0,
+    "bodies_requested": 0,
+    "owner_reported_custom_gmail_results": "Human and AI Agent correct",
+    "owner_reported_client_latency_seconds": [
+      5,
+      6
+    ],
+    "client_build_color_matrix": "not_independently_identified"
+  },
+  "review": {
+    "subject_body_filters_removed": true,
+    "message_id_allowlist_removed": true,
+    "all_incoming_receiving_folders": true,
+    "slow_audit_off_receiving_path": true,
+    "transactions_shutdown_serialized": true,
+    "transient_reads_auto_retry": true,
+    "mutation_conflicts_bounded": true,
+    "stale_metadata_recollected": true,
+    "raw_mail_or_tokens_in_git": false,
+    "unresolved_critical_high_implementation_defects": 0
+  },
+  "limits": [
+    "POC MCP marker can be forged; Gmail API indicator can flag ordinary automation, explicitly accepted by owner.",
+    "Human means normal-client compatibility, not biological-controller proof.",
+    "Native client refresh/provider/network time prevents a zero-latency guarantee.",
+    "Owner confirmed displayed functional labels; exact web/new-Windows client-build/color matrix remains unverified.",
+    "No population detection accuracy claim; pilot observation remains outstanding."
+  ]
+}

@@ -225,16 +225,8 @@ class SyncState:
                 self.finish_discovery(db, job["epoch"])
                 return
             attempts = int(job["attempts"]) + 1
-            status = (
-                "due"
-                if error.retryable and attempts < store.config.max_attempts
-                else "dead_letter"
-                if error.retryable
-                else "blocked"
-            )
+            status = "due" if error.retryable else "blocked"
             code = error.code
-            if error.retry_after >= 3600:
-                status, code = "blocked", "retry_after_requires_operator"
             delay = max(error.retry_after, min(300, 2 ** min(attempts, 10))) + jitter
             db.execute(
                 "UPDATE sync_jobs SET status=?,attempts=?,error=?,due=?,visited=? WHERE key=?",
@@ -290,6 +282,8 @@ class SyncState:
             result["sync_health"] = (
                 "degraded"
                 if result["sync_gaps"]
+                else "recovering"
+                if result["sync_retry_waiting"]
                 else "collecting"
                 if result["sync_pending_items"]
                 or result["discovery_jobs_pending"]

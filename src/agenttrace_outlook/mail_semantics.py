@@ -22,7 +22,11 @@ def sender_snapshot(detail: dict[str, Any]) -> tuple[dict[str, Any], bool]:
     }
     semantic["internetMessageHeaders"] = (
         sorted(
-            [{"name": h["name"].lower(), "value": h["value"]} for h in (headers or [])],
+            [
+                {"name": h["name"].lower(), "value": h["value"]}
+                for h in (headers or [])
+                if h["name"].lower() != "subject"
+            ],
             key=lambda h: (h["name"], h["value"]),
         )
         if complete

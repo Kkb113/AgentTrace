@@ -5,7 +5,7 @@
 - **Revision:** 30 October 2026 — Outlook-native production POC.
 - **Deliverable:** A new, maintainable Python monitor that classifies received email and applies native Outlook color categories.
 - **Outlook categories:** **AI Agent** (red), **Human** (green), **Unknown** (yellow).
-- **Scope:** Sender/action detection only; no AI-written-text detection.
+- **Scope:** Sender/action detection for every incoming message in the connected mailbox, regardless of sender/subject/body; no AI-written-text detection.
 - **Interface:** Outlook itself, plus a terminal and local operational reports. No standalone application, web dashboard, custom backend API, Office.js add-in or custom icon framework.
 - **Deployment:** One designated Microsoft 365 mailbox and one operator-started Python monitor on the existing PC, using the already tested credentials. Outlook can be closed; the PC and monitor process must remain running. No dedicated Windows account or service installation is required for this POC.
 - **Azure constraint:** No new cloud resource is required initially. Any justified new Azure resource must use kb-agentdemo, an explicit subscription and the smallest suitable configuration.
@@ -25,6 +25,10 @@ A [recorded authenticated Claude test](docs/evidence/agent-audit-fallback-valida
 Earlier repository Phases 0–4 and their reports remain historical evidence under the previous baseline. The **new phase numbering below is a replanned delivery sequence**, not a claim that the first five phases of this sequence are already complete. Existing incomplete evaluation work and legacy v1 contracts must be preserved; migrate only what the new monitor actually needs.
 
 The owner-approved [three-label revision](docs/adr/simple-classification-labels.md) uses only AI Agent, Human and Unknown. It preserves the [accepted compatibility and corroborated-indicator semantics](docs/adr/human-capable-classification.md) that superseded earlier Human/controller and independent receipt-identity requirements. Historical reports remain records of their prior baseline and names; current output uses the simple names.
+
+During Phase 8, the owner accepted the optional [known-MCP-marker POC policy](docs/adr/poc-marker-and-refresh-policy.md) to label that indicator immediately, including its header-spoofing false-positive risk. It is explicitly enabled in the private demo configuration; new configurations retain authenticated detection by default. Human compatibility remains stable during routine audit refreshes. These POC labels must not be presented as authenticated execution or measured population accuracy when their rule does not establish that claim.
+
+The owner also accepted the optional Gmail API POC rule, including ordinary-automation false positives. It labels that transport indicator as AI Agent in the demo configuration. The latest owner instruction removes all subject and message-ID restrictions: every incoming message in the connected mailbox is processed from metadata and technical headers, without reading bodies or attachments. Earlier synthetic-only restrictions are historical. Analytical audits run outside the incoming-mail loop, using the existing process and permissions.
 
 ## 1. Product contract and coverage
 
@@ -138,12 +142,12 @@ The Graph update API supports the categories property and requires Mail.ReadWrit
 - Master-category creation through Graph needs MailboxSettings.ReadWrite. Prefer owner/manual creation or a temporary separate setup identity; the runtime writer does not need that ongoing scope merely to assign known category names. Any temporary setup grant needs an exact retirement plan. [Create master categories](https://learn.microsoft.com/en-us/graph/api/outlookuser-post-mastercategories?view=graph-rest-1.0).
 - Before any new app/grant, prepare the concrete identity, mailbox filter, operations and residual-permission proposal. The feature request establishes category-annotation intent; existing read-only grants do not magically permit writes.
 - Default to dry-run. Actual category-write rollout begins only after the scoped grant, category ownership and concurrency checks pass.
-- Use non-exportable certificates under the actual scheduled-task runtime account and test access while the interactive operator is signed out. Existing CurrentUser certificates are not automatically accessible to another account. Tokens/assertions stay out of files/logs. Test renewal/rotation/revocation.
+- Reuse the existing operator's non-exportable CurrentUser certificates. This POC requires that PC/process and operator authentication to remain available; it does not require a new account, scheduled task or sign-out operation. Tokens/assertions stay out of files/logs. Credential expiry or renewal failures stop the affected operation.
 - If later hosted on Azure, prefer managed identity and an approved durable state design. Do not move this SQLite-based worker into ephemeral containers unchanged.
 
 ### Data and minimal cost
 
-The initial qualification dataset and write tests remain synthetic. The owner authorized mailbox-wide incoming metadata for the live diagnostic; that does not authorize storing real customer bodies, training on mail or broad source history. Record the final production data/retention/access boundary before unattended live deployment.
+Historical qualification samples were synthetic. The owner now explicitly authorizes header-only processing and category annotation for every incoming message in this connected mailbox. Subject/body text is not a detection input; bodies/attachments are not fetched. No training, public text upload or other-mailbox access is authorized. Retain the existing local seven-day header and thirty-day decision boundaries.
 
 Request the minimum fields and necessary headers; no body/attachment processing by default. Keep raw captures optional, protected and limited to the accepted seven-day window. Retain decision metadata for thirty days. Put no raw bodies, subjects, addresses, tokens or full headers into general logs. Protected local raw evidence follows deletion deadlines; backup retention must not resurrect expired raw records. Store durable references/digests with the decision and disclose when full replay is no longer possible after source deletion.
 
@@ -400,21 +404,25 @@ Validation is recorded in [the simple POC operation report](docs/evidence/simple
 
 **Implementation work**
 
-- Run externally prepared synthetic agent/human/Unknown/ordinary-automation scenarios across Outlook → Outlook and Gmail → Outlook.
-- Exercise qualified and unavailable evidence, initial Unknown, delayed reassessment, category drift, failures and service restart.
+- Run real owner-controlled manual/agent examples across Outlook → Outlook and Gmail → Outlook using arbitrary subjects/bodies; cover Unknown/ordinary automation under the selected policy. No content, sender or message-ID test whitelist may control processing.
+- Connect the existing monitor to the existing scoped writer with explicit `--apply-categories`, private settings and a current endpoint qualification. Keep dry-run as default; add no account, service, app, grant or Azure resource. This owner-authorized synthetic activation precedes the broader Phase 9 pilot.
+- Exercise qualified/unavailable evidence, delayed reassessment, category drift, process restart and transient outage recovery. Keep slow audit IO off the receiving loop; yield collected observations promptly to decisions/categories and measure receipt/ingestion/write/client timing separately.
 - Verify exact category names/colors in Outlook on the web and new Outlook for Windows, preserving existing categories, unread state, content and delivery.
 - Review changed code and run the relevant shared security/contract/integration checks against the exact candidate revision.
 
 **Expected outcomes:** Sanitized end-to-end report, captured category verification and a defect/coverage review.
 
-**Validation criteria:** Trace each applied category to the production rule/evidence/version. Show non-AI API senders and unsigned declarations do not automatically turn red. Verify client display separately from confirmed server write time.
+**Validation criteria:** Trace each applied category to the production rule/evidence/version. Verify the strict default does not treat API/declarations alone as proof. Optional owner-accepted POC modes must disclose their spoofing/ordinary-automation false positives. Verify client display separately from confirmed server write time.
 
 **Exit criteria**
 
-- [ ] Real synthetic mailbox category application/readback and supported-client display tests pass.
-- [ ] Unknown/pending and source-unavailable cases remain honest; no demo binary fallback enters production.
-- [ ] Concurrency/preservation/loop/restart/access/rollback regressions pass.
-- [ ] No unresolved critical/high safety or correctness defect remains; source limitations are documented.
+- [x] Real mailbox category application/readback passes across Outlook/Gmail manual and agent controls, including arbitrary subjects. The owner confirmed displayed Human/AI Agent results.
+- [ ] Exact color/rendering checks for both Outlook on the web and new Outlook for Windows are independently recorded; the owner has not identified the precise client/build matrix.
+- [x] Unknown/pending and source-unavailable cases follow the selected, disclosed policy. Both optional POC indicators retain their explicitly accepted limitations; no message-specific detection or legacy terminal import is used.
+- [x] Concurrency/preservation/loop/restart/access/rollback, arbitrary-subject coverage, slow-audit isolation and transient-read recovery regressions pass.
+- [x] No unresolved critical/high implementation defect remains in tested scope; accepted detection limitations and remaining client/pilot coverage are documented.
+
+Technical validation: [incoming-mail report](docs/evidence/incoming-mail-validation.json). The implementation and measured functional tests are complete; the separate two-client display/build confirmation above remains open. The current scope processes incoming headers for all senders and subjects, with no body/subject inference or message-specific exceptions.
 
 ## Phase 9 — Complete the pilot and production POC handover
 
@@ -422,7 +430,7 @@ Validation is recorded in [the simple POC operation report](docs/evidence/simple
 
 **Implementation work**
 
-- Run dry-run/shadow collection first, then enable category writes for the allowlisted synthetic pilot after detector and writer gates pass.
+- Start from Phase 8's scoped, tested apply mode; run shadow collection before any expansion of the allowlisted synthetic pilot after detector and writer gates pass.
 - Observe ten consecutive business days after the last material fix; track errors, Unknowns, source lag, apply failures, unsafe edits and recovery.
 - Deliver exact run/install/stop/rollback commands, scope/source matrix, retention/credential runbooks, tests and accuracy/coverage evidence.
 - Tag/review/commit/push the approved release, excluding credentials, raw captures and unrelated workbook changes. Ordinary customer-data deployment requires its own recorded boundary.

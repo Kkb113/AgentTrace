@@ -1,4 +1,4 @@
-"""Separate category setup/ownership contracts; no automatic application is enabled."""
+"""Separate category setup/ownership contracts; monitor activation requires an explicit flag."""
 
 from pathlib import Path
 from typing import Literal

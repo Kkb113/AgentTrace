@@ -16,7 +16,7 @@ from .errors import OutlookError, SourceError
 
 DELTA_FIELDS = "id,changeKey,parentFolderId,receivedDateTime,isDraft,categories"
 FOLDER_FIELDS = "id,parentFolderId,childFolderCount,isHidden"
-DETAIL_FIELDS = "id,changeKey,parentFolderId,receivedDateTime,sentDateTime,isDraft,internetMessageId,internetMessageHeaders,categories,subject"
+DETAIL_FIELDS = "id,changeKey,parentFolderId,receivedDateTime,sentDateTime,isDraft,internetMessageId,internetMessageHeaders,categories"
 
 
 class ReadTransport(Protocol):

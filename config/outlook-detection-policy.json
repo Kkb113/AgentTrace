@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "policy_version": "corroborated-poc-human/v3",
+  "policy_version": "corroborated-poc-human/v6",
   "labels": {
     "agent": "AI Agent",
     "compatible_client": "Human",
@@ -18,5 +18,20 @@
   "statistical_accuracy_qualified": false,
   "owner_policy_revision": "Human browser/client policy and corroborated-indicator POC AI rule explicitly approved in this chat on 30 October 2026",
   "provider_rule": "sender-rules/provider-corroborated/v1",
-  "provider_enrollment": "Explicit per-application configuration and live capability qualification; no automatic enrollment by name, API trace or pasted transcript"
+  "provider_enrollment": "Explicit per-application configuration and live capability qualification; no automatic enrollment by name, API trace or pasted transcript",
+  "pending_audit_clean_client": "Human under the compatibility policy; not proof of human identity. Headerless agents can initially receive Human until authenticated evidence arrives.",
+  "optional_known_mcp_marker_poc": {
+    "default_enabled": false,
+    "rule": "sender-rules/known-mcp-marker-poc/v1",
+    "indicator": "Exactly one x-ai-generated: mcp-office365 in a complete, non-conflicting inspected header set",
+    "acceptance": "Owner explicitly accepted header-spoofing false-positive risk on 30 October 2026",
+    "claim": "Header indicator only; authenticated execution is not established by this rule"
+  },
+  "optional_gmail_api_poc": {
+    "default_enabled": false,
+    "rule": "sender-rules/gmail-api-indicator-poc/v1",
+    "indicator": "One unique Gmail API HTTPREST Received hop; identical provider-repeated copies are deduplicated",
+    "acceptance": "Owner explicitly accepted ordinary Gmail API automation false positives on 30 October 2026",
+    "claim": "API transport indicator only; it does not identify Claude or establish agent-specific execution"
+  }
 }

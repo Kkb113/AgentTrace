@@ -106,6 +106,8 @@ def main(argv: list[str] | None = None) -> int:
                                 providers=runtime.sender_source.agent_providers
                                 if runtime.sender_source
                                 else (),
+                                allow_known_mcp_marker=runtime.known_mcp_marker_poc_enabled,
+                                allow_gmail_api_poc=runtime.gmail_api_agent_poc_enabled,
                             )
                             rows.append({"message_ref_sha256": reference, "preview": item})
                         except OutlookError as error:

@@ -219,8 +219,8 @@
       "$ref": "#/$defs/CategoryMapping"
     },
     "data_boundary": {
-      "const": "synthetic_only",
-      "default": "synthetic_only",
+      "const": "mailbox_headers_only",
+      "default": "mailbox_headers_only",
       "title": "Data Boundary",
       "type": "string"
     },
@@ -236,6 +236,16 @@
       "minimum": 60,
       "title": "Folder Refresh Seconds",
       "type": "integer"
+    },
+    "gmail_api_agent_poc_enabled": {
+      "default": false,
+      "title": "Gmail Api Agent Poc Enabled",
+      "type": "boolean"
+    },
+    "known_mcp_marker_poc_enabled": {
+      "default": false,
+      "title": "Known Mcp Marker Poc Enabled",
+      "type": "boolean"
     },
     "lease_seconds": {
       "default": 120,
@@ -344,17 +354,11 @@
       "type": "integer"
     },
     "sync_poll_seconds": {
-      "default": 30,
+      "default": 2,
       "maximum": 600,
-      "minimum": 10,
+      "minimum": 1,
       "title": "Sync Poll Seconds",
       "type": "integer"
-    },
-    "synthetic_subject_prefix": {
-      "const": "AgentTrace synthetic test:",
-      "default": "AgentTrace synthetic test:",
-      "title": "Synthetic Subject Prefix",
-      "type": "string"
     }
   },
   "required": [

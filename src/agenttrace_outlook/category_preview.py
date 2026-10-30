@@ -23,6 +23,8 @@ def category_preview(
     now: datetime,
     *,
     providers: tuple[AgentProvider, ...] = (),
+    allow_known_mcp_marker: bool = False,
+    allow_gmail_api_poc: bool = False,
 ) -> dict[str, Any]:
     verify_ownership(registry, inventory)
     require_annotation_eligible(decision, registry.scope, now)
@@ -33,17 +35,21 @@ def category_preview(
     ):
         raise OutlookError("category_preview_observation_mismatch")
     if decision.rule_version.startswith("sender-rules/"):
-        current = evaluate(observation, snapshot, source, now, providers=providers)
+        current = evaluate(
+            observation,
+            snapshot,
+            source,
+            now,
+            providers=providers,
+            allow_known_mcp_marker=allow_known_mcp_marker,
+            allow_gmail_api_poc=allow_gmail_api_poc,
+        )
         if current.category != decision.category or current.rule_version != decision.rule_version:
             raise OutlookError("category_preview_evidence_stale")
         if tuple(current.reason_codes) != decision.reason_codes:
             raise OutlookError("category_preview_evidence_changed")
-    if (
-        message.get("id") != decision.message_id
-        or message.get("isDraft") is not False
-        or not str(message.get("subject", "")).startswith("AgentTrace synthetic test:")
-    ):
-        raise OutlookError("category_preview_synthetic_message_required")
+    if message.get("id") != decision.message_id or message.get("isDraft") is not False:
+        raise OutlookError("category_preview_message_mismatch")
     categories = message.get("categories")
     if (
         not isinstance(categories, list)

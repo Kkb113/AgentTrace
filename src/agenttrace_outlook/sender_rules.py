@@ -16,21 +16,30 @@ from .contracts import Code, Observation, Opaque, Record
 
 RULE_VERSION: Literal["sender-rules/unknown/v1"] = "sender-rules/unknown/v1"
 CLAUDE_APP = "07c030f6-5743-41b7-ba00-0a6e85f37c17"
-HUMAN_RULE: Literal["sender-rules/human/v2"] = "sender-rules/human/v2"
+HUMAN_RULE: Literal["sender-rules/human/v3"] = "sender-rules/human/v3"
+MCP_MARKER_RULE: Literal["sender-rules/known-mcp-marker-poc/v1"] = (
+    "sender-rules/known-mcp-marker-poc/v1"
+)
+GMAIL_API_RULE: Literal["sender-rules/gmail-api-indicator-poc/v1"] = (
+    "sender-rules/gmail-api-indicator-poc/v1"
+)
 AGENT_RULE: Literal["sender-rules/claude-corroborated/v1"] = "sender-rules/claude-corroborated/v1"
 PROVIDER_RULE: Literal["sender-rules/provider-corroborated/v1"] = (
     "sender-rules/provider-corroborated/v1"
 )
-POLICY_VERSION = "corroborated-poc-human/v3"
+POLICY_VERSION = "corroborated-poc-human/v6"
 
 
 class RuleAssessment(Record):
     rule_version: Literal[
         "sender-rules/unknown/v1",
         "sender-rules/human/v2",
+        "sender-rules/human/v3",
         "sender-rules/human-capable/v1",
         "sender-rules/claude-corroborated/v1",
         "sender-rules/provider-corroborated/v1",
+        "sender-rules/known-mcp-marker-poc/v1",
+        "sender-rules/gmail-api-indicator-poc/v1",
     ] = RULE_VERSION
     category: Literal["Unknown", "Human", "AI Agent"] = "Unknown"
     inspection: Literal["complete", "incomplete", "conflicting"]
@@ -39,7 +48,9 @@ class RuleAssessment(Record):
     agent_execution: Literal[
         "unavailable", "verified_enrolled_send", "conflicting", "not_established"
     ]
-    receipt_link: Literal["unqualified", "missing", "conflicting", "corroborated_indicators"]
+    receipt_link: Literal[
+        "unqualified", "missing", "conflicting", "corroborated_indicators", "header_indicator"
+    ]
     reason_codes: tuple[Code, ...] = Field(min_length=1)
     evidence_refs: tuple[Opaque, ...] = ()
 
@@ -167,6 +178,8 @@ def evaluate(
     now: datetime,
     *,
     providers: tuple[AgentProvider, ...] = (),
+    allow_known_mcp_marker: bool = False,
+    allow_gmail_api_poc: bool = False,
 ) -> RuleAssessment:
     inspection, hints = inspect_snapshot(observation, snapshot)
     reasons = set(hints)
@@ -176,11 +189,16 @@ def evaluate(
     execution: Literal[
         "unavailable", "verified_enrolled_send", "conflicting", "not_established"
     ] = "unavailable"
-    link: Literal["unqualified", "missing", "conflicting", "corroborated_indicators"] = "missing"
+    link: Literal[
+        "unqualified", "missing", "conflicting", "corroborated_indicators", "header_indicator"
+    ] = "missing"
     refs: tuple[str, ...] = ()
     agent = False
     agent_rule: Literal[
-        "sender-rules/claude-corroborated/v1", "sender-rules/provider-corroborated/v1"
+        "sender-rules/claude-corroborated/v1",
+        "sender-rules/provider-corroborated/v1",
+        "sender-rules/known-mcp-marker-poc/v1",
+        "sender-rules/gmail-api-indicator-poc/v1",
     ] = AGENT_RULE
     if source:
         refs = tuple(source.get("evidence_refs", ()))
@@ -189,7 +207,21 @@ def evaluate(
             or source.get("observed_version") != observation.source_version
         ):
             reasons.add("source_stale_or_version_mismatch")
-            human = False
+            # A refresh is not contrary actor evidence. Preserve the explicitly
+            # accepted clean-client interpretation across a routine audit wait;
+            # stale positive/conflicting/error evidence still cannot authorize it.
+            human = (
+                human
+                and source.get("observed_version") == observation.source_version
+                and (
+                    source.get("status") == "normal_client_context"
+                    or source.get("reason") == "completed_send_evidence_missing"
+                    or (
+                        source.get("status") == "pending"
+                        and source.get("reason") == "audit_search_pending"
+                    )
+                )
+            )
         elif source.get("status") == "verified_enrolled_send":
             execution, link = "verified_enrolled_send", "unqualified"
             human = False
@@ -245,9 +277,6 @@ def evaluate(
         ):
             execution = "not_established"
             reasons.add("compatible_path_does_not_establish_controller")
-            if providers and source.get("status") == "pending":
-                human = False
-                reasons.add("enrolled_application_audit_pending")
         else:
             execution = "not_established"
             reasons.add(str(source.get("reason", "completed_send_evidence_missing")))
@@ -255,6 +284,50 @@ def evaluate(
                 human = False
     else:
         reasons.add("authenticated_send_source_unavailable")
+    indicator_conflict = bool(source) and (
+        (source or {}).get("status") in {"conflicting", "normal_client_context"}
+        or (source or {}).get("observed_version") != observation.source_version
+        or (
+            (source or {}).get("status") == "verified_enrolled_send"
+            and (source or {}).get("expires_at", 0) > now.timestamp()
+        )
+    )
+    if (
+        allow_known_mcp_marker
+        and not agent
+        and inspection == "complete"
+        and hints == ("untrusted_agent_declaration",)
+        and not indicator_conflict
+    ):
+        declarations = [
+            row["value"].strip().lower()
+            for row in (snapshot or {}).get("internetMessageHeaders", [])
+            if row.get("name", "").lower() == "x-ai-generated"
+        ]
+        if declarations == ["mcp-office365"]:
+            agent, human, link, agent_rule = True, False, "header_indicator", MCP_MARKER_RULE
+            reasons = {"known_mcp_marker_poc_indicator_spoofable"}
+            refs = ("header-sha256:" + sha({"x-ai-generated": declarations[0]}),)
+    if (
+        allow_gmail_api_poc
+        and not agent
+        and inspection == "complete"
+        and hints == ("generic_api_submission",)
+        and not indicator_conflict
+    ):
+        hops = sorted(
+            {
+                row["value"]
+                for row in (snapshot or {}).get("internetMessageHeaders", [])
+                if row.get("name", "").lower() == "received"
+                and "gmailapi.google.com" in row["value"].lower()
+                and "httprest" in row["value"].lower()
+            }
+        )
+        if len(hops) == 1:
+            agent, human, link, agent_rule = True, False, "header_indicator", GMAIL_API_RULE
+            reasons = {"generic_api_submission", "gmail_api_poc_indicator_not_agent_specific"}
+            refs = ("transport-sha256:" + sha(hops[0]),)
     if observation.observed_at + timedelta(hours=24) < now:
         reasons.add("late_observation_window_closed")
     elif observation.observed_at + timedelta(hours=2) <= now:

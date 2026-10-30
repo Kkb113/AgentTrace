@@ -2,7 +2,7 @@
 
 The current output names are **AI Agent**, **Human** and **Unknown**. Old Human-capable records are readable history; they cannot authorize a new write under the retired rule. Run the detector to obtain a fresh current-rule assessment after the naming migration. The [migration decision](../adr/simple-classification-labels.md) records the owner-UI category replacement and cleanup; no setup app needs recreating.
 
-Use PowerShell under the designated Windows operator profile in `C:\AgentDetection`. The existing category writer certificate and private configuration are required. This is an explicit synthetic-pilot command workflow; the continuous monitor still runs read-only. No new Azure deployment or mail permission is needed.
+Use PowerShell under the existing Windows operator profile in `C:\AgentDetection`. The existing category writer certificate and private configuration are required. These explicit synthetic-pilot commands support qualification, inspection, retry and rollback. The [simple monitor](simple-poc-monitor.md) also supports an explicit scoped apply mode using the same writer and receipts. Stop it before running these commands against its state. No new Azure deployment or mail permission is needed.
 
 All operations need a fresh private `--output` filename; reports are never overwritten. Actual IDs, addresses, headers, category inventory and certificates must stay outside Git. Protect the existing private parent directory and state backup. Stop another runtime before accessing its exclusively locked state; do not copy or edit its live WAL files.
 

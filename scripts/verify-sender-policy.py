@@ -4,7 +4,13 @@ import json
 from pathlib import Path
 
 from agenttrace_outlook.config import CategoryMapping
-from agenttrace_outlook.sender_rules import AGENT_RULE, POLICY_VERSION, PROVIDER_RULE
+from agenttrace_outlook.sender_rules import (
+    AGENT_RULE,
+    GMAIL_API_RULE,
+    MCP_MARKER_RULE,
+    POLICY_VERSION,
+    PROVIDER_RULE,
+)
 
 
 def main() -> int:
@@ -30,6 +36,10 @@ def main() -> int:
         assert policy[field] is False
     assert policy["declaration_or_generic_api_alone"] == "Unknown"
     assert policy["failed_or_incomplete_inspection"] == "Unknown"
+    assert policy["optional_known_mcp_marker_poc"]["rule"] == MCP_MARKER_RULE
+    assert policy["optional_known_mcp_marker_poc"]["default_enabled"] is False
+    assert policy["optional_gmail_api_poc"]["rule"] == GMAIL_API_RULE
+    assert policy["optional_gmail_api_poc"]["default_enabled"] is False
     accuracy = json.loads(
         (Path(__file__).resolve().parents[1] / "config/sender-accuracy-policy.json").read_text(
             encoding="utf-8"
