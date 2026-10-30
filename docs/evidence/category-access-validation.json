@@ -1,0 +1,179 @@
+{
+  "schema_version": "1.0",
+  "executed_at": "2026-10-30T03:49:33.140857+00:00",
+  "milestone": "Scoped Outlook category access and ownership",
+  "phase_status": "complete",
+  "approval": {
+    "before_grant_and_use": true,
+    "date": "2026-10-30",
+    "owner_reply": "Approve the scoped setup, probes and temporary-app retirement",
+    "proposal": "docs/category-access-proposal.md",
+    "residual_privilege_accepted": true
+  },
+  "validated_source_sha256": "53d0b06f6b184557f3e59508eae52b1e5ae4e724d5d94ec146d3d1906181bc7c",
+  "source_files_hashed": 273,
+  "source_hash_scope": "Sorted tracked src/, packages/, scripts/, tests/, config/ plus pyproject.toml, uv.lock and requirements files. SHA256 stream: UTF-8 path + NUL + ASCII byte length + NUL + LF-normalized bytes. Documentation and validation records excluded.",
+  "validation_basis": "Isolated selected-index checkout with pinned Python 3.12.14; unrelated existing evaluation/workbook changes excluded",
+  "gates": {
+    "quality": "passed",
+    "security": "passed",
+    "infrastructure": "passed",
+    "guard_controls": "passed",
+    "integration_end_to_end": "passed",
+    "strict_outlook_types": "passed",
+    "powershell_syntax": "passed",
+    "authenticated_live_category_setup_and_probe": "passed",
+    "writer_only_post_retirement_verification": "passed"
+  },
+  "unit_primary_tests_passed": 532,
+  "unit_subtests_passed": 97,
+  "unit_skipped": 1,
+  "new_category_tests_passed": 34,
+  "integration_tests_passed": 123,
+  "junit_counts_including_subtests": {
+    "unit": {
+      "tests": 630,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "integration": {
+      "tests": 123,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "platform_limit": "One Windows symlink privilege test skipped locally; Linux CI executes it. The real PowerShell replay regression runs on Windows and skips when pwsh is absent on Linux. Windows-native certificate and Exchange setup tested on the designated operator profile.",
+  "scope": {
+    "mailboxes_allowed": 1,
+    "management_scope_members": 1,
+    "existing_identical_scope_reused": true,
+    "scope_filter_or_reader_roles_changed": false,
+    "negative_control": "Existing dedicated disabled-sign-in shared mailbox"
+  },
+  "writer": {
+    "exchange_roles": [
+      "Application Mail.ReadWrite",
+      "Application MailboxSettings.Read"
+    ],
+    "entra_application_grants": 0,
+    "entra_delegated_grants": 0,
+    "directory_membership": 0,
+    "mail_send_or_full_access_granted": false,
+    "master_category_provisioning_grant": false,
+    "certificate_non_exportable": true,
+    "certificate_validity_days": 30
+  },
+  "setup": {
+    "exchange_roles_before_retirement": [
+      "Application MailboxSettings.ReadWrite"
+    ],
+    "exchange_assignment_and_pointer_removed": true,
+    "applications_active_object_absent": true,
+    "servicePrincipals_active_object_absent": true,
+    "retired_at": "2026-10-30T03:27:06.663817+00:00",
+    "previous_token_expires_at": "2026-10-30T04:26:28+00:00",
+    "new_setup_token_issuance_denied": true,
+    "previous_token_data_access_denied": false,
+    "temporary_setup_certificate_removed": true,
+    "writer_certificate_unchanged": true,
+    "runtime_setup_identity_is_null": true,
+    "retired_identity_reconfiguration_blocked": true,
+    "issued_token_retained_on_disk": false,
+    "instantaneous_issued_token_revocation_claimed": false,
+    "cache_caveat": "Issued token still accepted for a category read immediately after retirement; discarded from memory. Expiry is recorded, not a post-expiry rejection test."
+  },
+  "effective_graph_probes": {
+    "owned_categories": 3,
+    "ownership_verified": true,
+    "automatic_application_enabled": false,
+    "allowed_noop_patch_verified": true,
+    "category_membership_unchanged": true,
+    "negative_mail_read_denied": true,
+    "negative_category_read_denied": true,
+    "negative_mailbox_path_patch_denied": true,
+    "existing_read_only_collector_patch_denied": true,
+    "mail_send_attempted": false,
+    "negative_patch_semantics": "Authorization denial on the negative mailbox path using the enrolled synthetic item reference; no negative-mailbox item was read or written",
+    "setup_negative_api_denial_claimed": false,
+    "setup_scope_basis": "Exact same scope; single-member filter and both allowed/denied Exchange simulator role checks before retirement"
+  },
+  "categories": [
+    {
+      "name": "AI Agent",
+      "color": "red",
+      "preset": "preset0"
+    },
+    {
+      "name": "Human-capable",
+      "color": "green",
+      "preset": "preset4"
+    },
+    {
+      "name": "Unknown",
+      "color": "yellow",
+      "preset": "preset3"
+    }
+  ],
+  "owned_definition_count": 3,
+  "live_previews": {
+    "eligible": 2,
+    "labels": [
+      "AI Agent",
+      "Human-capable"
+    ],
+    "blocked_changed_evidence": 1,
+    "classification_labels_applied": 0,
+    "automatic_application_enabled": false,
+    "mail_mutations_by_preview": 0
+  },
+  "regression_scope": [
+    "Case/Unicode/whitespace name conflicts before first POST",
+    "Confirmed partial setup replay and ambiguous POST refusal",
+    "Provider ID/name/color/deletion drift and wrong writer binding",
+    "Only captured unchanged categories plus If-Match in probes",
+    "403 required for server-denial proof; 404/401/transient rejected",
+    "Current rule/decision/expiry checks and unrelated-category preservation",
+    "No apply CLI or automatic activation; retired setup cannot reconfigure"
+  ],
+  "review": "docs/outlook-category-access.md",
+  "operations": "docs/runbooks/outlook-categories.md",
+  "azure_resources_created": 0,
+  "mail_send_calls": 0,
+  "classification_accuracy_claim_changed": false,
+  "private_proof_sha256": {
+    "effective-probe.private.json": "039115592c5b2a4c329d9a7fa8e6472aef37f362a3f7319d025b2384552237e9",
+    "reader-write-denial.private.json": "073dba0068767490432e0726d0b4435ce58276fce5a278d6347100d0665c2b6f",
+    "retirement.private.json": "f6824313046eca0cce63ab360b00ae6a74adee7aeae242b081ae04d77debc831",
+    "retirement-absence.private.json": "32a945811e71394c4ee27fd2025887a353e337cc70b6fda2b6189966162382fa",
+    "exchange-configure.private.json": "2e165c34de831d3950261e97e9dd19e4db19a37d08489741d14c51e761211b5c",
+    "exchange-inspect.private.json": "92f81a6880c7fef4e185dd8113adf46f7536718da167cdc855b251a76a41709d",
+    "entra-inventory.private.json": "1171e4def706399db73920e5ca759c8d8caef4ade5c3494699fdcaed33698153",
+    "category-preview.private.json": "5a1aa85bc314a7daaea87695e9b1792fae91c76af59c3cb817ac5bdf2ad23698",
+    "after-retirement-verification.private.json": "7293cd2ef7de32cdd05e33eb8fe248440e02a5a02977920eb0d04df8703ec34b",
+    "ownership/ownership.json": "8fedc1f9b8db806bac61f7f2c4cc73fc7838d94f48cf96e7a899fb6d5ff21006"
+  },
+  "exit_criteria": [
+    {
+      "id": "accepted_exact_scope_and_residual_privilege",
+      "met": true
+    },
+    {
+      "id": "effective_mailbox_boundary_without_send_or_full_access",
+      "met": true
+    },
+    {
+      "id": "runtime_and_temporary_provisioning_separated_and_retired",
+      "met": true
+    },
+    {
+      "id": "owned_definitions_and_fail_closed_previews_without_activation",
+      "met": true
+    }
+  ],
+  "exit_criteria_met": 4,
+  "exit_criteria_total": 4,
+  "all_exit_criteria_met": true,
+  "remaining_work": "Phase 6 durable category writer, concurrency/readback/rollback; supervised operation and Outlook client display qualification remain later phases."
+}

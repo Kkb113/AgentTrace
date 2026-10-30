@@ -329,10 +329,12 @@ Executed POC evidence: [controlled actual-email recheck](docs/evidence/controlle
 
 **Exit criteria**
 
-- [ ] Exact writer/setup scope and residual privilege are accepted before grant/use.
-- [ ] Effective allowed/denied calls prove mailbox isolation; no Mail.Send/full-access role is granted.
-- [ ] Runtime lacks unnecessary category-provisioning rights and temporary setup access has an exact retirement plan.
-- [ ] Category ownership and preview checks pass; no category application is silently enabled.
+- [x] Exact writer/setup scope and residual privilege are accepted before grant/use.
+- [x] Effective allowed/denied calls prove mailbox isolation; no Mail.Send/full-access role is granted.
+- [x] Runtime lacks unnecessary category-provisioning rights and temporary setup access has an exact retirement plan.
+- [x] Category ownership and preview checks pass; no category application is silently enabled.
+
+Executed evidence: [category access and ownership review](docs/outlook-category-access.md), [operations](docs/runbooks/outlook-categories.md) and [validation record](docs/evidence/category-access-validation.json). The approved one-mailbox writer has two scoped roles and no additive Entra grants. Three owned color definitions exist; an unchanged-array PATCH/readback, actual negative authorization probes and reader-write denial passed. Temporary setup grants/registration/key were removed and new setup tokens were denied. An already-issued token still permitted a read immediately after cleanup, with recorded expiry 30 October 2026 at 04:26:28 UTC; immediate universal revocation is not claimed. Two current decision previews passed and one changed-evidence preview was blocked. No detection label was applied; automatic application remains Phase 6 work.
 
 ## Phase 6 — Implement the idempotent category writer
 
